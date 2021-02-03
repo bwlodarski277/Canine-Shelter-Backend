@@ -47,8 +47,8 @@ CREATE TABLE `dogLocations`
 
 CREATE TABLE `breeds`
 (
-    `id`          int PRIMARY KEY,
-    `name`        varchar(255) NOT NULL,
+    `id`          int PRIMARY KEY AUTO_INCREMENT,
+    `name`        varchar(32) NOT NULL,
     `description` text
 );
 
