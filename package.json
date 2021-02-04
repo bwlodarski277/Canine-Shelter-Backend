@@ -1,0 +1,24 @@
+{
+  "name": "canine-shelter-backend",
+  "version": "0.0.1",
+  "description": "The backend code for The Canine Shelter.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.coventry.ac.uk/6003CEM-2021JANMAY/6003CEM_backend.git"
+  },
+  "author": "Bartlomiej Wlodarski",
+  "license": "ISC",
+  "dependencies": {
+    "koa": "^2.13.1",
+    "koa-bodyparser": "^4.3.0",
+    "koa-router": "^10.0.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.7"
+  }
+}
