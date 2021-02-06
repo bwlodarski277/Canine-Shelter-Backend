@@ -1,18 +1,14 @@
 const Koa = require('koa');
-const Router = require('koa-router');
 
 const app = new Koa();
 
-const router = new Router();
+const special = require('./routes/special');
+const users = require('./routes/users');
+const dogs = require('./routes/dogs');
 
-router.get('/', welcome);
-
-async function welcome(ctx) {
-    const data = { message: 'The Canine Shelter API' };
-    ctx.body = data;
-}
-
-app.use(router.routes());
+app.use(special.routes());
+app.use(users.routes());
+app.use(dogs.routes());
 
 const port = process.env.PORT || 3000;
 
