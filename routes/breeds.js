@@ -1,81 +1,58 @@
 const Router = require('koa-router');
 const bodyParser = require('koa-bodyparser');
 
+const model = require('../models/breeds');
+
 const router = new Router({ prefix: '/api/v1/breeds' });
-
-let breeds = [
-    {
-        name: 'Shiba Inu',
-        description: 'A breed of good bois.'
-    }
-]
-
-/**
- * Creates a date string.
- */
-async function getCurrentDate() {
-    const now = new Date();
-    const date = `${now.getDate()}/${now.getMonth()}/${now.getFullYear()}`;
-    return date;
-}
-
-/**
- * Checks if an ID is valid.
- * @param {int} id ID to check
- */
-const isValid = id => id < breeds.length + 1 && id > 0;
 
 router.get('/', getAll);
 router.post('/', bodyParser(), addBreed);
 
 router.get('/:id([0-9]{1,})', getBreed);
-router.put('/:id([0-9]{1,})', updateBreed);
+router.put('/:id([0-9]{1,})', bodyParser(), updateBreed);
 router.del('/:id([0-9]{1,})', deleteBreed);
 
 /**
  * Gets all the breeds from the database.
  */
 async function getAll(ctx) {
-    ctx.body = breeds;
+    ctx.body = await model.getAll();
 }
 
 /**
  * Gets a single breed from the database.
  */
 async function getBreed(ctx) {
-    const id = parseInt(ctx.params.id);
-    if (isValid(id))
-        ctx.body = breeds[id - 1];
-    else
-        ctx.status = 404;
+    const id = ctx.params.id;
+    ctx.body = await model.getById(id);
 }
 
 /**
  * Adds a breed to the database.
  */
 async function addBreed(ctx) {
-    const { name, description } = ctx.request.body;
-    const date = await getCurrentDate();
-    // Creating a new breed
-    let newBreed = { name, description };
-    breeds.push(newBreed);
-    ctx.status = 201;
-    ctx.body = newBreed;
+    const body = ctx.request.body;
+    const id = await model.add(body);
+    if (id) {
+        ctx.status = 201;
+        ctx.body = { ID: id, created: true, link: `${ctx.request.path}/${id}` };
+    }
 }
 
 /**
  * Updates a breed in the database.
  */
 async function updateBreed(ctx) {
-    const id = parseInt(ctx.params.id);
-    if (isValid(id)) {
-        // Constructing updated breed
-        const { name, description } = ctx.request.body;
-        const updatedBreed = { name, description };
-
-        ctx.body = updatedBreed;
-    } else {
-        ctx.status = 404;
+    const breed_id = ctx.params.id;
+    let breed = await model.getById(breed_id);
+    if (breed) {
+        // Excluding fields that must not be updated
+        const { id, ...body } = ctx.request.body;
+        Object.assign(breed, body); // overwriting everything else
+        const result = await model.update(breed_id, breed);
+        if (result) { // Knex returns amount of affected rows.
+            ctx.body = { id: breed_id, updated: true, link: ctx.request.path };
+        }
     }
 }
 
@@ -83,12 +60,13 @@ async function updateBreed(ctx) {
  * Deletes a breed from the database.
  */
 async function deleteBreed(ctx) {
-    const id = parseInt(ctx.params.id);
-    if (isValid(id)) {
-        breeds.splice(id - 1, 1);
-        ctx.status = 200;
-    } else {
-        ctx.status = 404;
+    const id = ctx.params.id;
+    let breed = await model.getById(id);
+    if (breed) {
+        const result = await model.delete(id);
+        if (result) {
+            ctx.status = 200;
+        }
     }
 }
 
