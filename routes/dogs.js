@@ -1,94 +1,70 @@
 const Router = require('koa-router');
 const bodyParser = require('koa-bodyparser');
 
+const dogModel = require('../models/dogs');
+const dogBreedModel = require('../models/dogBreeds');
+const dogLocationModel = require('../models/dogLocations');
+
 const router = new Router({ prefix: '/api/v1/dogs' });
-
-let dogs = [
-    {
-        name: 'Doggo',
-        description: 'A good boi.',
-        views: 0,
-        age: 4,
-        gender: 'male',
-        imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/18/Samojed00.jpg/1024px-Samojed00.jpg',
-        dateCreated: '23/12/2019',
-        dateModified: '23/12/2019'
-    }
-]
-
-/**
- * Creates a date string.
- */
-async function getCurrentDate() {
-    const now = new Date();
-    const date = `${now.getDate()}/${now.getMonth()}/${now.getFullYear()}`;
-    return date;
-}
-
-/**
- * Checks if an ID is valid.
- * @param {int} id ID to check
- */
-const isValid = id => id < dogs.length + 1 && id > 0;
 
 router.get('/', getAll);
 router.post('/', bodyParser(), addDog);
 
 router.get('/:id([0-9]{1,})', getDog);
-router.put('/:id([0-9]{1,})', updateDog);
+router.put('/:id([0-9]{1,})', bodyParser(), updateDog);
 router.del('/:id([0-9]{1,})', deleteDog);
+
+router.get('/:id([0-9]{1,})/breed', getDogBreed);
+router.post('/:id([0-9]{1,})/breed', bodyParser(), addDogBreed);
+router.put('/:id([0-9]{1,})/breed', bodyParser(), updateDogBreed);
+router.del('/:id([0-9]{1,})/breed', deleteDogBreed);
+
+router.get('/:id([0-9]{1,})/location', getDogLocation);
+router.post('/:id([0-9]{1,})/location', bodyParser(), addDogLocation);
+router.put('/:id([0-9]{1,})/location', bodyParser(), updateDogLocation);
+router.del('/:id([0-9]{1,})/location', deleteDogLocation);
 
 /**
  * Gets all the dogs from the database.
  */
 async function getAll(ctx) {
-    ctx.body = dogs;
+    ctx.body = await dogModel.getAll();
 }
 
 /**
  * Gets a single dog from the database.
  */
 async function getDog(ctx) {
-    const id = parseInt(ctx.params.id);
-    if (isValid(id)) {
-        dogs[id - 1].views++;
-        ctx.body = dogs[id - 1];
-    } else
-        ctx.status = 404;
+    const id = ctx.params.id;
+    ctx.body = await dogModel.getById(id);
 }
 
 /**
  * Adds a dog to the database.
  */
 async function addDog(ctx) {
-    const { name, description, age, gender, imageUrl } = ctx.request.body;
-    const date = await getCurrentDate();
-    // Creating a new dog
-    let newDog = {
-        name, description, age, gender, imageUrl,
-        dateCreated: date, dateModified: date
-    };
-    dogs.push(newDog);
-    ctx.status = 201;
-    ctx.body = newDog;
+    const body = ctx.request.body;
+    const id = await dogModel.add(body);
+    if (id) {
+        ctx.status = 201;
+        ctx.body = { ID: id, created: true, link: `${ctx.request.path}/${id}` };
+    }
 }
 
 /**
  * Updates a dog in the database.
  */
 async function updateDog(ctx) {
-    const id = parseInt(ctx.params.id);
-    if (isValid(id)) {
-        const dog = dogs[id - 1];
-        // Constructing updated dog
-        const { name, description, age, gender, imageUrl } = ctx.request.body;
-        const { dateCreated } = dog;
-        const dateModified = await getCurrentDate();
-        const updatedDog = { name, description, age, gender, imageUrl, dateCreated, dateModified };
-
-        ctx.body = updatedDog;
-    } else {
-        ctx.status = 404;
+    const dog_id = ctx.params.id;
+    let dog = await dogModel.getById(dog_id);
+    if (dog) {
+        // Excluding fields that must not be updated
+        const { id, dateCreated, dateModified, ...body } = ctx.request.body;
+        Object.assign(dog, body); // overwriting everything else
+        const result = await dogModel.update(dog_id, dog);
+        if (result) { // Knex returns amount of affected rows.
+            ctx.body = { id: dog_id, updated: true, link: ctx.request.path };
+        }
     }
 }
 
@@ -96,12 +72,77 @@ async function updateDog(ctx) {
  * Deletes a dog from the database.
  */
 async function deleteDog(ctx) {
-    const id = parseInt(ctx.params.id);
-    if (isValid(id)) {
-        dogs.splice(id - 1, 1);
+    const id = ctx.params.id;
+    let dog = await dogModel.getById(id);
+    if (dog) {
+        const result = await dogModel.delete(id);
+        if (result) {
+            ctx.status = 200;
+        }
+    }
+}
+
+async function getDogBreed(ctx) {
+    const id = ctx.params.id;
+    let dogBreed = await dogBreedModel.getByDogId(id);
+    ctx.body = dogBreed
+}
+
+async function addDogBreed(ctx) {
+    const dogId = ctx.params.id;
+    const { breedId } = ctx.request.body;
+    const result = await dogBreedModel.add(dogId, breedId);
+    if (result === 0) { // 0 as add function returns PK of inserted row
+        ctx.status = 201;
+    }
+}
+
+async function updateDogBreed(ctx) {
+    const dogId = ctx.params.id;
+    const { breedId } = ctx.request.body;
+    let id = await dogBreedModel.update(dogId, breedId);
+    if (id) {
         ctx.status = 200;
-    } else {
-        ctx.status = 404;
+    }
+}
+
+async function deleteDogBreed(ctx) {
+    const dogId = ctx.params.id;
+    let id = await dogBreedModel.delete(dogId);
+    if (id) {
+        ctx.status = 200;
+    }
+}
+
+async function getDogLocation(ctx) {
+    const id = ctx.params.id;
+    let dogLocation = await dogLocationModel.getByDogId(id);
+    ctx.body = dogLocation
+}
+
+async function addDogLocation(ctx) {
+    const dogId = ctx.params.id;
+    const { locationId } = ctx.request.body;
+    const result = await dogLocationModel.add(dogId, locationId);
+    if (result === 0) { // 0 as add function returns PK of inserted row
+        ctx.status = 201;
+    }
+}
+
+async function updateDogLocation(ctx) {
+    const dogId = ctx.params.id;
+    const { locationId } = ctx.request.body;
+    let id = await dogLocationModel.update(dogId, locationId);
+    if (id) {
+        ctx.status = 200;
+    }
+}
+
+async function deleteDogLocation(ctx) {
+    const dogId = ctx.params.id;
+    let id = await dogLocationModel.delete(dogId);
+    if (id) {
+        ctx.status = 200;
     }
 }
 
