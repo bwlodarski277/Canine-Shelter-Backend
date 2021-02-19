@@ -21,6 +21,7 @@ router.del('/:id([0-9]{1,})/favourites/:dogId', deleteUserFav);
 
 /**
  * Gets all the users from the database.
+ * @param {object} ctx context passed from Koa.
  */
 async function getAll(ctx) {
     ctx.body = await userModel.getAll();
@@ -28,6 +29,7 @@ async function getAll(ctx) {
 
 /**
  * Gets a single user from the database.
+ * @param {object} ctx context passed from Koa.
  */
 async function getUser(ctx) {
     const id = ctx.params.id;
@@ -39,6 +41,7 @@ async function getUser(ctx) {
 
 /**
  * Adds a user to the database.
+ * @param {object} ctx context passed from Koa.
  */
 async function createUser(ctx) {
     const body = ctx.request.body;
@@ -51,6 +54,7 @@ async function createUser(ctx) {
 
 /**
  * Updates a user in the database.
+ * @param {object} ctx context passed from Koa.
  */
 async function updateUser(ctx) {
     const user_id = ctx.params.id;
@@ -68,6 +72,7 @@ async function updateUser(ctx) {
 
 /**
  * Deletes a user from the database.
+ * @param {object} ctx context passed from Koa.
  */
 async function deleteUser(ctx) {
     const id = ctx.params.id;
@@ -80,6 +85,10 @@ async function deleteUser(ctx) {
     }
 }
 
+/**
+ * Gets a user's favourites.
+ * @param {object} ctx context passed from Koa.
+ */
 async function getUserFavs(ctx) {
     const id = ctx.params.id;
     let favs = await favsModel.getByUserId(id);
@@ -88,6 +97,10 @@ async function getUserFavs(ctx) {
     }
 }
 
+/**
+ * Adds a dog to a user's favourites by dog ID.
+ * @param {object} ctx context passed from Koa.
+ */
 async function addUserFav(ctx) {
     const userId = ctx.params.id;
     const { dogId } = ctx.request.body;
@@ -97,6 +110,10 @@ async function addUserFav(ctx) {
     }
 }
 
+/**
+ * Gets a user's favourite from the database by dog ID.
+ * @param {object} ctx context passed from Koa.
+ */
 async function getUserFav(ctx) {
     const userId = ctx.params.id;
     const dogId = ctx.params.dogId;
@@ -106,6 +123,10 @@ async function getUserFav(ctx) {
     }
 }
 
+/**
+ * Delete a user's favourite dog by ID.
+ * @param {object} ctx context passed from Koa.
+ */
 async function deleteUserFav(ctx) {
     const userId = ctx.params.id;
     const dogId = ctx.params.dogId;

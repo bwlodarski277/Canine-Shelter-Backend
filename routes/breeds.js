@@ -14,13 +14,15 @@ router.del('/:id([0-9]{1,})', deleteBreed);
 
 /**
  * Gets all the breeds from the database.
+ * @param {object} ctx context passed from Koa.
  */
 async function getAll(ctx) {
     ctx.body = await model.getAll();
 }
 
 /**
- * Gets a single breed from the database.
+ * Gets a single breed from the database by breed ID.
+ * @param {object} ctx context passed from Koa.
  */
 async function getBreed(ctx) {
     const id = ctx.params.id;
@@ -29,6 +31,7 @@ async function getBreed(ctx) {
 
 /**
  * Adds a breed to the database.
+ * @param {object} ctx context passed from Koa.
  */
 async function addBreed(ctx) {
     const body = ctx.request.body;
@@ -40,7 +43,8 @@ async function addBreed(ctx) {
 }
 
 /**
- * Updates a breed in the database.
+ * Updates a breed in the database by breed ID.
+ * @param {object} ctx context passed from Koa.
  */
 async function updateBreed(ctx) {
     const breed_id = ctx.params.id;
@@ -57,7 +61,8 @@ async function updateBreed(ctx) {
 }
 
 /**
- * Deletes a breed from the database.
+ * Deletes a breed from the database by breed ID.
+ * @param {object} ctx context passed from Koa.
  */
 async function deleteBreed(ctx) {
     const id = ctx.params.id;

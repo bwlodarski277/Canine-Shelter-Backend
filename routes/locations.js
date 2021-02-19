@@ -14,13 +14,15 @@ router.del('/:id([0-9]{1,})', deleteLocation);
 
 /**
  * Gets all the locations from the database.
+ * @param {object} ctx context passed from Koa.
  */
 async function getAll(ctx) {
     ctx.body = await model.getAll();
 }
 
 /**
- * Gets a single location from the database.
+ * Gets a single location from the database by ID.
+ * @param {object} ctx context passed from Koa.
  */
 async function getLocation(ctx) {
     const id = ctx.params.id;
@@ -29,6 +31,7 @@ async function getLocation(ctx) {
 
 /**
  * Adds a location to the database.
+ * @param {object} ctx context passed from Koa.
  */
 async function addLocation(ctx) {
     const body = ctx.request.body;
@@ -40,7 +43,8 @@ async function addLocation(ctx) {
 }
 
 /**
- * Updates a location in the database.
+ * Updates a location in the database by ID.
+ * @param {object} ctx context passed from Koa.
  */
 async function updateLocation(ctx) {
     const location_id = ctx.params.id;
@@ -57,7 +61,8 @@ async function updateLocation(ctx) {
 }
 
 /**
- * Deletes a location from the database.
+ * Deletes a location from the database by ID.
+ * @param {object} ctx context passed from Koa.
  */
 async function deleteLocation(ctx) {
     const id = ctx.params.id;
