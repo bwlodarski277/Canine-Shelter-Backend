@@ -13,6 +13,19 @@ exports.getByUserId = async userId => {
 }
 
 /**
+ * Gets a single favourite by user ID and dog ID.
+ * @param {number} userId ID of user's favourite to fetch.
+ * @param {number} dogId ID of favourited dog to fetch.
+ * @returns {Promise<object>} record of user's favourited dog.
+ * @async
+ */
+exports.getSingleFav = async (userId, dogId) => {
+    const [data] = await run(async () =>
+        await db('favourites').where({ userId, dogId }));
+    return data;
+}
+
+/**
  * Gets a list of users that favourited a dog.
  * @param {number} dogId ID of the dog to find the favourites of.
  * @returns {Promise<Array<object>>} list of users who favourited a dog.
