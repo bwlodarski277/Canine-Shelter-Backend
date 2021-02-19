@@ -13,6 +13,7 @@ exports.getByDogId = async dogId => {
 /**
  * Gets all the dogs with a location ID.
  * @param {number} locationId ID of the location to fetch.
+ * @returns {Array<object>} list of dogs at the given location.
  */
 exports.getByLocationId = async locationId => {
     const data = await run(async () =>
@@ -22,28 +23,32 @@ exports.getByLocationId = async locationId => {
 
 /**
  * Creates a new location entry in the DB.
- * @param {Object} location location data to pass to the DB.
+ * @param {number} dogId ID of the dog to set the location of.
+ * @param {number} locationId ID of the location to assign to the dog.
+ * @returns {true} confirmation of insertion.
  */
 exports.add = async (dogId, locationId) => {
-    const [data] = await run(async () =>
+    await run(async () =>
         await db('dogLocations').insert({ dogId, locationId }));
-    return data;
+    return true;
 }
 
 /**
  * Updates a location entry in the DB.
- * @param {number} dogId ID of the dog to update
- * @param {number} locationId ID to assign to the dog
+ * @param {number} dogId ID of the dog to update.
+ * @param {number} locationId ID to assign to the dog.
+ * @returns {object} updated location entry.
  */
 exports.update = async (dogId, locationId) => {
-    const data = await run(async () =>
+    const [data] = await run(async () =>
         await db('dogLocations').where({ dogId }).update({ locationId }));
     return data;
 }
 
 /**
  * Deletes a dog location entry from the DB.
- * @param {Object} id ID of the location to delete
+ * @param {number} dogId ID of the location to delete.
+ * @returns {number} number of affected rows (should be 1).
  */
 exports.delete = async dogId => {
     const data = await run(async () =>

@@ -1,8 +1,9 @@
 const { db, run } = require('../helpers/database');
 
 /**
- * Gets all the dogs with a breed ID.
+ * Gets a list of a user's favourite dogs.
  * @param {number} userId ID of the user's favourites to fetch.
+ * @returns {Array<object>} list of the user's favourite dogs.
  */
 exports.getByUserId = async userId => {
     const data = await run(async () =>
@@ -10,27 +11,34 @@ exports.getByUserId = async userId => {
     return data;
 }
 
-exports.getByDogId = async (userId, dogId) => {
-    const [data] = await run(async () =>
-        await db('favourites').where({ userId, dogId }));
+/**
+ * Gets a list of users that favourited a dog.
+ * @param {number} dogId ID of the dog to find the favourites of.
+ * @returns {Array<object>} list of users who favourited a dog.
+ */
+exports.getByDogId = async dogId => {
+    const data = await run(async () =>
+        await db('favourites').where({ dogId }));
     return data;
 }
 
 /**
  * Creates a new favourite entry in the DB.
- * @param {number} userId ID of user adding a favourite
- * @param {number} dogId ID of dog a user wants to favourite
+ * @param {number} userId ID of user adding a favourite.
+ * @param {number} dogId ID of dog a user wants to favourite.
+ * @returns {true} confirmation of insertion.
  */
 exports.add = async (userId, dogId) => {
-    const data = await run(async () =>
+    await run(async () =>
         await db('favourites').insert({ userId, dogId }));
-    return data;
+    return true;
 }
 
 /**
  * Deletes a favourite entry from the DB.
- * @param {number} userId ID of user wanting to remove favourite
- * @param {number} dogId ID of dog the user wants to delete a favourite of
+ * @param {number} userId ID of favouriting user.
+ * @param {number} dogId ID of favourited dog.
+ * @returns {number} number of affected rows (should be 1).
  */
 exports.delete = async (userId, dogId) => {
     const data = await run(async () =>
