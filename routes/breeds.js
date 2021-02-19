@@ -26,7 +26,10 @@ async function getAll(ctx) {
  */
 async function getBreed(ctx) {
     const id = ctx.params.id;
-    ctx.body = await model.getById(id);
+    const breed = await model.getById(id);
+    if (breed) {
+        ctx.body = breed;
+    }
 }
 
 /**
@@ -52,8 +55,11 @@ async function updateBreed(ctx) {
     if (breed) {
         // Excluding fields that must not be updated
         const { id, ...body } = ctx.request.body;
-        Object.assign(breed, body); // overwriting everything else
+
+        // overwriting everything else
+        Object.assign(breed, body);
         const result = await model.update(breed_id, breed);
+
         if (result) { // Knex returns amount of affected rows.
             ctx.body = { id: breed_id, updated: true, link: ctx.request.path };
         }
