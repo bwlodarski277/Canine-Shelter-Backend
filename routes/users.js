@@ -16,8 +16,8 @@ router.del('/:id([0-9]{1,})', deleteUser);
 router.get('/:id([0-9]{1,})/favourites', getUserFavs);
 router.post('/:id([0-9]{1,})/favourites', bodyParser(), addUserFav);
 
-router.get('/:id([0-9]{1,})/favourites/:dogId', getUserFav);
-router.del('/:id([0-9]{1,})/favourites/:dogId', deleteUserFav);
+router.get('/:id([0-9]{1,})/favourites/:dogId([0-9]{1,})', getUserFav);
+router.del('/:id([0-9]{1,})/favourites/:dogId([0-9]{1,})', deleteUserFav);
 
 /**
  * Gets all the users from the database.
@@ -57,15 +57,19 @@ async function createUser(ctx) {
  * @param {object} ctx context passed from Koa.
  */
 async function updateUser(ctx) {
-    const user_id = ctx.params.id;
-    let user = await userModel.getById(user_id);
+    const userId = ctx.params.id;
+    let user = await userModel.getById(userId);
     if (user) {
         // Excluding fields that must not be updated
         const { id, dateCreated, ...body } = ctx.request.body;
-        Object.assign(user, body); // overwriting everything else
-        const result = await userModel.update(user_id, user);
-        if (result) { // Knex returns amount of affected rows.
-            ctx.body = { id: user_id, updated: true, link: ctx.request.path };
+
+        // overwriting everything else
+        Object.assign(user, body);
+        const result = await userModel.update(userId, user);
+
+        // Knex returns amount of affected rows.
+        if (result) {
+            ctx.body = { id: userId, updated: true, link: `${ctx.request.path}/${id}` };
         }
     }
 }
@@ -76,7 +80,7 @@ async function updateUser(ctx) {
  */
 async function deleteUser(ctx) {
     const id = ctx.params.id;
-    let user = await userModel.getById(id);
+    const user = await userModel.getById(id);
     if (user) {
         const result = await userModel.delete(id);
         if (result) {
@@ -91,9 +95,9 @@ async function deleteUser(ctx) {
  */
 async function getUserFavs(ctx) {
     const id = ctx.params.id;
-    let favs = await favsModel.getByUserId(id);
-    if (favs) {
-        ctx.body = favs
+    const favourites = await favsModel.getByUserId(id);
+    if (favourites) {
+        ctx.body = favourites;
     }
 }
 
@@ -105,7 +109,7 @@ async function addUserFav(ctx) {
     const userId = ctx.params.id;
     const { dogId } = ctx.request.body;
     const result = await favsModel.add(userId, dogId);
-    if (result === 0) { // 0 since add returns PK of inserted row
+    if (result) {
         ctx.status = 201;
     }
 }
@@ -117,7 +121,7 @@ async function addUserFav(ctx) {
 async function getUserFav(ctx) {
     const userId = ctx.params.id;
     const dogId = ctx.params.dogId;
-    const result = await favsModel.getByDogId(userId, dogId);
+    const result = await favsModel.getSingleFav(userId, dogId);
     if (result) {
         ctx.body = result;
     }
