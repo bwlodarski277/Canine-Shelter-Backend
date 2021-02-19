@@ -1,13 +1,32 @@
 const { db, run } = require('../helpers/database');
 const bcrypt = require('bcrypt');
 
+/** List of columns to return from the DB (excludes password). */
+const cols = [
+    'id', 'username', 'email', 'firstName',
+    'lastName', 'dateCreated', 'dateModified', 'imageUrl'];
+
+/**
+ * Gets a user entry by their username.
+ * Used for authentication only!
+ * @param {string} username User's unique username.
+ * @returns {Promise<object>} user's record from the DB.
+ * @async
+ */
+exports.findByUsername = async username => {
+    const [data] = await run(async () =>
+        await db('users').where({ username }));
+    return data;
+}
+
 /**
  * Gets all users from the DB.
  * @returns {Promise<Array<object>>} list of users in the DB.
  * @async
  */
 exports.getAll = async () => {
-    const data = await run(async () => await db('users'));
+    const data = await run(async () =>
+        await db('users').select(...cols));
     return data;
 }
 
@@ -19,7 +38,7 @@ exports.getAll = async () => {
  */
 exports.getById = async id => {
     const [data] = await run(async () =>
-        await db('users').where({ id }));
+        await db('users').where({ id }).select(...cols));
     return data;
 }
 
