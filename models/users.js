@@ -44,7 +44,7 @@ exports.add = async user => {
  * Updates a user record in the DB.
  * @param {number} id ID of the user to update
  * @param {object} user user data to pass to the DB.
- * @returns {Promise<number>} ID of the newly inserted row.
+ * @returns {Promise<object>} updated user entry.
  * @async
  */
 exports.update = async (id, user) => {
