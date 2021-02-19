@@ -2,7 +2,8 @@ const { db, run } = require('../helpers/database');
 
 /**
  * Gets all location entries from the DB.
- * @returns {Array<object>} array of all location records.
+ * @returns {Promise<Array<object>>} array of all location records.
+ * @async
  */
 exports.getAll = async () => {
     const data = await run(async () => await db('locations'));
@@ -12,7 +13,8 @@ exports.getAll = async () => {
 /**
  * Gets a single location entry from the DB by its ID.
  * @param {number} id ID of the location to fetch.
- * @returns {object} object containing the locations's record.
+ * @returns {Promise<object>} object containing the locations's record.
+ * @async
  */
 exports.getById = async id => {
     const [data] = await run(async () =>
@@ -23,7 +25,8 @@ exports.getById = async id => {
 /**
  * Creates a new location entry in the DB.
  * @param {object} location location data to pass to the DB.
- * @returns {number} ID of the newly inserted row.
+ * @returns {Promise<number>} ID of the newly inserted row.
+ * @async
  */
 exports.add = async location => {
     const [data] = await run(async () =>
@@ -35,7 +38,8 @@ exports.add = async location => {
  * Updates a location entry in the DB.
  * @param {number} id ID of the location to update.
  * @param {object} location data to pass to the DB.
- * @returns {object} updated database entry.
+ * @returns {Promise<object>} updated database entry.
+ * @async
  */
 exports.update = async (id, location) => {
     const [data] = await run(async () =>
@@ -46,7 +50,8 @@ exports.update = async (id, location) => {
 /**
  * Deletes a location entry from the DB.
  * @param {number} id ID of the location to delete.
- * @returns {number} number of affected rows (should be 1).
+ * @returns {Promise<number>} number of affected rows (should be 1).
+ * @async
  */
 exports.delete = async id => {
     const data = await run(async () =>

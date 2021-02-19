@@ -2,7 +2,8 @@ const { db, run } = require('../helpers/database');
 
 /**
  * Gets all dog entries from the DB.
- * @returns {Array<object>} array of all dog records.
+ * @returns {Promise<Array<object>>} array of all dog records.
+ * @async
  */
 exports.getAll = async () => {
     const data = await run(async () => await db('dogs'));
@@ -12,7 +13,8 @@ exports.getAll = async () => {
 /**
  * Gets a single dog entry from the DB by their ID.
  * @param {number} id ID of the dog to fetch.
- * @returns {object} object containing the dog's record.
+ * @returns {Promise<object>} object containing the dog's record.
+ * @async
  */
 exports.getById = async id => {
     const [data] = await run(async () =>
@@ -23,7 +25,8 @@ exports.getById = async id => {
 /**
  * Creates a new dog entry in the DB.
  * @param {object} dog dog data to pass to the DB.
- * @returns {number} ID of the newly inserted row.
+ * @returns {Promise<number>} ID of the newly inserted row.
+ * @async
  */
 exports.add = async dog => {
     const [data] = await run(async () =>
@@ -35,7 +38,8 @@ exports.add = async dog => {
  * Updates a dog entry in the DB.
  * @param {number} id ID of the dog to update.
  * @param {object} dog data to pass to the DB.
- * @returns {object} updated database entry.
+ * @returns {Promise<object>} updated database entry.
+ * @async
  */
 exports.update = async (id, dog) => {
     const [data] = await run(async () =>
@@ -46,7 +50,8 @@ exports.update = async (id, dog) => {
 /**
  * Deletes a dog entry from the DB.
  * @param {number} id ID of the dog to delete.
- * @returns {number} number of affected rows (should be 1).
+ * @returns {Promise<number>} number of affected rows (should be 1).
+ * @async
  */
 exports.delete = async id => {
     const data = await run(async () =>
