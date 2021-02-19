@@ -14,21 +14,27 @@ router.del('/:id([0-9]{1,})', deleteBreed);
 
 /**
  * Gets all the breeds from the database.
+ * @param {object} ctx context passed from Koa.
  */
 async function getAll(ctx) {
     ctx.body = await model.getAll();
 }
 
 /**
- * Gets a single breed from the database.
+ * Gets a single breed from the database by breed ID.
+ * @param {object} ctx context passed from Koa.
  */
 async function getBreed(ctx) {
     const id = ctx.params.id;
-    ctx.body = await model.getById(id);
+    const breed = await model.getById(id);
+    if (breed) {
+        ctx.body = breed;
+    }
 }
 
 /**
  * Adds a breed to the database.
+ * @param {object} ctx context passed from Koa.
  */
 async function addBreed(ctx) {
     const body = ctx.request.body;
@@ -40,7 +46,8 @@ async function addBreed(ctx) {
 }
 
 /**
- * Updates a breed in the database.
+ * Updates a breed in the database by breed ID.
+ * @param {object} ctx context passed from Koa.
  */
 async function updateBreed(ctx) {
     const breed_id = ctx.params.id;
@@ -48,8 +55,11 @@ async function updateBreed(ctx) {
     if (breed) {
         // Excluding fields that must not be updated
         const { id, ...body } = ctx.request.body;
-        Object.assign(breed, body); // overwriting everything else
+
+        // overwriting everything else
+        Object.assign(breed, body);
         const result = await model.update(breed_id, breed);
+
         if (result) { // Knex returns amount of affected rows.
             ctx.body = { id: breed_id, updated: true, link: ctx.request.path };
         }
@@ -57,7 +67,8 @@ async function updateBreed(ctx) {
 }
 
 /**
- * Deletes a breed from the database.
+ * Deletes a breed from the database by breed ID.
+ * @param {object} ctx context passed from Koa.
  */
 async function deleteBreed(ctx) {
     const id = ctx.params.id;

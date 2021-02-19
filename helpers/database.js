@@ -18,7 +18,9 @@ exports.db = knex({
 /**
  * Wrapper for DB queries.
  * Handles errors to make sure sensitive info doesn't leak.
- * @param {Object} dbQuery query function to execute
+ * @param {function} dbQuery query function to execute
+ * @returns {object|Array<object>} data returned from `dbQuery`
+ * @throws {DatabaseException} when a database exceptiono occurs.
  */
 exports.run = async dbQuery => {
     try {
@@ -30,9 +32,18 @@ exports.run = async dbQuery => {
     }
 };
 
-
-function DatabaseException(message, code) {
-    this.message = message;
-    this.code = code;
-    this.name = "DatabaseException";
+/**
+ * Database Exception class.
+ * Used to hide sensitive information when an error happens in the DB.
+ */
+class DatabaseException {
+    /**
+     * @param {string} message error message to provide
+     * @param {number|string} code exception's error code
+     */
+    constructor(message, code) {
+        this.message = message;
+        this.code = code;
+        this.name = "DatabaseException";
+    }
 }

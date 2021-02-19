@@ -3,6 +3,8 @@ const { db, run } = require('../helpers/database');
 /**
  * Gets a dog's location by their ID.
  * @param {number} dogId ID of the dog to fetch.
+ * @returns {Promise<object>} record of dog's location.
+ * @async
  */
 exports.getByDogId = async dogId => {
     const [data] = await run(async () =>
@@ -13,6 +15,8 @@ exports.getByDogId = async dogId => {
 /**
  * Gets all the dogs with a location ID.
  * @param {number} locationId ID of the location to fetch.
+ * @returns {Promise<Array<object>>} list of dogs at the given location.
+ * @async
  */
 exports.getByLocationId = async locationId => {
     const data = await run(async () =>
@@ -22,28 +26,35 @@ exports.getByLocationId = async locationId => {
 
 /**
  * Creates a new location entry in the DB.
- * @param {Object} location location data to pass to the DB.
+ * @param {number} dogId ID of the dog to set the location of.
+ * @param {number} locationId ID of the location to assign to the dog.
+ * @returns {Promise<true>} confirmation of insertion.
+ * @async
  */
 exports.add = async (dogId, locationId) => {
-    const [data] = await run(async () =>
+    await run(async () =>
         await db('dogLocations').insert({ dogId, locationId }));
-    return data;
+    return true;
 }
 
 /**
  * Updates a location entry in the DB.
- * @param {number} dogId ID of the dog to update
- * @param {number} locationId ID to assign to the dog
+ * @param {number} dogId ID of the dog to update.
+ * @param {number} locationId ID to assign to the dog.
+ * @returns {Promise<object>} updated location entry.
+ * @async
  */
 exports.update = async (dogId, locationId) => {
-    const data = await run(async () =>
+    const [data] = await run(async () =>
         await db('dogLocations').where({ dogId }).update({ locationId }));
     return data;
 }
 
 /**
  * Deletes a dog location entry from the DB.
- * @param {Object} id ID of the location to delete
+ * @param {number} dogId ID of the location to delete.
+ * @returns {Promise<number>} number of affected rows (should be 1).
+ * @async
  */
 exports.delete = async dogId => {
     const data = await run(async () =>

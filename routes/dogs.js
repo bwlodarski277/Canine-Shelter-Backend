@@ -26,21 +26,27 @@ router.del('/:id([0-9]{1,})/location', deleteDogLocation);
 
 /**
  * Gets all the dogs from the database.
+ * @param {object} ctx context passed from Koa.
  */
 async function getAll(ctx) {
     ctx.body = await dogModel.getAll();
 }
 
 /**
- * Gets a single dog from the database.
+ * Gets a single dog from the database by ID.
+ * @param {object} ctx context passed from Koa.
  */
 async function getDog(ctx) {
     const id = ctx.params.id;
-    ctx.body = await dogModel.getById(id);
+    const dog = await dogModel.getById(id);
+    if (dog) {
+        ctx.body = dog;
+    }
 }
 
 /**
  * Adds a dog to the database.
+ * @param {object} ctx context passed from Koa.
  */
 async function addDog(ctx) {
     const body = ctx.request.body;
@@ -52,29 +58,35 @@ async function addDog(ctx) {
 }
 
 /**
- * Updates a dog in the database.
+ * Updates a dog in the database by ID.
+ * @param {object} ctx context passed from Koa.
  */
 async function updateDog(ctx) {
-    const dog_id = ctx.params.id;
-    let dog = await dogModel.getById(dog_id);
+    const dogId = ctx.params.id;
+    let dog = await dogModel.getById(dogId);
     if (dog) {
         // Excluding fields that must not be updated
         const { id, dateCreated, dateModified, ...body } = ctx.request.body;
-        Object.assign(dog, body); // overwriting everything else
-        const result = await dogModel.update(dog_id, dog);
-        if (result) { // Knex returns amount of affected rows.
-            ctx.body = { id: dog_id, updated: true, link: ctx.request.path };
+
+        // overwriting everything else
+        Object.assign(dog, body);
+        const result = await dogModel.update(dogId, dog);
+
+        // Knex returns amount of affected rows.
+        if (result) {
+            ctx.body = { id: dogId, updated: true, link: ctx.request.path };
         }
     }
 }
 
 /**
- * Deletes a dog from the database.
+ * Deletes a dog from the database by ID.
+ * @param {object} ctx context passed from Koa.
  */
 async function deleteDog(ctx) {
     const id = ctx.params.id;
-    let dog = await dogModel.getById(id);
-    if (dog) {
+    const id = await dogModel.getById(id);
+    if (id) {
         const result = await dogModel.delete(id);
         if (result) {
             ctx.status = 200;
@@ -82,66 +94,102 @@ async function deleteDog(ctx) {
     }
 }
 
+/**
+ * Gets a dog's breed by the dog ID.
+ * @param {object} ctx context passed from Koa.
+ */
 async function getDogBreed(ctx) {
     const id = ctx.params.id;
-    let dogBreed = await dogBreedModel.getByDogId(id);
-    ctx.body = dogBreed
+    const dogBreed = await dogBreedModel.getByDogId(id);
+    if (dogBreed) {
+        ctx.body = dogBreed;
+    }
 }
 
+/**
+ * Sets a dog's breed by the dog's ID and breed ID.
+ * @param {object} ctx context passed from Koa.
+ */
 async function addDogBreed(ctx) {
     const dogId = ctx.params.id;
     const { breedId } = ctx.request.body;
     const result = await dogBreedModel.add(dogId, breedId);
-    if (result === 0) { // 0 as add function returns PK of inserted row
+    if (result) {
         ctx.status = 201;
     }
 }
 
+/**
+ * Updates a dog's breed by the dog's ID and new breed ID.
+ * @param {object} ctx context passed from Koa.
+ */
 async function updateDogBreed(ctx) {
     const dogId = ctx.params.id;
     const { breedId } = ctx.request.body;
-    let id = await dogBreedModel.update(dogId, breedId);
-    if (id) {
+    const result = await dogBreedModel.update(dogId, breedId);
+    if (result) {
         ctx.status = 200;
     }
 }
 
+/**
+ * Deletes a dog's breed from the database.
+ * @param {object} ctx context passed from Koa.
+ */
 async function deleteDogBreed(ctx) {
     const dogId = ctx.params.id;
-    let id = await dogBreedModel.delete(dogId);
-    if (id) {
+    const result = await dogBreedModel.delete(dogId);
+    if (result) {
         ctx.status = 200;
     }
 }
 
+/**
+ * Gets a dog's location by the dog's ID.
+ * @param {object} ctx context passed from Koa.
+ */
 async function getDogLocation(ctx) {
     const id = ctx.params.id;
-    let dogLocation = await dogLocationModel.getByDogId(id);
-    ctx.body = dogLocation
+    const dogLocation = await dogLocationModel.getByDogId(id);
+    if (dogLocation) {
+        ctx.body = dogLocation;
+    }
 }
 
+/**
+ * Sets a dog's location by the dog's ID and location ID.
+ * @param {object} ctx context passed from Koa.
+ */
 async function addDogLocation(ctx) {
     const dogId = ctx.params.id;
     const { locationId } = ctx.request.body;
     const result = await dogLocationModel.add(dogId, locationId);
-    if (result === 0) { // 0 as add function returns PK of inserted row
+    if (result) {
         ctx.status = 201;
     }
 }
 
+/**
+ * Updates a dog's location by the dog's ID and new location ID.
+ * @param {object} ctx context passed from Koa.
+ */
 async function updateDogLocation(ctx) {
     const dogId = ctx.params.id;
     const { locationId } = ctx.request.body;
-    let id = await dogLocationModel.update(dogId, locationId);
-    if (id) {
+    const result = await dogLocationModel.update(dogId, locationId);
+    if (result) {
         ctx.status = 200;
     }
 }
 
+/**
+ * Deletes a dog's location from the database by dog ID.
+ * @param {object} ctx context passed from Koa.
+ */
 async function deleteDogLocation(ctx) {
     const dogId = ctx.params.id;
-    let id = await dogLocationModel.delete(dogId);
-    if (id) {
+    const result = await dogLocationModel.delete(dogId);
+    if (result) {
         ctx.status = 200;
     }
 }
