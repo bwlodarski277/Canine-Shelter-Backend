@@ -5,24 +5,26 @@ const dogModel = require('../models/dogs');
 const dogBreedModel = require('../models/dogBreeds');
 const dogLocationModel = require('../models/dogLocations');
 
+const auth = require('../controllers/auth');
+
 const router = new Router({ prefix: '/api/v1/dogs' });
 
 router.get('/', getAll);
-router.post('/', bodyParser(), addDog);
+router.post('/', auth, bodyParser(), addDog);
 
 router.get('/:id([0-9]{1,})', getDog);
-router.put('/:id([0-9]{1,})', bodyParser(), updateDog);
-router.del('/:id([0-9]{1,})', deleteDog);
+router.put('/:id([0-9]{1,})', auth, bodyParser(), updateDog);
+router.del('/:id([0-9]{1,})', auth, deleteDog);
 
 router.get('/:id([0-9]{1,})/breed', getDogBreed);
-router.post('/:id([0-9]{1,})/breed', bodyParser(), addDogBreed);
-router.put('/:id([0-9]{1,})/breed', bodyParser(), updateDogBreed);
-router.del('/:id([0-9]{1,})/breed', deleteDogBreed);
+router.post('/:id([0-9]{1,})/breed', auth, bodyParser(), addDogBreed);
+router.put('/:id([0-9]{1,})/breed', auth, bodyParser(), updateDogBreed);
+router.del('/:id([0-9]{1,})/breed', auth, deleteDogBreed);
 
 router.get('/:id([0-9]{1,})/location', getDogLocation);
-router.post('/:id([0-9]{1,})/location', bodyParser(), addDogLocation);
-router.put('/:id([0-9]{1,})/location', bodyParser(), updateDogLocation);
-router.del('/:id([0-9]{1,})/location', deleteDogLocation);
+router.post('/:id([0-9]{1,})/location', auth, bodyParser(), addDogLocation);
+router.put('/:id([0-9]{1,})/location', auth, bodyParser(), updateDogLocation);
+router.del('/:id([0-9]{1,})/location', auth, deleteDogLocation);
 
 /**
  * Gets all the dogs from the database.
@@ -85,8 +87,8 @@ async function updateDog(ctx) {
  */
 async function deleteDog(ctx) {
     const id = ctx.params.id;
-    const id = await dogModel.getById(id);
-    if (id) {
+    const dog = await dogModel.getById(id);
+    if (dog) {
         const result = await dogModel.delete(id);
         if (result) {
             ctx.status = 200;

@@ -3,14 +3,16 @@ const bodyParser = require('koa-bodyparser');
 
 const model = require('../models/breeds');
 
+const auth = require('../controllers/auth');
+
 const router = new Router({ prefix: '/api/v1/breeds' });
 
 router.get('/', getAll);
-router.post('/', bodyParser(), addBreed);
+router.post('/', auth, bodyParser(), addBreed);
 
 router.get('/:id([0-9]{1,})', getBreed);
-router.put('/:id([0-9]{1,})', bodyParser(), updateBreed);
-router.del('/:id([0-9]{1,})', deleteBreed);
+router.put('/:id([0-9]{1,})', auth, bodyParser(), updateBreed);
+router.del('/:id([0-9]{1,})', auth, deleteBreed);
 
 /**
  * Gets all the breeds from the database.

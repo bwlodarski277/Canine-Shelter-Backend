@@ -4,14 +4,16 @@ const bodyParser = require('koa-bodyparser');
 const locationsModel = require('../models/locations');
 const dogLocationsModel = require('../models/dogLocations');
 
+const auth = require('../controllers/auth');
+
 const router = new Router({ prefix: '/api/v1/locations' });
 
 router.get('/', getAll);
-router.post('/', bodyParser(), addLocation);
+router.post('/', auth, bodyParser(), addLocation);
 
 router.get('/:id([0-9]{1,})', getLocation);
-router.put('/:id([0-9]{1,})', bodyParser(), updateLocation);
-router.del('/:id([0-9]{1,})', deleteLocation);
+router.put('/:id([0-9]{1,})', auth, bodyParser(), updateLocation);
+router.del('/:id([0-9]{1,})', auth, deleteLocation);
 
 router.get('/:id([0-9]{1,})/dogs', getLocationDogs);
 

@@ -4,20 +4,22 @@ const bodyParser = require('koa-bodyparser');
 const userModel = require('../models/users');
 const favsModel = require('../models/favourites');
 
+const auth = require('../controllers/auth');
+
 const router = new Router({ prefix: '/api/v1/users' });
 
-router.get('/', getAll);
+router.get('/', auth, getAll);
 router.post('/', bodyParser(), createUser);
 
-router.get('/:id([0-9]{1,})', getUser);
-router.put('/:id([0-9]{1,})', bodyParser(), updateUser);
-router.del('/:id([0-9]{1,})', deleteUser);
+router.get('/:id([0-9]{1,})', auth, getUser);
+router.put('/:id([0-9]{1,})', auth, bodyParser(), updateUser);
+router.del('/:id([0-9]{1,})', auth, deleteUser);
 
-router.get('/:id([0-9]{1,})/favourites', getUserFavs);
-router.post('/:id([0-9]{1,})/favourites', bodyParser(), addUserFav);
+router.get('/:id([0-9]{1,})/favourites', auth, getUserFavs);
+router.post('/:id([0-9]{1,})/favourites', auth, bodyParser(), addUserFav);
 
-router.get('/:id([0-9]{1,})/favourites/:dogId([0-9]{1,})', getUserFav);
-router.del('/:id([0-9]{1,})/favourites/:dogId([0-9]{1,})', deleteUserFav);
+router.get('/:id([0-9]{1,})/favourites/:dogId([0-9]{1,})', auth, getUserFav);
+router.del('/:id([0-9]{1,})/favourites/:dogId([0-9]{1,})', auth, deleteUserFav);
 
 /**
  * Gets all the users from the database.
