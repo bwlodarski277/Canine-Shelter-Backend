@@ -30,11 +30,11 @@ exports.add = async (userId, locationId) => {
  * Updates a staff entry in the DB.
  * @param {number} userId ID of the staff to update.
  * @param {number} locationId new location to assign to the staff.
- * @returns {Promise<object>} updated staff entry.
+ * @returns {Promise<number>} number of updated rows (should be 1).
  * @async
  */
 exports.update = async (userId, locationId) => {
-    const [data] = await run(async () =>
+    const data = await run(async () =>
         await db('staff').where({ userId }).update({ locationId }));
     return data;
 }

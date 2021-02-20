@@ -38,11 +38,11 @@ exports.add = async location => {
  * Updates a location entry in the DB.
  * @param {number} id ID of the location to update.
  * @param {object} location data to pass to the DB.
- * @returns {Promise<object>} updated database entry.
+ * @returns {Promise<number>} number of updated rows (should be 1).
  * @async
  */
 exports.update = async (id, location) => {
-    const [data] = await run(async () =>
+    const data = await run(async () =>
         await db('locations').where({ id }).update(location));
     return data;
 }

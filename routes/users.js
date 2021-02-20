@@ -65,14 +65,12 @@ async function updateUser(ctx) {
         // Excluding fields that must not be updated
         const { id, dateCreated, ...body } = ctx.request.body;
 
-        // overwriting everything else
-        Object.assign(user, body);
-        const result = await userModel.update(userId, user);
+        const result = await userModel.update(userId, body);
 
         // Knex returns amount of affected rows.
         if (result) {
-            ctx.body = { id: userId, updated: true, link: `${ctx.request.path}/${id}` };
-        }
+            ctx.body = { id: userId, updated: true, link: ctx.request.path };
+        };
     }
 }
 
@@ -86,7 +84,7 @@ async function deleteUser(ctx) {
     if (user) {
         const result = await userModel.delete(id);
         if (result) {
-            ctx.status = 200;
+            ctx.body = { id, deleted: true };
         }
     }
 }
@@ -113,6 +111,7 @@ async function addUserFav(ctx) {
     const result = await favsModel.add(userId, dogId);
     if (result) {
         ctx.status = 201;
+        ctx.body = { id: userId, created: true, link: `${ctx.request.path}/${dogId}` };
     }
 }
 
@@ -138,7 +137,7 @@ async function deleteUserFav(ctx) {
     const dogId = ctx.params.dogId;
     const result = await favsModel.delete(userId, dogId);
     if (result) {
-        ctx.status = 200;
+        ctx.body = { id: userId, deleted: true };
     }
 }
 

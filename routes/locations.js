@@ -31,7 +31,10 @@ async function getAll(ctx) {
  */
 async function getLocation(ctx) {
     const id = ctx.params.id;
-    ctx.body = await locationsModel.getById(id);
+    const location = await locationsModel.getById(id);
+    if (location) {
+        ctx.body = location;
+    }
 }
 
 /**
@@ -52,19 +55,17 @@ async function addLocation(ctx) {
  * @param {object} ctx context passed from Koa.
  */
 async function updateLocation(ctx) {
-    const location_id = ctx.params.id;
-    let location = await locationsModel.getById(location_id);
+    const locationId = ctx.params.id;
+    let location = await locationsModel.getById(locationId);
     if (location) {
         // Excluding fields that must not be updated
         const { id, ...body } = ctx.request.body;
 
-        // overwriting everything else
-        Object.assign(location, body);
-        const result = await locationsModel.update(location_id, location);
+        const result = await locationsModel.update(locationId, body);
 
         // Knex returns amount of affected rows.
         if (result) {
-            ctx.body = { id: location_id, updated: true, link: ctx.request.path };
+            ctx.body = { id: locationId, updated: true, link: ctx.request.path };
         }
     }
 }
@@ -79,7 +80,7 @@ async function deleteLocation(ctx) {
     if (location) {
         const result = await locationsModel.delete(id);
         if (result) {
-            ctx.status = 200;
+            ctx.body = { id, deleted: true };
         }
     }
 }
