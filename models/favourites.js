@@ -38,6 +38,18 @@ exports.getByDogId = async dogId => {
 }
 
 /**
+ * Gets a count of users that favourited a dog.
+ * @param {number} dogId ID of the dog to count the favourites of.
+ * @returns {Promise<number>} count of users that favourited a dog.
+ * @async
+ */
+exports.getFavCount = async dogId => {
+    const [data] = await run(async () =>
+        await db('favourites').where({ dogId }).count('dogId', { as: 'count' }));
+    return data;
+}
+
+/**
  * Creates a new favourite entry in the DB.
  * @param {number} userId ID of user adding a favourite.
  * @param {number} dogId ID of dog a user wants to favourite.
