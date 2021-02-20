@@ -2,11 +2,21 @@ const { db, run } = require('../helpers/database');
 
 /**
  * Gets all dog entries from the DB.
- * @returns {Promise<Array<object>>} array of all dog records.
+ * @param {number} [page=1] which page to get data from.
+ * @param {number} [limit=50] number of items on a page.
+ * @param {string} [order='name'] what parameter to order by.
+ * @param {'asc'|'desc'} [direction='asc'] direction to sort (asc. or desc.).
+ * @returns {Promise<Array<object>>} array of selected dog records.
  * @async
  */
-exports.getAll = async () => {
-    const data = await run(async () => await db('dogs'));
+exports.getAll = async (page = 1, limit = 50, order = 'name', direction = 'asc') => {
+    const offset = (page - 1) * limit;
+    // if direction is anything but descending, use ascending.
+    const direct = (direction === 'desc') ? 'desc' : 'asc';
+    const data = await run(async () =>
+        await db('dogs')
+            .orderBy(order, direct)
+            .limit(limit).offset(offset));
     return data;
 }
 
