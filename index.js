@@ -1,4 +1,5 @@
 const Koa = require('koa');
+const cors = require('@koa/cors');
 
 const app = new Koa();
 
@@ -8,6 +9,11 @@ const dogs = require('./routes/dogs');
 const breeds = require('./routes/breeds');
 const locations = require('./routes/locations');
 const login = require('./routes/login');
+
+// Allowing the frontend box to access the API.
+const options = { origin: 'https://latin-kimono-3000.codio-box.uk' };
+
+app.use(cors(options));
 
 app.use(special.routes());
 app.use(users.routes());
