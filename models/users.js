@@ -63,11 +63,17 @@ exports.add = async user => {
  * Updates a user record in the DB.
  * @param {number} id ID of the user to update
  * @param {object} user user data to pass to the DB.
- * @returns {Promise<object>} updated user entry.
+ * @returns {Promise<number>} number of updated rows (should be 1).
  * @async
  */
 exports.update = async (id, user) => {
-    const [data] = await run(async () =>
+    // If the user is changing their password
+    if (user.password) {
+        const { password } = user;
+        const hash = bcrypt.hashSync(password, 10);
+        user.password = hash;
+    }
+    const data = await run(async () =>
         await db('users').where({ id }).update(user));
     return data;
 }
