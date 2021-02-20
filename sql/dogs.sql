@@ -5,7 +5,7 @@ CREATE TABLE `dogs` (
     `views` int,
     `age` int,
     `gender` bool,
-    `dateCreated` datetime,
-    `dateModified` datetime,
+    `dateCreated` datetime DEFAULT CURRENT_TIMESTAMP,
+    `dateModified` datetime ON UPDATE CURRENT_TIMESTAMP,
     `imageUrl` varchar(2048)
 );

@@ -6,7 +6,7 @@ CREATE TABLE `users` (
     `passwordSalt` varchar(256),
     `firstName` varchar(32) NOT NULL,
     `lastName` varchar(32) NOT NULL,
-    `dateCreated` datetime,
-    `dateModified` datetime,
+    `dateCreated` datetime DEFAULT CURRENT_TIMESTAMP,
+    `dateModified` datetime ON UPDATE CURRENT_TIMESTAMP,
     `imageUrl` varchar(2048)
 );
