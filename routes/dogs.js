@@ -70,12 +70,11 @@ async function updateDog(ctx) {
         // Excluding fields that must not be updated
         const { id, dateCreated, dateModified, ...body } = ctx.request.body;
 
-        // overwriting everything else
-        Object.assign(dog, body);
-        const result = await dogModel.update(dogId, dog);
+        const result = await dogModel.update(dogId, body);
 
         // Knex returns amount of affected rows.
         if (result) {
+            ctx.status = 201;
             ctx.body = { id: dogId, updated: true, link: ctx.request.path };
         }
     }
@@ -91,7 +90,7 @@ async function deleteDog(ctx) {
     if (dog) {
         const result = await dogModel.delete(id);
         if (result) {
-            ctx.status = 200;
+            ctx.stbody = { id, deleted: true };
         }
     }
 }
@@ -118,6 +117,7 @@ async function addDogBreed(ctx) {
     const result = await dogBreedModel.add(dogId, breedId);
     if (result) {
         ctx.status = 201;
+        ctx.body = { id: dogId, created: true, link: ctx.request.path };
     }
 }
 
@@ -130,7 +130,7 @@ async function updateDogBreed(ctx) {
     const { breedId } = ctx.request.body;
     const result = await dogBreedModel.update(dogId, breedId);
     if (result) {
-        ctx.status = 200;
+        ctx.body = { id: dogId, updated: true, link: ctx.request.path };
     }
 }
 
@@ -142,7 +142,7 @@ async function deleteDogBreed(ctx) {
     const dogId = ctx.params.id;
     const result = await dogBreedModel.delete(dogId);
     if (result) {
-        ctx.status = 200;
+        ctx.body = { id: dogId, deleted: true };
     }
 }
 
@@ -168,6 +168,7 @@ async function addDogLocation(ctx) {
     const result = await dogLocationModel.add(dogId, locationId);
     if (result) {
         ctx.status = 201;
+        ctx.body = { id: dogId, created: true, link: ctx.request.path };
     }
 }
 
@@ -180,7 +181,7 @@ async function updateDogLocation(ctx) {
     const { locationId } = ctx.request.body;
     const result = await dogLocationModel.update(dogId, locationId);
     if (result) {
-        ctx.status = 200;
+        ctx.body = { id: dogId, updated: true, link: ctx.request.path };
     }
 }
 
@@ -192,7 +193,7 @@ async function deleteDogLocation(ctx) {
     const dogId = ctx.params.id;
     const result = await dogLocationModel.delete(dogId);
     if (result) {
-        ctx.status = 200;
+        ctx.body = { id: dogId, deleted: true };
     }
 }
 

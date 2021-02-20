@@ -52,18 +52,16 @@ async function addBreed(ctx) {
  * @param {object} ctx context passed from Koa.
  */
 async function updateBreed(ctx) {
-    const breed_id = ctx.params.id;
-    let breed = await model.getById(breed_id);
+    const breedId = ctx.params.id;
+    let breed = await model.getById(breedId);
     if (breed) {
         // Excluding fields that must not be updated
         const { id, ...body } = ctx.request.body;
 
-        // overwriting everything else
-        Object.assign(breed, body);
-        const result = await model.update(breed_id, breed);
+        const result = await model.update(breedId, body);
 
         if (result) { // Knex returns amount of affected rows.
-            ctx.body = { id: breed_id, updated: true, link: ctx.request.path };
+            ctx.body = { id: breedId, updated: true, link: ctx.request.path };
         }
     }
 }
@@ -78,7 +76,7 @@ async function deleteBreed(ctx) {
     if (breed) {
         const result = await model.delete(id);
         if (result) {
-            ctx.status = 200;
+            ctx.body = { id, deleted: true };
         }
     }
 }

@@ -38,11 +38,11 @@ exports.add = async breed => {
  * Updates a breed entry in the DB.
  * @param {number} id ID of the breed to update.
  * @param {object} breed data to pass to the DB.
- * @returns {Promise<object>} updated database entry.
+ * @returns {Promise<number>} number of updated rows (should be 1).
  * @async
  */
 exports.update = async (id, breed) => {
-    const [data] = await run(async () =>
+    const data = await run(async () =>
         await db('breeds').where({ id }).update(breed));
     return data;
 }
