@@ -4,6 +4,7 @@ const bodyParser = require('koa-bodyparser');
 const dogModel = require('../models/dogs');
 const dogBreedModel = require('../models/dogBreeds');
 const dogLocationModel = require('../models/dogLocations');
+const favouritesModel = require('../models/favourites');
 
 const auth = require('../controllers/auth');
 
@@ -26,12 +27,18 @@ router.post('/:id([0-9]{1,})/location', auth, bodyParser(), addDogLocation);
 router.put('/:id([0-9]{1,})/location', auth, bodyParser(), updateDogLocation);
 router.del('/:id([0-9]{1,})/location', auth, deleteDogLocation);
 
+router.get('/:id([0-9]{1,})/favourites', getFavourites);
+
 /**
  * Gets all the dogs from the database.
  * @param {object} ctx context passed from Koa.
  */
 async function getAll(ctx) {
-    ctx.body = await dogModel.getAll();
+    const { page, limit, order, direction } = ctx.request.query;
+    const dogs = await dogModel.getAll(page, limit, order, direction);
+    if (dogs.length) {
+        ctx.body = dogs;
+    }
 }
 
 /**
@@ -195,6 +202,16 @@ async function deleteDogLocation(ctx) {
     if (result) {
         ctx.body = { id: dogId, deleted: true };
     }
+}
+
+/**
+ * Gets the number of favourites a dog has.
+ * @param {object} ctx context passed from Koa.
+ */
+async function getFavourites(ctx) {
+    const id = ctx.params.id;
+    const count = await favouritesModel.getFavCount(id);
+    ctx.body = count;
 }
 
 module.exports = router;
