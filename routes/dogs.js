@@ -13,21 +13,21 @@ const router = new Router({ prefix: '/api/v1/dogs' });
 router.get('/', getAll);
 router.post('/', auth, bodyParser(), addDog);
 
-router.get('/:id([0-9]{1,})', getDog);
-router.put('/:id([0-9]{1,})', auth, bodyParser(), updateDog);
-router.del('/:id([0-9]{1,})', auth, deleteDog);
+router.get('/:id([0-9]+)', getDog);
+router.put('/:id([0-9]+)', auth, bodyParser(), updateDog);
+router.del('/:id([0-9]+)', auth, deleteDog);
 
-router.get('/:id([0-9]{1,})/breed', getDogBreed);
-router.post('/:id([0-9]{1,})/breed', auth, bodyParser(), addDogBreed);
-router.put('/:id([0-9]{1,})/breed', auth, bodyParser(), updateDogBreed);
-router.del('/:id([0-9]{1,})/breed', auth, deleteDogBreed);
+router.get('/:id([0-9]+)/breed', getDogBreed);
+router.post('/:id([0-9]+)/breed', auth, bodyParser(), addDogBreed);
+router.put('/:id([0-9]+)/breed', auth, bodyParser(), updateDogBreed);
+router.del('/:id([0-9]+)/breed', auth, deleteDogBreed);
 
-router.get('/:id([0-9]{1,})/location', getDogLocation);
-router.post('/:id([0-9]{1,})/location', auth, bodyParser(), addDogLocation);
-router.put('/:id([0-9]{1,})/location', auth, bodyParser(), updateDogLocation);
-router.del('/:id([0-9]{1,})/location', auth, deleteDogLocation);
+router.get('/:id([0-9]+)/location', getDogLocation);
+router.post('/:id([0-9]+)/location', auth, bodyParser(), addDogLocation);
+router.put('/:id([0-9]+)/location', auth, bodyParser(), updateDogLocation);
+router.del('/:id([0-9]+)/location', auth, deleteDogLocation);
 
-router.get('/:id([0-9]{1,})/favourites', getFavourites);
+router.get('/:id([0-9]+)/favourites', getFavourites);
 
 /**
  * Gets all the dogs from the database.

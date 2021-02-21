@@ -11,11 +11,11 @@ const router = new Router({ prefix: '/api/v1/locations' });
 router.get('/', getAll);
 router.post('/', auth, bodyParser(), addLocation);
 
-router.get('/:id([0-9]{1,})', getLocation);
-router.put('/:id([0-9]{1,})', auth, bodyParser(), updateLocation);
-router.del('/:id([0-9]{1,})', auth, deleteLocation);
+router.get('/:id([0-9]+)', getLocation);
+router.put('/:id([0-9]+)', auth, bodyParser(), updateLocation);
+router.del('/:id([0-9]+)', auth, deleteLocation);
 
-router.get('/:id([0-9]{1,})/dogs', getLocationDogs);
+router.get('/:id([0-9]+)/dogs', getLocationDogs);
 
 /**
  * Gets all the locations from the database.
