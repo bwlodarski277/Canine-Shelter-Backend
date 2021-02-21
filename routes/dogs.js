@@ -34,8 +34,8 @@ router.get('/:id([0-9]{1,})/favourites', getFavourites);
  * @param {object} ctx context passed from Koa.
  */
 async function getAll(ctx) {
-    const { page, limit, order, direction } = ctx.request.query;
-    const dogs = await dogModel.getAll(page, limit, order, direction);
+    const { query, page, limit, order, direction, ...filters } = ctx.request.query;
+    const dogs = await dogModel.getAll(query, filters, page, limit, order, direction);
     if (dogs.length) {
         ctx.body = dogs;
     }
