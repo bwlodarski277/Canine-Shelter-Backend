@@ -5,6 +5,7 @@ const userModel = require('../models/users');
 const favsModel = require('../models/favourites');
 
 const auth = require('../controllers/auth');
+const { config } = require('../config');
 
 const router = new Router({ prefix: '/api/v1/users' });
 
@@ -46,7 +47,9 @@ async function getUser(ctx) {
  * @param {object} ctx context passed from Koa.
  */
 async function createUser(ctx) {
-    const body = ctx.request.body;
+    const { staffKey, role, ...body } = ctx.request.body;
+    // Giving the user the role 'staff' if they provide right key.
+    body.role = staffKey === config.staffKey ? 'staff' : 'user';
     const id = await userModel.add(body);
     if (id) {
         ctx.status = 201;
