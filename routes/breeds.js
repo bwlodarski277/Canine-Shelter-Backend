@@ -10,9 +10,9 @@ const router = new Router({ prefix: '/api/v1/breeds' });
 router.get('/', getAll);
 router.post('/', auth, bodyParser(), addBreed);
 
-router.get('/:id([0-9]{1,})', getBreed);
-router.put('/:id([0-9]{1,})', auth, bodyParser(), updateBreed);
-router.del('/:id([0-9]{1,})', auth, deleteBreed);
+router.get('/:id([0-9]+)', getBreed);
+router.put('/:id([0-9]+)', auth, bodyParser(), updateBreed);
+router.del('/:id([0-9]+)', auth, deleteBreed);
 
 /**
  * Gets all the breeds from the database.

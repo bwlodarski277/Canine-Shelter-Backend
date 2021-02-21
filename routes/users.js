@@ -11,15 +11,15 @@ const router = new Router({ prefix: '/api/v1/users' });
 router.get('/', auth, getAll);
 router.post('/', bodyParser(), createUser);
 
-router.get('/:id([0-9]{1,})', auth, getUser);
-router.put('/:id([0-9]{1,})', auth, bodyParser(), updateUser);
-router.del('/:id([0-9]{1,})', auth, deleteUser);
+router.get('/:id([0-9]+)', auth, getUser);
+router.put('/:id([0-9]+)', auth, bodyParser(), updateUser);
+router.del('/:id([0-9]+)', auth, deleteUser);
 
-router.get('/:id([0-9]{1,})/favourites', auth, getUserFavs);
-router.post('/:id([0-9]{1,})/favourites', auth, bodyParser(), addUserFav);
+router.get('/:id([0-9]+)/favourites', auth, getUserFavs);
+router.post('/:id([0-9]+)/favourites', auth, bodyParser(), addUserFav);
 
-router.get('/:id([0-9]{1,})/favourites/:dogId([0-9]{1,})', auth, getUserFav);
-router.del('/:id([0-9]{1,})/favourites/:dogId([0-9]{1,})', auth, deleteUserFav);
+router.get('/:id([0-9]+)/favourites/:dogId([0-9]+)', auth, getUserFav);
+router.del('/:id([0-9]+)/favourites/:dogId([0-9]+)', auth, deleteUserFav);
 
 /**
  * Gets all the users from the database.
