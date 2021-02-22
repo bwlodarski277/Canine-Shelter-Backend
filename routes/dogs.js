@@ -1,3 +1,9 @@
+/**
+ * @file Dogs route endpoints.
+ * @module routes/dogs
+ * @author Bartlomiej Wlodarski
+ */
+
 const Router = require('koa-router');
 const bodyParser = require('koa-bodyparser');
 

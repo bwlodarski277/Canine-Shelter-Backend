@@ -1,3 +1,9 @@
+/**
+ * @file Basic authentication strategy.
+ * @module strategies/basic
+ * @author Bartlomiej Wlodarski
+ */
+
 const BasicStrategy = require('passport-http').BasicStrategy;
 const users = require('../models/users');
 const bcrypt = require('bcrypt');

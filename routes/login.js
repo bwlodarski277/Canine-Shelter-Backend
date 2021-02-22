@@ -1,3 +1,9 @@
+/**
+ * @file Login route endpoints.
+ * @module routes/login
+ * @author Bartlomiej Wlodarski
+ */
+
 const Router = require('koa-router');
 const bodyParser = require('koa-bodyparser');
 const jwt = require('jsonwebtoken');

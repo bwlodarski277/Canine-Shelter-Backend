@@ -1,3 +1,9 @@
+/**
+ * @file Locations route endpoints.
+ * @module routes/locations
+ * @author Bartlomiej Wlodarski
+ */
+
 const Router = require('koa-router');
 const bodyParser = require('koa-bodyparser');
 

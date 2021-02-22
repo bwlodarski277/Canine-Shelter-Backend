@@ -1,3 +1,10 @@
+/**
+ * @file JWT authentication strategy.
+ * @module strategies/jwt
+ * @author Bartlomiej Wlodarski
+ */
+
+
 const JwtStrategy = require('passport-jwt').Strategy;
 const ExtractJwt = require('passport-jwt').ExtractJwt;
 

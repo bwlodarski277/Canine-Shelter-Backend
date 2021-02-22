@@ -1,8 +1,13 @@
+/**
+ * @file Breeds route endpoints.
+ * @module routes/breeds
+ * @author Bartlomiej Wlodarski
+ */
+
 const Router = require('koa-router');
 const bodyParser = require('koa-bodyparser');
 
 const breedModel = require('../models/breeds');
-const dogModel = require('../models/dogs');
 const dogBreedModel = require('../models/dogBreeds');
 
 const auth = require('../controllers/auth');
