@@ -1,4 +1,17 @@
+/**
+ * @file Dog locations model to manage interactions with the database.
+ * @module models/dogLocations
+ * @author Bartlomiej Wlodarski
+ */
+
 const { db, run } = require('../helpers/database');
+
+/**
+ * Dog location object returned from the DB.
+ * @typedef {object} DogLocation
+ * @property {number} dogId Dog ID (foreign key)
+ * @property {number} locationId Location ID (foreign key)
+ */
 
 /**
  * Gets a dog's location by their ID.

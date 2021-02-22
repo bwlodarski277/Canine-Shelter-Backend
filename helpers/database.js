@@ -1,3 +1,9 @@
+/**
+ * @file Database helpers. Used for running queries to the DB.
+ * @module helpers/database
+ * @author Bartlomiej Wlodarski
+ */
+
 const knex = require('knex');
 const { config } = require('../config');
 
@@ -35,6 +41,7 @@ exports.run = async dbQuery => {
 /**
  * Database Exception class.
  * Used to hide sensitive information when an error happens in the DB.
+ * @memberof helpers/database
  */
 class DatabaseException {
     /**

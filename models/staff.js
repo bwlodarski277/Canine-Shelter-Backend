@@ -1,6 +1,24 @@
-const db = require('../helpers/database');
+/**
+ * @file Staff model to manage interactions with the database.
+ * @module models/staff
+ * @author Bartlomiej Wlodarski
+ */
+
 const { db, run } = require('../helpers/database');
 
+/**
+ * Staff object returned from the DB.
+ * @typedef {object} Staff
+ * @property {number} id Staff ID
+ * @property {number} userId Staff user ID (foreign key)
+ * @property {number} locationId Location ID (foreign key)
+ */
+
+/**
+ * Gets all staff entries from the DB.
+ * @returns {Promise<Array<Staff>>} array of all staff records.
+ * @async
+ */
 exports.getAll = async () => {
     const data = await run(async () =>
         await db('staff'));
@@ -10,7 +28,7 @@ exports.getAll = async () => {
 /**
  * Gets a staff member's location by ID.
  * @param {number} userId User ID of the staff to fetch.
- * @returns {Promise<object>} record containing staff member's location.
+ * @returns {Promise<Staff>} record containing staff member's location.
  * @async
  */
 exports.getByUserId = async userId => {
@@ -22,7 +40,7 @@ exports.getByUserId = async userId => {
 /**
  * Gets a staff member's location by ID.
  * @param {number} userId ID of the staff to fetch.
- * @returns {Promise<object>} record containing staff member's location.
+ * @returns {Promise<Staff>} record containing staff member's location.
  * @async
  */
 exports.getByStaffId = async id => {

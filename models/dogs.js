@@ -1,4 +1,23 @@
+/**
+ * @file Dogs model to manage interactions with the database.
+ * @module models/dogs
+ * @author Bartlomiej Wlodarski
+ */
+
 const { db, run } = require('../helpers/database');
+
+/**
+ * Dog object returned from the DB.
+ * @typedef {object} Dog
+ * @property {number} id Dog ID
+ * @property {string} name Dog name
+ * @property {string} description Dog description
+ * @property {number} age Dog age
+ * @property {booolean} gender Dog gender (1 for male, 0 for female)
+ * @property {string} dateCreated Dog entry creation date
+ * @property {string} dateModified Dog entry modification date
+ * @property {string} imageUrl Dog image URL
+ */
 
 /**
  * Get a list of dog entries from the DB.
@@ -9,7 +28,7 @@ const { db, run } = require('../helpers/database');
  * @param {number} [limit=50] number of items on a page.
  * @param {string} [order='id'] what parameter to order by.
  * @param {'asc'|'desc'} [direction='asc'] direction to sort (asc. or desc.).
- * @returns {Promise<Array<object>>} array of selected dog records.
+ * @returns {Promise<Array<Dog>>} array of selected dog records.
  * @async
  */
 exports.getAll = async (query = '', filters = {}, page = 1, limit = 50, order = 'id', direction = 'asc') => {
@@ -30,7 +49,7 @@ exports.getAll = async (query = '', filters = {}, page = 1, limit = 50, order = 
 /**
  * Gets a single dog entry from the DB by their ID.
  * @param {number} id ID of the dog to fetch.
- * @returns {Promise<object>} object containing the dog's record.
+ * @returns {Promise<Dog>} object containing the dog's record.
  * @async
  */
 exports.getById = async id => {
@@ -41,7 +60,7 @@ exports.getById = async id => {
 
 /**
  * Creates a new dog entry in the DB.
- * @param {object} dog dog data to pass to the DB.
+ * @param {Dog} dog dog data to pass to the DB.
  * @returns {Promise<number>} ID of the newly inserted row.
  * @async
  */
@@ -54,7 +73,7 @@ exports.add = async dog => {
 /**
  * Updates a dog entry in the DB.
  * @param {number} id ID of the dog to update.
- * @param {object} dog data to pass to the DB.
+ * @param {Dog} dog data to pass to the DB.
  * @returns {Promise<number>} number of updated rows (should be 1).
  * @async
  */

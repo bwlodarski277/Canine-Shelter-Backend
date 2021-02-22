@@ -1,3 +1,9 @@
+/**
+ * @file Users model to manage interactions with the database.
+ * @module models/users
+ * @author Bartlomiej Wlodarski
+ */
+
 const { db, run } = require('../helpers/database');
 const bcrypt = require('bcrypt');
 
@@ -7,10 +13,24 @@ const cols = [
     'lastName', 'dateCreated', 'dateModified', 'imageUrl'];
 
 /**
+ * User object returned from the DB.
+ * @typedef {object} User
+ * @property {number} id User ID
+ * @property {string} username Unique username
+ * @property {string} email User's email address
+ * @property {string} password User password (not returned by get calls)
+ * @property {string} firstName User's first name
+ * @property {string} lastName User's last name
+ * @property {string} dateCreated Date when the user was created
+ * @property {string} dateModified Last date when user details were changed
+ * @property {string} imageUrl Link to user's profile picture
+ */
+
+/**
  * Gets a user entry by their username.
  * Used for authentication only!
  * @param {string} username User's unique username.
- * @returns {Promise<object>} user's record from the DB.
+ * @returns {Promise<User>} user's record from the DB.
  * @async
  */
 exports.findByUsername = async username => {
@@ -21,11 +41,12 @@ exports.findByUsername = async username => {
 
 /**
  * Gets all users from the DB.
- * @returns {Promise<Array<object>>} list of users in the DB.
+ * @returns {Promise<Array<User>>} list of users in the DB.
  * @async
  */
 exports.getAll = async () => {
     const data = await run(async () =>
+        // ...cols is to make sure password is not returned.
         await db('users').select(...cols));
     return data;
 }
@@ -33,7 +54,7 @@ exports.getAll = async () => {
 /**
  * Gets a single user from the DB by their ID.
  * @param {number} id ID of user to fetch.
- * @returns {Promise<object>} object containing the user's record.
+ * @returns {Promise<User>} object containing the user's record.
  * @async
  */
 exports.getById = async id => {
@@ -44,7 +65,7 @@ exports.getById = async id => {
 
 /**
  * Creates a new user entry in the DB.
- * @param {object} user user data to pass to the DB.
+ * @param {User} user user data to pass to the DB.
  * @returns {Promise<number>} ID of the newly inserted row.
  * @async
  */
@@ -62,7 +83,7 @@ exports.add = async user => {
 /**
  * Updates a user record in the DB.
  * @param {number} id ID of the user to update
- * @param {object} user user data to pass to the DB.
+ * @param {User} user user data to pass to the DB.
  * @returns {Promise<number>} number of updated rows (should be 1).
  * @async
  */

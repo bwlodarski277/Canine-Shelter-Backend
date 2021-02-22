@@ -1,9 +1,22 @@
+/**
+ * @file Favourites model to manage interactions with the database.
+ * @module models/favourites
+ * @author Bartlomiej Wlodarski
+ */
+
 const { db, run } = require('../helpers/database');
+
+/**
+ * Favourite object returned from the DB.
+ * @typedef {object} Favourite
+ * @property {number} userId User ID (foreign key)
+ * @property {number} dogId Dog ID (foreign key)
+ */
 
 /**
  * Gets a list of a user's favourite dogs.
  * @param {number} userId ID of the user's favourites to fetch.
- * @returns {Promise<Array<object>>} list of the user's favourite dogs.
+ * @returns {Promise<Array<Favourite>>} list of the user's favourite dogs.
  * @async
  */
 exports.getByUserId = async userId => {
@@ -16,7 +29,7 @@ exports.getByUserId = async userId => {
  * Gets a single favourite by user ID and dog ID.
  * @param {number} userId ID of user's favourite to fetch.
  * @param {number} dogId ID of favourited dog to fetch.
- * @returns {Promise<object>} record of user's favourited dog.
+ * @returns {Promise<Favourite>} record of user's favourited dog.
  * @async
  */
 exports.getSingleFav = async (userId, dogId) => {
@@ -28,7 +41,7 @@ exports.getSingleFav = async (userId, dogId) => {
 /**
  * Gets a list of users that favourited a dog.
  * @param {number} dogId ID of the dog to find the favourites of.
- * @returns {Promise<Array<object>>} list of users who favourited a dog.
+ * @returns {Promise<Array<Favourite>>} list of users who favourited a dog.
  * @async
  */
 exports.getByDogId = async dogId => {

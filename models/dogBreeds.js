@@ -1,9 +1,22 @@
+/**
+ * @file Dog breeds model to manage interactions with the database.
+ * @module models/dogBreeds
+ * @author Bartlomiej Wlodarski
+ */
+
 const { db, run } = require('../helpers/database');
+
+/**
+ * Dog breed object returned from the DB.
+ * @typedef {object} DogBreed
+ * @property {number} dogId Dog ID (foreign key)
+ * @property {number} breedId Breed ID (foreign key)
+ */
 
 /**
  * Gets a dog's breed(s) by their ID.
  * @param {number} dogId ID of the dog to fetch.
- * @returns {Promise<object>} database entry containing dog's breed.
+ * @returns {Promise<DogBreed>} database entry containing dog's breed.
  * @async
  */
 exports.getByDogId = async dogId => {
@@ -15,7 +28,7 @@ exports.getByDogId = async dogId => {
 /**
  * Gets all the dogs with a breed ID.
  * @param {number} breedId ID of the breed to fetch.
- * @returns {Promise<Array<object>>} list of all dogs of the given breed.
+ * @returns {Promise<Array<DogBreed>>} list of all dogs of the given breed.
  * @async
  */
 exports.getByBreedId = async breedId => {
