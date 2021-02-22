@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: routes/breeds.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: routes/breeds.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
+ * @file Breeds route endpoints.
+ * @module routes/breeds
+ * @author Bartlomiej Wlodarski
+ */
+
+const Router = require('koa-router');
+const bodyParser = require('koa-bodyparser');
+
+const breedModel = require('../models/breeds');
+const dogBreedModel = require('../models/dogBreeds');
+
+const auth = require('../controllers/auth');
+
+const router = new Router({ prefix: '/api/v1/breeds' });
+
+router.get('/', getAll);
+router.post('/', auth, bodyParser(), addBreed);
+
+router.get('/:id([0-9]+)', getBreed);
+router.put('/:id([0-9]+)', auth, bodyParser(), updateBreed);
+router.del('/:id([0-9]+)', auth, deleteBreed);
+
+router.get('/:id([0-9]+)/dogs', getDogs);
+
+/**
+ * Gets all the breeds from the database.
+ * @param {object} ctx context passed from Koa.
+ */
+async function getAll(ctx) {
+    ctx.body = await breedModel.getAll();
+}
+
+async function getDogs(ctx) {
+    const id = ctx.params.id;
+    const dogs = await dogBreedModel.getByBreedId(id);
+    if (dogs) {
+        ctx.body = dogs;
+    }
+}
+
+/**
+ * Gets a single breed from the database by breed ID.
+ * @param {object} ctx context passed from Koa.
+ */
+async function getBreed(ctx) {
+    const id = ctx.params.id;
+    const breed = await breedModel.getById(id);
+    if (breed) {
+        ctx.body = breed;
+    }
+}
+
+/**
+ * Adds a breed to the database.
+ * @param {object} ctx context passed from Koa.
+ */
+async function addBreed(ctx) {
+    const body = ctx.request.body;
+    const id = await breedModel.add(body);
+    if (id) {
+        ctx.status = 201;
+        ctx.body = { ID: id, created: true, link: `${ctx.request.path}/${id}` };
+    }
+}
+
+/**
+ * Updates a breed in the database by breed ID.
+ * @param {object} ctx context passed from Koa.
+ */
+async function updateBreed(ctx) {
+    const breedId = ctx.params.id;
+    let breed = await breedModel.getById(breedId);
+    if (breed) {
+        // Excluding fields that must not be updated
+        const { id, ...body } = ctx.request.body;
+
+        const result = await breedModel.update(breedId, body);
+
+        if (result) { // Knex returns amount of affected rows.
+            ctx.body = { id: breedId, updated: true, link: ctx.request.path };
+        }
+    }
+}
+
+/**
+ * Deletes a breed from the database by breed ID.
+ * @param {object} ctx context passed from Koa.
+ */
+async function deleteBreed(ctx) {
+    const id = ctx.params.id;
+    let breed = await breedModel.getById(id);
+    if (breed) {
+        const result = await breedModel.delete(id);
+        if (result) {
+            ctx.body = { id, deleted: true };
+        }
+    }
+}
+
+module.exports = router;</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-helpers_database.html">helpers/database</a></li><li><a href="module-models_breeds.html">models/breeds</a></li><li><a href="module-models_chatMessages.html">models/chatMessages</a></li><li><a href="module-models_dogBreeds.html">models/dogBreeds</a></li><li><a href="module-models_dogLocations.html">models/dogLocations</a></li><li><a href="module-models_dogs.html">models/dogs</a></li><li><a href="module-models_favourites.html">models/favourites</a></li><li><a href="module-models_locations.html">models/locations</a></li><li><a href="module-models_messages.html">models/messages</a></li><li><a href="module-models_staff.html">models/staff</a></li><li><a href="module-models_users.html">models/users</a></li><li><a href="module-modules_chats.html">modules/chats</a></li><li><a href="module-routes_breeds.html">routes/breeds</a></li><li><a href="module-routes_dogs.html">routes/dogs</a></li><li><a href="module-routes_locations.html">routes/locations</a></li><li><a href="module-routes_login.html">routes/login</a></li><li><a href="module-routes_special.html">routes/special</a></li><li><a href="module-routes_staff.html">routes/staff</a></li><li><a href="module-routes_users.html">routes/users</a></li><li><a href="module-strategies_basic.html">strategies/basic</a></li><li><a href="module-strategies_jwt.html">strategies/jwt</a></li></ul><h3>Classes</h3><ul><li><a href="helpers_database.DatabaseException.html">DatabaseException</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.6</a> on Mon Feb 22 2021 10:53:28 GMT+0000 (Coordinated Universal Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
