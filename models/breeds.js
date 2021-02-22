@@ -1,8 +1,22 @@
+/**
+ * @file Breeds model to manage interactions with the database.
+ * @module models/breeds
+ * @author Bartlomiej Wlodarski
+ */
+
 const { db, run } = require('../helpers/database');
 
 /**
+ * Breed object returned from the DB.
+ * @typedef {object} Breed
+ * @property {number} id Breed ID
+ * @property {string} name Name of the breed
+ * @property {string} description Breed description 
+ */
+
+/**
  * Gets all breed entries from the DB.
- * @returns {Promise<Array<object>>} array of all breed records.
+ * @returns {Promise<Array<Breed>>} array of all breed records.
  * @async
  */
 exports.getAll = async () => {
@@ -13,7 +27,7 @@ exports.getAll = async () => {
 /**
  * Gets a single breed entry from the DB by its ID.
  * @param {number} id ID of the breed to fetch.
- * @returns {Promise<object>} object containing the breed record.
+ * @returns {Promise<Breed>} object containing the breed record.
  * @async
  */
 exports.getById = async id => {
