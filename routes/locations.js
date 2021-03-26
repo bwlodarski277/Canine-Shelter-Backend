@@ -127,7 +127,7 @@ async function getAllChats(ctx) {
 
 async function createChat(ctx) {
     const locationId = ctx.params.id;
-    const { userId } = ctx.request.body;
+    const userId = ctx.state.user.id;
     const user = await userModel.getById(userId);
     if (user) {
         const id = await chatModel.add(locationId, userId);
@@ -148,9 +148,9 @@ async function getChat(ctx) {
 
 async function getMessages(ctx) {
     const { chatId } = ctx.params;
-    const messages = await chatMessagesModel.getByChatId(chatId);
-    if (messages) {
-        ctx.body = messages;
+    const chatMessages = await chatMessagesModel.getByChatId(chatId);
+    if (chatMessages) {
+        ctx.body = chatMessages;
     }
 }
 
