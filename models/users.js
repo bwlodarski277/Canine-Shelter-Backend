@@ -9,8 +9,15 @@ const bcrypt = require('bcrypt');
 
 /** List of columns to return from the DB (excludes password). */
 const cols = [
-    'id', 'username', 'email', 'firstName',
-    'lastName', 'dateCreated', 'dateModified', 'imageUrl'];
+	'id',
+	'username',
+	'email',
+	'firstName',
+	'lastName',
+	'dateCreated',
+	'dateModified',
+	'imageUrl'
+];
 
 /**
  * User object returned from the DB.
@@ -34,10 +41,9 @@ const cols = [
  * @async
  */
 exports.findByUsername = async username => {
-    const [data] = await run(async () =>
-        await db('users').where({ username }));
-    return data;
-}
+	const [data] = await run(async () => await db('users').where({ username }));
+	return data;
+};
 
 /**
  * Gets all users from the DB.
@@ -45,11 +51,13 @@ exports.findByUsername = async username => {
  * @async
  */
 exports.getAll = async () => {
-    const data = await run(async () =>
-        // ...cols is to make sure password is not returned.
-        await db('users').select(...cols));
-    return data;
-}
+	const data = await run(
+		async () =>
+			// ...cols is to make sure password is not returned.
+			await db('users').select(...cols)
+	);
+	return data;
+};
 
 /**
  * Gets a single user from the DB by their ID.
@@ -58,10 +66,14 @@ exports.getAll = async () => {
  * @async
  */
 exports.getById = async id => {
-    const [data] = await run(async () =>
-        await db('users').where({ id }).select(...cols));
-    return data;
-}
+	const [data] = await run(
+		async () =>
+			await db('users')
+				.where({ id })
+				.select(...cols)
+	);
+	return data;
+};
 
 /**
  * Creates a new user entry in the DB.
@@ -70,15 +82,14 @@ exports.getById = async id => {
  * @async
  */
 exports.add = async user => {
-    // Hashing the password and storing it back in the object
-    const { password } = user;
-    const hash = bcrypt.hashSync(password, 10);
-    user.password = hash;
-    // Passing data to Knex
-    const [data] = await run(async () =>
-        await db('users').insert(user));
-    return data;
-}
+	// Hashing the password and storing it back in the object
+	const { password } = user;
+	const hash = bcrypt.hashSync(password, 10);
+	user.password = hash;
+	// Passing data to Knex
+	const [data] = await run(async () => await db('users').insert(user));
+	return data;
+};
 
 /**
  * Updates a user record in the DB.
@@ -88,16 +99,17 @@ exports.add = async user => {
  * @async
  */
 exports.update = async (id, user) => {
-    // If the user is changing their password
-    if (user.password) {
-        const { password } = user;
-        const hash = bcrypt.hashSync(password, 10);
-        user.password = hash;
-    }
-    const data = await run(async () =>
-        await db('users').where({ id }).update(user));
-    return data;
-}
+	// If the user is changing their password
+	if (user.password) {
+		const { password } = user;
+		const hash = bcrypt.hashSync(password, 10);
+		user.password = hash;
+	}
+	const data = await run(
+		async () => await db('users').where({ id }).update(user)
+	);
+	return data;
+};
 
 /**
  * Deletes a user entry from the DB.
@@ -106,7 +118,8 @@ exports.update = async (id, user) => {
  * @async
  */
 exports.delete = async id => {
-    const data = await run(async () =>
-        await db('users').where({ id }).delete());
-    return data;
-}
+	const data = await run(
+		async () => await db('users').where({ id }).delete()
+	);
+	return data;
+};

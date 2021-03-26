@@ -27,14 +27,13 @@ exports.getByUserId = async userId => {
 
 /**
  * Gets a single favourite by user ID and dog ID.
- * @param {number} userId ID of user's favourite to fetch.
- * @param {number} dogId ID of favourited dog to fetch.
+ * @param {number} id ID of the favourite record.
  * @returns {Promise<Favourite>} record of user's favourited dog.
  * @async
  */
-exports.getSingleFav = async (userId, dogId) => {
+exports.getSingleFav = async id => {
     const [data] = await run(async () =>
-        await db('favourites').where({ userId, dogId }));
+        await db('favourites').where({ id }));
     return data;
 }
 
@@ -66,24 +65,23 @@ exports.getFavCount = async dogId => {
  * Creates a new favourite entry in the DB.
  * @param {number} userId ID of user adding a favourite.
  * @param {number} dogId ID of dog a user wants to favourite.
- * @returns {Promise<true>} confirmation of insertion.
+ * @returns {Promise<number>} ID of newly inserted row.
  * @async
  */
 exports.add = async (userId, dogId) => {
-    await run(async () =>
+    const data = await run(async () =>
         await db('favourites').insert({ userId, dogId }));
-    return true;
+    return data;
 }
 
 /**
  * Deletes a favourite entry from the DB.
- * @param {number} userId ID of favouriting user.
- * @param {number} dogId ID of favourited dog.
+ * @param {number} id ID of the favourite record.
  * @returns {Promise<number>} number of affected rows (should be 1).
  * @async
  */
-exports.delete = async (userId, dogId) => {
+exports.delete = async id => {
     const data = await run(async () =>
-        await db('favourites').where({ userId, dogId }).delete());
+        await db('favourites').where({ id }).delete());
     return data;
 }
