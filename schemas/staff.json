@@ -1,0 +1,112 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "definitions": {
+        "staff": {
+            "$id": "#staff",
+            "title": "Staff",
+            "description": "Data to register new staff.",
+            "type": "object",
+            "properties": {
+                "userId": {
+                    "description": "Staff user ID",
+                    "type": "integer"
+                },
+                "locationId": {
+                    "description": "Staff location ID",
+                    "type": "integer"
+                }
+            },
+            "required": [
+                "userId",
+                "locationId"
+            ]
+        },
+        "staffData": {
+            "$id": "#staffData",
+            "title": "Staff data",
+            "description": "Staff information record.",
+            "type": "object",
+            "properties": {
+                "id": {
+                    "description": "Staff ID",
+                    "type": "integer"
+                },
+                "userId": {
+                    "description": "Staff user ID",
+                    "type": "integer"
+                },
+                "locationId": {
+                    "description": "Staff location ID",
+                    "type": "integer"
+                }
+            }
+        },
+        "staffList": {
+            "$id": "#staffList",
+            "title": "Staff list",
+            "description": "List of staff.",
+            "type": "array",
+            "items": {
+                "$ref": "#/definitions/staffData"
+            }
+        },
+        "staffCreated": {
+            "$id": "#staffCreated",
+            "title": "Staff created",
+            "description": "Confirmation of a created staff.",
+            "type": "object",
+            "properties": {
+                "id": {
+                    "description": "ID of the newly created staff.",
+                    "type": "integer"
+                },
+                "created": {
+                    "description": "Indiactor of creation success.",
+                    "type": "boolean"
+                },
+                "link": {
+                    "description": "Path to the new staff record.",
+                    "type": "string",
+                    "format": "uri"
+                }
+            }
+        },
+        "staffUpdated": {
+            "$id": "#staffUpdated",
+            "title": "Staff updated",
+            "description": "Confirmation of staff update.",
+            "type": "object",
+            "properties": {
+                "id": {
+                    "description": "ID of the updated staff.",
+                    "type": "integer"
+                },
+                "updated": {
+                    "description": "Indiactor of update success.",
+                    "type": "boolean"
+                },
+                "link": {
+                    "description": "Path to the updated staff record.",
+                    "type": "string",
+                    "format": "uri"
+                }
+            }
+        },
+        "staffDeleted": {
+            "$id": "#staffDeleted",
+            "title": "Staff deleted",
+            "description": "Confirmation of staff removal.",
+            "type": "object",
+            "properties": {
+                "id": {
+                    "description": "ID of the deleted staff.",
+                    "type": "integer"
+                },
+                "deleted": {
+                    "description": "Indiactor of removal success.",
+                    "type": "boolean"
+                }
+            }
+        }
+    }
+}
