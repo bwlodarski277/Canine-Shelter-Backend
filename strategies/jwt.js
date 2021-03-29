@@ -4,16 +4,19 @@
  * @author Bartlomiej Wlodarski
  */
 
-
 const JwtStrategy = require('passport-jwt').Strategy;
 const ExtractJwt = require('passport-jwt').ExtractJwt;
 
 const { config } = require('../config');
 const userModel = require('../models/users');
 
+/**
+ * JWT options object
+ * @type {import('passport-jwt').StrategyOptions}
+ */
 const opts = {
-    jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-    secretOrKey: config.jwtSecret
+	jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+	secretOrKey: config.jwtSecret
 };
 
 /**
@@ -23,22 +26,24 @@ const opts = {
  * @async
  */
 const checkUser = async (jwtPayload, done) => {
-    let user;
+	let user;
 
-    try {
-        user = await userModel.getById(jwtPayload.sub);
-    } catch (error) {
-        console.error(`Error during authentication for user ${jwtPayload.name}`);
-        return done(error)
-    }
+	try {
+		user = await userModel.getById(jwtPayload.sub);
+	} catch (error) {
+		console.error(
+			`Error during authentication for user ${jwtPayload.name}`
+		);
+		return done(error);
+	}
 
-    if (user) {
-        console.log(`Successfully authenticated user ${jwtPayload.name}.`);
-        return done(null, user);
-    } else {
-        return done(null, false);
-        // return done(null, { role: 'guest' });
-    }
-}
+	if (user) {
+		console.log(`Successfully authenticated user ${jwtPayload.name}.`);
+		return done(null, user);
+	} else {
+		return done(null, false);
+		// return done(null, { role: 'guest' });
+	}
+};
 
 module.exports = new JwtStrategy(opts, checkUser);
