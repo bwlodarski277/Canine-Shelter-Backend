@@ -1,0 +1,1452 @@
+{
+	"openapi": "3.0.0",
+	"info": {
+		"version": "1.0.0",
+		"title": "Canine shelter API",
+		"description": "An API for a canine shelter website",
+		"contact": {
+			"name": "Bartlomiej Wlodarski",
+			"email": "wlodarsb@uni.coventry.ac.uk"
+		},
+		"license": {
+			"name": "Apache 2.0",
+			"url": "https://www.apache.org/licenses/LICENSE-2.0.html"
+		}
+	},
+	"servers": [
+		{
+			"url": "https://canoe-janet-3000.codio-box.uk/api/v1",
+			"description": "API backend server"
+		}
+	],
+	"security": [
+		{
+			"basic": [],
+			"jwt": []
+		}
+	],
+	"tags": [
+		{
+			"name": "Dogs",
+			"description": "Endpoints for dog-related functionalities"
+		},
+		{
+			"name": "Breeds",
+			"description": "Endpoints for managing breed-related functionalities"
+		},
+		{
+			"name": "Users",
+			"description": "Endpoinds for user-related functionalities"
+		},
+		{
+			"name": "Staff",
+			"description": "Endpoints for managing staff members"
+		},
+		{
+			"name": "Locations",
+			"description": "Endpoints for managing locations"
+		},
+		{
+			"name": "Chats",
+			"description": "Endpoints for managing conversations with shelters"
+		},
+		{
+			"name": "Miscellaneous",
+			"description": "Miscellaneous endpoints"
+		}
+	],
+	"components": {
+		"responses": {
+			"authenticationError": {
+				"description": "User needs to be authenticated to access this route"
+			},
+			"notFoundError": {
+				"description": "Resource does not exist"
+			},
+			"validationError": {
+				"description": "Occurs when the server rejects the form data",
+				"content": {
+					"application/json": {
+						"schema": {
+							"$ref": "./errors.json#/definitions/validationErrors"
+						}
+					}
+				}
+			}
+		},
+		"parameters": {
+			"userId": {
+				"name": "id",
+				"in": "path",
+				"description": "User ID",
+				"required": true,
+				"schema": { "type": "integer" }
+			},
+			"favId": {
+				"name": "favId",
+				"in": "path",
+				"description": "Favourite ID",
+				"required": true,
+				"schema": { "type": "integer" }
+			},
+			"dogId": {
+				"name": "id",
+				"in": "path",
+				"description": "Dog ID",
+				"required": true,
+				"schema": { "type": "integer" }
+			},
+			"locationId": {
+				"name": "id",
+				"in": "path",
+				"description": "Location ID",
+				"required": true,
+				"schema": { "type": "integer" }
+			},
+			"chatId": {
+				"name": "chatId",
+				"in": "path",
+				"description": "Chat ID",
+				"required": true,
+				"schema": { "type": "integer" }
+			},
+			"messageId": {
+				"name": "messageId",
+				"in": "path",
+				"description": "Message ID",
+				"required": true,
+				"schema": { "type": "integer" }
+			},
+			"staffId": {
+				"name": "id",
+				"in": "path",
+				"description": "Staff ID",
+				"required": true,
+				"schema": { "type": "integer" }
+			}
+		},
+		"securitySchemes": {
+			"jwt": {
+				"type": "http",
+				"scheme": "bearer",
+				"bearerFormat": "JWT"
+			},
+			"basic": {
+				"type": "http",
+				"scheme": "basic"
+			}
+		}
+	},
+	"paths": {
+		"/": {
+			"description": "API root",
+			"get": {
+				"description": "API root directory",
+				"tags": ["Miscellaneous"],
+				"security": [],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				}
+			}
+		},
+		"/users": {
+			"summary": "Represents users on the website",
+			"get": {
+				"tags": ["Users"],
+				"summary": "Gets a list of users on the website",
+				"responses": {
+					"200": {
+						"description": "A list of users",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "./users.json#/definitions/users"
+								}
+							}
+						}
+					},
+					"401": {
+						"$ref": "#/components/responses/authenticationError"
+					},
+					"403": {
+						"description": "Only staff may view the user list"
+					}
+				}
+			},
+			"post": {
+				"tags": ["Users"],
+				"security": [],
+				"summary": "Register a new user",
+				"description": "Add a new user to the database",
+				"requestBody": {
+					"description": "Data to register a new user",
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "./users.json#/definitions/user"
+							}
+						}
+					}
+				},
+				"responses": {
+					"201": {
+						"description": "User was created",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "./users.json#/definitions/userCreated"
+								}
+							}
+						}
+					},
+					"400": {
+						"$ref": "#/components/responses/validationError"
+					}
+				}
+			}
+		},
+		"/users/{id}": {
+			"summary": "A single user",
+			"parameters": [{ "$ref": "#/components/parameters/userId" }],
+			"get": {
+				"tags": ["Users"],
+				"summary": "Get a single user from the database",
+				"description": "Gets a single user by their ID",
+				"responses": {
+					"200": {
+						"description": "A single user's data",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "./users.json#/definitions/userData"
+								}
+							}
+						}
+					},
+					"401": {
+						"$ref": "#/components/responses/authenticationError"
+					},
+					"403": {
+						"description": "Users may only view their own records"
+					},
+					"404": {
+						"$ref": "#/components/responses/notFoundError"
+					}
+				}
+			},
+			"put": {
+				"tags": ["Users"],
+				"summary": "Update user information in the database",
+				"description": "Updates a given user's database entry using data provided",
+				"requestBody": {
+					"description": "Data to update in the database",
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "./users.json#/definitions/user"
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "User was successfully updated",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "./users.json#/definitions/userUpdated"
+								}
+							}
+						}
+					},
+					"400": {
+						"$ref": "#/components/responses/validationError"
+					},
+					"401": {
+						"$ref": "#/components/responses/authenticationError"
+					},
+					"403": {
+						"description": "Non-admins can only modify their own account"
+					},
+					"404": { "$ref": "#/components/responses/notFoundError" }
+				}
+			},
+			"delete": {
+				"tags": ["Users"],
+				"summary": "Delete a user from the database",
+				"description": "Deletes a user with a given ID",
+				"responses": {
+					"200": {
+						"description": "User successfully deleted",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "./users.json#/definitions/userDeleted"
+								}
+							}
+						}
+					},
+					"401": {
+						"$ref": "#/components/responses/authenticationError"
+					},
+					"403": {
+						"description": "Non-admins can only modify their own account"
+					},
+					"404": {
+						"$ref": "#/components/responses/notFoundError"
+					}
+				}
+			}
+		},
+		"/users/{id}/favourites": {
+			"description": "The dogs a user favourited",
+			"parameters": [{ "$ref": "#/components/parameters/userId" }],
+			"get": {
+				"tags": ["Users"],
+				"summary": "Get a list of a user's favourites",
+				"responses": {
+					"200": {
+						"description": "A list of favourites",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "./users.json#/definitions/favourites"
+								}
+							}
+						}
+					},
+					"401": {
+						"$ref": "#/components/responses/authenticationError"
+					},
+					"403": {
+						"description": "A user can only view their own favourites"
+					},
+					"404": {
+						"$ref": "#/components/responses/notFoundError"
+					}
+				}
+			},
+			"post": {
+				"tags": ["Users"],
+				"summary": "Add a dog to a user's favourite list",
+				"description": "Takes a dog ID to add to a user's favourite list",
+				"requestBody": {
+					"description": "ID of dog to favourite",
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "./users.json#/definitions/favourite"
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "Favourite was successfully created",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "./users.json#/definitions/favouriteCreated"
+								}
+							}
+						}
+					},
+					"400": {
+						"$ref": "#/components/responses/validationError"
+					},
+					"401": {
+						"$ref": "#/components/responses/authenticationError"
+					},
+					"403": {
+						"description": "Only administrators may add dogs"
+					},
+					"404": {
+						"$ref": "#/components/responses/notFoundError"
+					}
+				}
+			}
+		},
+		"/users/{id}/favourites/{favId}": {
+			"description": "A single favourite entry",
+			"parameters": [
+				{ "$ref": "#/components/parameters/userId" },
+				{ "$ref": "#/components/parameters/favId" }
+			],
+			"get": {
+				"tags": ["Users"],
+				"summary": "Get a singe user favourite by ID",
+				"description": "Gets a user's favourite record by user ID and favourite ID",
+				"responses": {
+					"200": {
+						"description": "Successfully retrieved favourite",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "./users.json#/definitions/favouriteData"
+								}
+							}
+						}
+					},
+					"401": {
+						"$ref": "#/components/responses/authenticationError"
+					},
+					"403": {
+						"description": "Users can only view their own favourites"
+					},
+					"404": {
+						"$ref": "#/components/responses/notFoundError"
+					}
+				}
+			},
+			"delete": {
+				"tags": ["Users"],
+				"summary": "Removes a favourite",
+				"description": "Delete's a user's favourite by user ID and favourite ID",
+				"responses": {
+					"200": {
+						"description": "Favourite was successfully deleted",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "./users.json#/definitions/favouriteDeleted"
+								}
+							}
+						}
+					},
+					"401": {
+						"$ref": "#/components/responses/authenticationError"
+					},
+					"403": {
+						"description": "Users may only manage their own favourites"
+					},
+					"404": {
+						"$ref": "#/components/responses/notFoundError"
+					}
+				}
+			}
+		},
+		"/dogs": {
+			"summary": "Represents dogs on the website",
+			"get": {
+				"tags": ["Dogs"],
+				"description": "Get a list of dogs from the database",
+				"security": [],
+				"parameters": [
+					{
+						"name": "query",
+						"description": "A search query",
+						"in": "query",
+						"required": false,
+						"schema": { "type": "string" },
+						"example": "Rex"
+					},
+					{
+						"name": "page",
+						"description": "Page number to browse",
+						"in": "query",
+						"required": false,
+						"schema": { "type": "integer" },
+						"example": 1
+					},
+					{
+						"name": "limit",
+						"description": "Limit of entries per page",
+						"in": "query",
+						"required": false,
+						"schema": { "type": "integer" },
+						"example": 5
+					},
+					{
+						"name": "order",
+						"description": "Item to order the results by",
+						"in": "query",
+						"required": false,
+						"schema": {
+							"type": "string",
+							"enum": [
+								"id",
+								"name",
+								"description",
+								"age",
+								"gender"
+							]
+						},
+						"example": "age"
+					},
+					{
+						"name": "direction",
+						"description": "Direction to sort in (ascending or descending)",
+						"in": "query",
+						"required": false,
+						"schema": {
+							"type": "string",
+							"enum": ["asc", "desc"]
+						},
+						"example": "asc"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Successfully retrieved list of dogs",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "./dogs.json#/definitions/dogs"
+								}
+							}
+						}
+					}
+				}
+			},
+			"post": {
+				"tags": ["Dogs"],
+				"summary": "Add a new dog to the database",
+				"description": "Adds a new dog to the database using information provided",
+				"requestBody": {
+					"description": "Data to register a new dog",
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "./dogs.json#/definitions/dog"
+							}
+						}
+					}
+				},
+				"responses": {
+					"201": {
+						"description": "Dog was successfully added to the database",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "./dogs.json#/definitions/dogCreated"
+								}
+							}
+						}
+					},
+					"400": {
+						"$ref": "#/components/responses/validationError"
+					},
+					"401": {
+						"$ref": "#/components/responses/authenticationError"
+					},
+					"403": {
+						"description": "Only administrators may add dogs"
+					}
+				}
+			}
+		},
+		"/dogs/{id}": {
+			"description": "A single dog record",
+			"parameters": [{ "$ref": "#/components/parameters/dogId" }],
+			"get": {
+				"tags": ["Dogs"],
+				"summary": "Get a single dog entry",
+				"security": [],
+				"responses": {
+					"200": {
+						"description": "Dog entry successfully retrieved",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "./dogs.json#/definitions/dogData"
+								}
+							}
+						}
+					},
+					"404": {
+						"$ref": "#/components/responses/notFoundError"
+					}
+				}
+			},
+			"put": {
+				"tags": ["Dogs"],
+				"summary": "Update a dog entry",
+				"description": "Updates a dog's entry by dog ID and data provided",
+				"requestBody": {
+					"description": "Data to update a dog",
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "./dogs.json#/definitions/dog"
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "Dog was successfully updated",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "./dogs.json#/definitions/dogUpdated"
+								}
+							}
+						}
+					},
+					"400": { "$ref": "#/components/responses/validationError" },
+					"401": {
+						"$ref": "#/components/responses/authenticationError"
+					},
+					"403": {
+						"description": "Only administrators may alter dog entries"
+					},
+					"404": { "$ref": "#/components/responses/notFoundError" }
+				}
+			},
+			"delete": {
+				"tags": ["Dogs"],
+				"summary": "Delete a dog from the database",
+				"description": "Deletes a dog from the database by dog ID",
+				"responses": {
+					"200": {
+						"description": "Dog was successfully deleted",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "./dogs.json#/definitions/dogDeleted"
+								}
+							}
+						}
+					},
+					"401": {
+						"$ref": "#/components/responses/authenticationError"
+					},
+					"403": {
+						"description": "Only administrators may delete dog entries"
+					},
+					"404": { "$ref": "#/components/responses/notFoundError" }
+				}
+			}
+		},
+		"/dogs/{id}/breed": {
+			"description": "A single dog's breed",
+			"parameters": [{ "$ref": "#/components/parameters/dogId" }],
+			"get": {
+				"tags": ["Dogs"],
+				"summary": "Get a dog's breed entry",
+				"security": [],
+				"responses": {
+					"200": {
+						"description": "Successflly retireved dog breed",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "./dogs.json#/definitions/dogBreedData"
+								}
+							}
+						}
+					},
+					"404": { "$ref": "#/components/responses/notFoundError" }
+				}
+			},
+			"post": {
+				"tags": ["Dogs"],
+				"summary": "Assign a breed to the dog",
+				"description": "Assigns a breed to a dog using the provided breed ID",
+				"requestBody": {
+					"description": "Dog ID and breed ID to link",
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "./dogs.json#/definitions/dogBreed"
+							}
+						}
+					}
+				},
+				"responses": {
+					"201": {
+						"description": "Successfully added dog breed",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "./dogs.json#/definitions/dogBreedCreated"
+								}
+							}
+						}
+					},
+					"400": { "$ref": "#/components/responses/validationError" },
+					"401": {
+						"$ref": "#/components/responses/authenticationError"
+					},
+					"403": {
+						"description": "Only administrators may assign breeds"
+					},
+					"404": { "$ref": "#/components/responses/notFoundError" }
+				}
+			},
+			"put": {
+				"tags": ["Dogs"],
+				"summary": "Update breed assigned to a dog",
+				"description": "Updates a given dog's breed using provided breed ID",
+				"requestBody": {
+					"description": "Dog ID and breed ID to update",
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "./dogs.json#/definitions/dogBreed"
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "Successfully updated dog breed",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "./dogs.json#/definitions/dogBreedUpdated"
+								}
+							}
+						}
+					},
+					"400": { "$ref": "#/components/responses/validationError" },
+					"401": {
+						"$ref": "#/components/responses/authenticationError"
+					},
+					"403": {
+						"description": "Only administrators may assign breeds"
+					},
+					"404": { "$ref": "#/components/responses/notFoundError" }
+				}
+			},
+			"delete": {
+				"tags": ["Dogs"],
+				"summary": "Delete a dog's breed assignment",
+				"description": "Deletes a dog's breed entry by the dog's ID",
+				"responses": {
+					"200": {
+						"description": "Dog breed successfully deleted",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "./dogs.json#/definitions/dogBreedDeleted"
+								}
+							}
+						}
+					},
+					"401": {
+						"$ref": "#/components/responses/authenticationError"
+					},
+					"403": {
+						"description": "Only administrators may assign breeds"
+					},
+					"404": { "$ref": "#/components/responses/notFoundError" }
+				}
+			}
+		},
+		"/dogs/{id}/location": {
+			"description": "Location of a dog",
+			"parameters": [{ "$ref": "#/components/parameters/dogId" }],
+			"get": {
+				"tags": ["Dogs"],
+				"summary": "Get the location a dog is associated with",
+				"security": [],
+				"responses": {
+					"200": {
+						"description": "Successfully retrieved dog location",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "./dogs.json#/definitions/dogLocationData"
+								}
+							}
+						}
+					},
+					"404": { "$ref": "#/components/responses/notFoundError" }
+				}
+			},
+			"post": {
+				"tags": ["Dogs"],
+				"summary": "Assigns a location to a dog",
+				"description": "Assigns a location to a dog by taking a location ID",
+				"requestBody": {
+					"description": "Dog ID and location ID to link",
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "./dogs.json#/definitions/dogLocation"
+							}
+						}
+					}
+				},
+				"responses": {
+					"201": {
+						"description": "Successfully assigned location to a dog",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "./dogs.json#/definitions/dogLocationCreated"
+								}
+							}
+						}
+					},
+					"400": { "$ref": "#/components/responses/validationError" },
+					"401": {
+						"$ref": "#/components/responses/authenticationError"
+					},
+					"403": {
+						"description": "Only administrators may alter dogs"
+					},
+					"404": { "$ref": "#/components/responses/notFoundError" }
+				}
+			},
+			"put": {
+				"tags": ["Dogs"],
+				"summary": "Assigns a new location to a dog",
+				"description": "Assigns a given dog's location based on a location ID",
+				"requestBody": {
+					"description": "Dog ID and location ID to update",
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "./dogs.json#/definitions/dogLocation"
+							}
+						}
+					}
+				},
+				"responses": {
+					"201": {
+						"description": "Successfully updated dog location",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "./dogs.json#/definitions/dogLocationUpdated"
+								}
+							}
+						}
+					},
+					"400": { "$ref": "#/components/responses/validationError" },
+					"401": {
+						"$ref": "#/components/responses/authenticationError"
+					},
+					"403": {
+						"description": "Only administrators may alter dogs"
+					},
+					"404": { "$ref": "#/components/responses/notFoundError" }
+				}
+			},
+			"delete": {
+				"tags": ["Dogs"],
+				"summary": "Delete a dog's location",
+				"description": "Deletes a dog's location by dog ID",
+				"responses": {
+					"201": {
+						"description": "Successfully deleted dog location",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "./dogs.json#/definitions/dogLocationDeleted"
+								}
+							}
+						}
+					},
+					"400": { "$ref": "#/components/responses/validationError" },
+					"401": {
+						"$ref": "#/components/responses/authenticationError"
+					},
+					"403": {
+						"description": "Only administrators may alter dogs"
+					},
+					"404": { "$ref": "#/components/responses/notFoundError" }
+				}
+			}
+		},
+		"/dogs/{id}/favourites": {
+			"description": "A list of a dog's favourites",
+			"parameters": [{ "$ref": "#/components/parameters/dogId" }],
+			"get": {
+				"tags": ["Dogs"],
+				"description": "Get a list of favourites associated with the dog",
+				"responses": {
+					"200": {
+						"description": "Successfully retrieved favourites list",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "./dogs.json#/definitions/dogFavourites"
+								}
+							}
+						}
+					},
+					"404": { "$ref": "#/components/responses/notFoundError" }
+				}
+			}
+		},
+		"/locations": {
+			"description": "Represents a physical shelter",
+			"get": {
+				"tags": ["Locations"],
+				"summary": "Get a list of locations",
+				"security": [],
+				"responses": {
+					"200": {
+						"description": "Successfully retrieved list of locations",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "./locations.json#/definitions/locations"
+								}
+							}
+						}
+					}
+				}
+			},
+			"post": {
+				"tags": ["Locations"],
+				"summary": "Add a new location",
+				"description": "Creates a new location using data provided",
+				"requestBody": {
+					"description": "Data to register a new location",
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "./locations.json#/definitions/location"
+							}
+						}
+					}
+				},
+				"responses": {
+					"201": {
+						"description": "Location was created",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "./locations.json#/definitions/locationCreated"
+								}
+							}
+						}
+					},
+					"400": { "$ref": "#/components/responses/validationError" },
+					"401": {
+						"$ref": "#/components/responses/authenticationError"
+					},
+					"403": {
+						"description": "Only staff may add new locations"
+					}
+				}
+			}
+		},
+		"/locations/{id}": {
+			"description": "An individual location",
+			"parameters": [{ "$ref": "#/components/parameters/locationId" }],
+			"get": {
+				"tags": ["Locations"],
+				"summary": "Get a single location",
+				"description": "Gets a single location by ID",
+				"security": [],
+				"responses": {
+					"200": {
+						"description": "Successfully retrieved location",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "./locations.json#/definitions/locationData"
+								}
+							}
+						}
+					}
+				}
+			},
+			"put": {
+				"summary": "Update a location's information",
+				"description": "Updates a given location's information using location ID",
+				"tags": ["Locations"],
+				"requestBody": {
+					"description": "Data to update",
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "./locations.json#/definitions/location"
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "Successfully updated entry",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "./locations.json#/definitions/locationUpdated"
+								}
+							}
+						}
+					},
+					"400": { "$ref": "#/components/responses/validationError" },
+					"401": {
+						"$ref": "#/components/responses/authenticationError"
+					},
+					"403": {
+						"description": "Only staff may alter locations"
+					},
+					"404": { "$ref": "#/components/responses/notFoundError" }
+				}
+			},
+			"delete": {
+				"tags": ["Locations"],
+				"summary": "Delete a location",
+				"description": "Deletes a location by its ID",
+				"responses": {
+					"200": {
+						"description": "Successfully deleted location",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "./locations.json#/definitions/locationDeleted"
+								}
+							}
+						}
+					},
+					"401": {
+						"$ref": "#/components/responses/authenticationError"
+					},
+					"403": {
+						"description": "Only staff may alter locations"
+					},
+					"404": { "$ref": "#/components/responses/notFoundError" }
+				}
+			}
+		},
+		"/locations/{id}/dogs": {
+			"description": "Dogs at a given location",
+			"parameters": [{ "$ref": "#/components/parameters/locationId" }],
+			"get": {
+				"summary": "Get a list of dogs",
+				"description": "Gets a list of dogs at a given location by location ID",
+				"security": [],
+				"tags": ["Locations"],
+				"responses": {
+					"200": {
+						"description": "Successfully retrieved list of dogs",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "./locations.json#/definitions/locationDogs"
+								}
+							}
+						}
+					},
+					"404": { "$ref": "#/components/responses/notFoundError" }
+				}
+			}
+		},
+		"/locations/{id}/chats": {
+			"description": "Chats with a local shelter",
+			"get": {
+				"tags": ["Chats"],
+				"summary": "Get a list of chats",
+				"description": "Gets a list of chats with a given location by location ID",
+				"responses": {
+					"200": {
+						"description": "Successfully retrieved list of chats",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "./locations.json#/definitions/chats"
+								}
+							}
+						}
+					},
+					"404": { "$ref": "#/components/responses/notFoundError" }
+				}
+			},
+			"post": {
+				"summary": "Create a new chat",
+				"description": "Creates a new chat at a given location",
+				"tags": ["Chats"],
+				"requestBody": {
+					"description": "Data to register a new chat",
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "./locations.json#/definitions/chat"
+							}
+						}
+					}
+				},
+				"responses": {
+					"201": {
+						"description": "Chat successfully registered",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "./locations.json#/definitions/chatCreated"
+								}
+							}
+						}
+					},
+					"400": { "$ref": "#/components/responses/validationError" },
+					"401": {
+						"$ref": "#/components/responses/authenticationError"
+					},
+					"404": { "$ref": "#/components/responses/notFoundError" }
+				}
+			}
+		},
+		"/locations/{id}/chats/{chatId}": {
+			"description": "A single chat with a given location",
+			"parameters": [
+				{ "$ref": "#/components/parameters/locationId" },
+				{ "$ref": "#/components/parameters/chatId" }
+			],
+			"get": {
+				"summary": "Get an individual chat",
+				"description": "Gets a chat's information by chat ID",
+				"tags": ["Chats"],
+				"security": [],
+				"responses": {
+					"200": {
+						"description": "Successfully retrieved chat information",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "./locations.json#/definitions/chatData"
+								}
+							}
+						}
+					},
+					"403": {
+						"description": "Users can only retrieve their own chats"
+					},
+					"404": {
+						"$ref": "#/components/responses/notFoundError"
+					}
+				}
+			},
+			"post": {
+				"summary": "Add a new message to a chat",
+				"description": "Adds a new message by chat ID",
+				"tags": ["Chats"],
+				"requestBody": {
+					"description": "New message to send",
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "./locations.json#/definitions/message"
+							}
+						}
+					}
+				},
+				"responses": {
+					"201": {
+						"description": "Message was sent",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "./locations.json#/definitions/messageCreated"
+								}
+							}
+						}
+					},
+					"400": {
+						"$ref": "#/components/responses/validationError"
+					},
+					"401": {
+						"$ref": "#/components/responses/authenticationError"
+					},
+					"403": {
+						"description": "Users can only send messages in their own chats"
+					},
+					"404": {
+						"$ref": "#/components/responses/notFoundError"
+					}
+				}
+			}
+		},
+		"/locations/{id}/chats/{chatId}/messages": {
+			"description": "The messages in a chat",
+			"parameters": [
+				{ "$ref": "#/components/parameters/locationId" },
+				{ "$ref": "#/components/parameters/chatId" }
+			],
+			"get": {
+				"summary": "Get all the messages in a chat",
+				"description": "Gets all chat messages by chat ID",
+				"tags": ["Chats"],
+				"responses": {
+					"200": {
+						"description": "Successfully retrieved list of messages",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "./locations.json#/definitions/messages"
+								}
+							}
+						}
+					},
+					"401": {
+						"$ref": "#/components/responses/authenticationError"
+					},
+					"403": {
+						"description": "Users can only access their own chats"
+					},
+					"404": {
+						"$ref": "#/components/responses/notFoundError"
+					}
+				}
+			},
+			"post": {
+				"summary": "Sends a new message to a chat",
+				"description": "Sends a new message to a chat using a chat ID",
+				"tags": ["Chats"],
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "./locations.json#/definitions/message"
+							}
+						}
+					}
+				},
+				"responses": {
+					"201": {
+						"description": "Message successfully added",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "./locations.json#/definitions/messageCreated"
+								}
+							}
+						}
+					},
+					"400": {
+						"$ref": "#/components/responses/validationError"
+					},
+					"401": {
+						"$ref": "#/components/responses/authenticationError"
+					},
+					"403": {
+						"description": "Users may only add messages to their own chats"
+					},
+					"404": {
+						"$ref": "#/components/responses/notFoundError"
+					}
+				}
+			}
+		},
+		"/locations{id}/chats/{chatId}/messages/{messageId}": {
+			"description": "A single chat message",
+			"parameters": [
+				{ "$ref": "#/components/parameters/locationId" },
+				{ "$ref": "#/components/parameters/chatId" },
+				{ "$ref": "#/components/parameters/messageId" }
+			],
+			"get": {
+				"summary": "Get a single chat message",
+				"description": "Get a chat message by its ID",
+				"tags": ["Chats"],
+				"responses": {
+					"200": {
+						"description": "Successfully retrieved chat message",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "./locations.json#/definitions/messageData"
+								}
+							}
+						}
+					},
+					"401": {
+						"$ref": "#/components/responses/authenticationError"
+					},
+					"403": {
+						"description": "Users may only view their own messages"
+					},
+					"404": {
+						"$ref": "#/components/responses/notFoundError"
+					}
+				}
+			},
+			"delete": {
+				"summary": "Delete a chat message",
+				"description": "Deletes a chat message by its ID",
+				"tags": ["Chats"],
+				"responses": {
+					"200": {
+						"description": "Successfully deleted chat message",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "./locations.json#/definitions/messageDeleted"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/staff": {
+			"description": "A list of staff members",
+			"get": {
+				"summary": "Get a list of staff members",
+				"description": "Gets a list of staff members, represented by a user ID and location ID they work at",
+				"tags": ["Staff"],
+				"responses": {
+					"200": {
+						"description": "Successfully retrieved list of staff members",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "./staff.json#/definitions/staffList"
+								}
+							}
+						}
+					},
+					"401": {
+						"$ref": "#/components/responses/authenticationError"
+					},
+					"403": {
+						"description": "Only staff may view the staff list"
+					}
+				}
+			},
+			"post": {
+				"tags": ["Staff"],
+				"summary": "Regsiter a new staff member",
+				"description": "Register a user as a staff member by assigning them to a location",
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "./staff.json#/definitions/staff"
+							}
+						}
+					}
+				},
+				"responses": {
+					"201": {
+						"description": "Successfully registered staff member",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "./staff.json#/definitions/staffCreated"
+								}
+							}
+						}
+					},
+					"400": {
+						"$ref": "#/components/responses/validationError"
+					},
+					"401": {
+						"$ref": "#/components/responses/authenticationError"
+					},
+					"403": {
+						"description": "Only users with the Staff role may set their location"
+					}
+				}
+			}
+		},
+		"/staff/{id}": {
+			"parameters": [
+				{
+					"$ref": "#/components/parameters/staffId"
+				}
+			],
+			"summary": "A single staff member",
+			"description": "Routes for managing individual staff members",
+			"get": {
+				"tags": ["Staff"],
+				"summary": "Get a single staff member",
+				"description": "Gets a single staff member by their staff ID",
+				"responses": {
+					"200": {
+						"description": "Successfully retrieved staff member information",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "./staff.json#/definitions/staffData"
+								}
+							}
+						}
+					},
+					"401": {
+						"$ref": "#/components/responses/authenticationError"
+					},
+					"403": {
+						"description": "Only staff may view staff records."
+					},
+					"404": {
+						"$ref": "#/components/responses/notFoundError"
+					}
+				}
+			},
+			"put": {
+				"tags": ["Staff"],
+				"summary": "Update a staff member",
+				"description": "Updates the staff member's data, such as their shelter location",
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "./staff.json#/definitions/staff"
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "Successfully updated staff record",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "./staff.json#/definitions/staffUpdated"
+								}
+							}
+						}
+					},
+					"400": {
+						"$ref": "#/components/responses/validationError"
+					},
+					"401": {
+						"$ref": "#/components/responses/authenticationError"
+					},
+					"403": {
+						"description": "Staff members may only update their own records"
+					},
+					"404": {
+						"$ref": "#/components/responses/notFoundError"
+					}
+				}
+			},
+			"delete": {
+				"summary": "Deletes a staff member",
+				"description": "Deletes a staff member by staff ID.",
+				"tags": ["Staff"],
+				"responses": {
+					"200": {
+						"description": "Successfully deleted staff record",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "./staff.json#/definitions/staffDeleted"
+								}
+							}
+						}
+					},
+					"401": {
+						"$ref": "#/components/responses/authenticationError"
+					},
+					"403": {
+						"description": "Staff may only delete their own records."
+					},
+					"404": {
+						"$ref": "#/components/responses/notFoundError"
+					}
+				}
+			}
+		}
+	}
+}

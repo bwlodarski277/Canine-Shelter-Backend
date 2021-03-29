@@ -25,8 +25,8 @@ router.del('/:id([0-9]+)', auth, deleteUser);
 router.get('/:id([0-9]+)/favourites', auth, getUserFavs);
 router.post('/:id([0-9]+)/favourites', auth, bodyParser(), addUserFav);
 
-router.get('/:id([0-9]+)/favourites/:dogId([0-9]+)', auth, getUserFav);
-router.del('/:id([0-9]+)/favourites/:dogId([0-9]+)', auth, deleteUserFav);
+router.get('/:id([0-9]+)/favourites/:favId([0-9]+)', auth, getUserFav);
+router.del('/:id([0-9]+)/favourites/:favId([0-9]+)', auth, deleteUserFav);
 
 /**
  * Gets all the users from the database.
@@ -129,9 +129,8 @@ async function addUserFav(ctx) {
  * @param {object} ctx context passed from Koa.
  */
 async function getUserFav(ctx) {
-    const userId = ctx.params.id;
-    const dogId = ctx.params.dogId;
-    const result = await favsModel.getSingleFav(userId, dogId);
+    const favId = ctx.params.favId;
+    const result = await favsModel.getSingleFav(favId);
     if (result) {
         ctx.body = result;
     }
@@ -142,11 +141,10 @@ async function getUserFav(ctx) {
  * @param {object} ctx context passed from Koa.
  */
 async function deleteUserFav(ctx) {
-    const userId = ctx.params.id;
-    const dogId = ctx.params.dogId;
-    const result = await favsModel.delete(userId, dogId);
+    const favId = ctx.params.favId;
+    const result = await favsModel.delete(favId);
     if (result) {
-        ctx.body = { id: userId, deleted: true };
+        ctx.body = { id: favId, deleted: true };
     }
 }
 

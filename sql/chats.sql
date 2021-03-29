@@ -3,5 +3,6 @@ CREATE TABLE `chats` (
     `locationId` int NOT NULL,
     `userId` int NOT NULL,
     FOREIGN KEY (`locationId`) REFERENCES `locations` (`id`),
-    FOREIGN KEY (`userId`) REFERENCES `users` (`id`)
+    FOREIGN KEY (`userId`) REFERENCES `users` (`id`),
+    UNIQUE(`locationId`, `userId`)
 );

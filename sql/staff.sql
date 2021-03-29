@@ -3,5 +3,6 @@ CREATE TABLE `staff` (
     `userId` int,
     `locationId` int,
     FOREIGN KEY (`userId`) REFERENCES `users` (`id`),
-    FOREIGN KEY (`locationId`) REFERENCES `locations` (`id`)
+    FOREIGN KEY (`locationId`) REFERENCES `locations` (`id`),
+    UNIQUE (`userId`, `locationId`)
 );

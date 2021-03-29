@@ -3,7 +3,6 @@ CREATE TABLE `users` (
     `username` varchar(32) UNIQUE NOT NULL,
     `email` varchar(32) UNIQUE NOT NULL,
     `password` varchar(256),
-    `passwordSalt` varchar(256),
     `firstName` varchar(32) NOT NULL,
     `lastName` varchar(32) NOT NULL,
     `dateCreated` datetime DEFAULT CURRENT_TIMESTAMP,

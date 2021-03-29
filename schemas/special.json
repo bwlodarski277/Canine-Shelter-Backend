@@ -1,0 +1,16 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "$id": "#welcome",
+    "title": "Welcome",
+    "description": "API welcome message",
+    "type": "object",
+    "properties": {
+        "message": {
+            "description": "Welcome message",
+            "type": "string",
+            "examples": [
+                "The Canine Shelter API"
+            ]
+        }
+    }
+}

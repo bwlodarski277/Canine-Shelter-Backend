@@ -1,0 +1,17 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "$id": "#jwt",
+    "title": "JWT",
+    "description": "JSON Web Token generated for the user",
+    "type": "object",
+    "properties": {
+        "token": {
+            "description": "JWT token for authentication",
+            "type": "string"
+        },
+        "expires": {
+            "description": "Token expiration date and time",
+            "type": "string"
+        }
+    }
+}

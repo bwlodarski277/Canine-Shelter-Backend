@@ -12,25 +12,55 @@ const dogBreedModel = require('../models/dogBreeds');
 const dogLocationModel = require('../models/dogLocations');
 const favouritesModel = require('../models/favourites');
 
+const {
+    validateDog,
+    validateDogBreed,
+    validateDogLocation
+} = require('../controllers/validation');
+
 const auth = require('../controllers/auth');
 
 const router = new Router({ prefix: '/api/v1/dogs' });
 
 router.get('/', getAll);
-router.post('/', auth, bodyParser(), addDog);
+router.post('/', auth, bodyParser(), validateDog, addDog);
 
 router.get('/:id([0-9]+)', getDog);
-router.put('/:id([0-9]+)', auth, bodyParser(), updateDog);
+router.put('/:id([0-9]+)', auth, bodyParser(), validateDog, updateDog);
 router.del('/:id([0-9]+)', auth, deleteDog);
 
 router.get('/:id([0-9]+)/breed', getDogBreed);
-router.post('/:id([0-9]+)/breed', auth, bodyParser(), addDogBreed);
-router.put('/:id([0-9]+)/breed', auth, bodyParser(), updateDogBreed);
+router.post(
+    '/:id([0-9]+)/breed',
+    auth,
+    bodyParser(),
+    validateDogBreed,
+    addDogBreed
+);
+router.put(
+    '/:id([0-9]+)/breed',
+    auth,
+    bodyParser(),
+    validateDogBreed,
+    updateDogBreed
+);
 router.del('/:id([0-9]+)/breed', auth, deleteDogBreed);
 
 router.get('/:id([0-9]+)/location', getDogLocation);
-router.post('/:id([0-9]+)/location', auth, bodyParser(), addDogLocation);
-router.put('/:id([0-9]+)/location', auth, bodyParser(), updateDogLocation);
+router.post(
+    '/:id([0-9]+)/location',
+    auth,
+    bodyParser(),
+    validateDogLocation,
+    addDogLocation
+);
+router.put(
+    '/:id([0-9]+)/location',
+    auth,
+    bodyParser(),
+    validateDogLocation,
+    updateDogLocation
+);
 router.del('/:id([0-9]+)/location', auth, deleteDogLocation);
 
 router.get('/:id([0-9]+)/favourites', getFavourites);
@@ -40,8 +70,20 @@ router.get('/:id([0-9]+)/favourites', getFavourites);
  * @param {object} ctx context passed from Koa.
  */
 async function getAll(ctx) {
-    const { query, page, limit, order, direction, ...filters } = ctx.request.query;
-    const dogs = await dogModel.getAll(query, filters, page, limit, order, direction);
+    const {
+        query,
+        page,
+        limit,
+        order,
+        direction
+    } = ctx.request.query;
+    const dogs = await dogModel.getAll(
+        query,
+        page,
+        limit,
+        order,
+        direction
+    );
     if (dogs.length) {
         ctx.body = dogs;
     }

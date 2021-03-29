@@ -16,6 +16,8 @@
   "license": "ISC",
   "dependencies": {
     "@koa/cors": "^3.1.0",
+    "ajv": "^7.1.1",
+    "ajv-formats": "^1.5.1",
     "bcrypt": "^5.0.0",
     "jsonwebtoken": "^8.5.1",
     "knex": "^0.21.17",
@@ -25,7 +27,8 @@
     "koa-router": "^10.0.0",
     "passport-http": "^0.3.0",
     "passport-jwt": "^4.0.0",
-    "promise-mysql": "^5.0.2"
+    "promise-mysql": "^5.0.2",
+    "twit": "^2.2.11"
   },
   "devDependencies": {
     "jsdoc": "^3.6.6",

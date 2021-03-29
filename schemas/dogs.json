@@ -1,0 +1,378 @@
+{
+	"$schema": "http://json-schema.org/draft-07/schema",
+	"definitions": {
+		"dog": {
+			"$id": "#dog",
+			"title": "Dog",
+			"description": "Data to register a new dog",
+			"type": "object",
+			"properties": {
+				"name": {
+					"description": "Dog name",
+					"type": "string",
+					"examples": ["Rex"],
+					"minLength": 3,
+					"maxLength": 32
+				},
+				"description": {
+					"description": "Description talking about the dog",
+					"type": "string",
+					"examples": ["A beautiful corgi"]
+				},
+				"age": {
+					"description": "Dog's age in years",
+					"type": "integer",
+					"examples": [5],
+					"minimum": 0
+				},
+				"gender": {
+					"description": "Dog's gender. 0 for female, 1 for male",
+					"type": "boolean",
+					"examples": [1]
+				},
+				"imageUrl": {
+					"description": "Path to a picture of the dog",
+					"type": "string",
+					"pattern": "uri",
+					"examples": ["https://picsum.photos/200"]
+				}
+			},
+			"required": ["name"],
+			"additionalProperties": false
+		},
+		"dogData": {
+			"$id": "#dogData",
+			"title": "Dog data",
+			"description": "Dog information record",
+			"type": "object",
+			"properties": {
+				"id": {
+					"description": "Dog's ID",
+					"type": "integer",
+					"examples": [2]
+				},
+				"name": {
+					"description": "Dog name",
+					"type": "string",
+					"examples": ["Rex"]
+				},
+				"description": {
+					"description": "Description talking about the dog",
+					"type": "string",
+					"examples": ["A beautiful corgi"]
+				},
+				"age": {
+					"description": "Dog's age in years",
+					"type": "integer",
+					"examples": [5]
+				},
+				"gender": {
+					"description": "Dog's gender. 0 for female, 1 for male",
+					"type": "boolean",
+					"examples": [1]
+				},
+				"dateCreated": {
+					"description": "Date and time of dog entry creation",
+					"type": "string",
+					"examples": ["2021-02-25 13:14:56"]
+				},
+				"dateModified": {
+					"description": "Date and time of last dog entry modification",
+					"type": "string",
+					"examples": ["2021-02-25 13:15:11"]
+				},
+				"imageUrl": {
+					"description": "Path to a picture of the dog",
+					"type": "string",
+					"pattern": "uri"
+				}
+			}
+		},
+		"dogs": {
+			"$id": "#dogs",
+			"title": "Dogs list",
+			"description": "List of dogs",
+			"type": "array",
+			"items": {
+				"$ref": "#/definitions/dogData"
+			}
+		},
+		"dogCreated": {
+			"$id": "#dogCreated",
+			"title": "Dog created",
+			"description": "Confirmation of a created dog",
+			"type": "object",
+			"properties": {
+				"id": {
+					"description": "ID of the newly created dog",
+					"type": "integer",
+					"examples": [2]
+				},
+				"created": {
+					"description": "Indiactor of creation success",
+					"type": "boolean"
+				},
+				"link": {
+					"description": "Path to the new dog record",
+					"type": "string",
+					"format": "uri",
+					"examples": ["/dogs/2"]
+				}
+			}
+		},
+		"dogUpdated": {
+			"$id": "#dogUpdated",
+			"title": "Dog updated",
+			"description": "Confirmation of dog update",
+			"type": "object",
+			"properties": {
+				"id": {
+					"description": "ID of the updated dog",
+					"type": "integer",
+					"examples": [2]
+				},
+				"updated": {
+					"description": "Indiactor of update success",
+					"type": "boolean"
+				},
+				"link": {
+					"description": "Path to the updated dog record",
+					"type": "string",
+					"format": "uri",
+					"examples": ["/dogs/2"]
+				}
+			}
+		},
+		"dogDeleted": {
+			"$id": "#dogDeleted",
+			"title": "Dog deleted",
+			"description": "Confirmation of dog removal",
+			"type": "object",
+			"properties": {
+				"id": {
+					"description": "ID of the deleted dog",
+					"type": "integer",
+					"examples": [2]
+				},
+				"deleted": {
+					"description": "Indiactor of removal success",
+					"type": "boolean"
+				}
+			},
+			"additionalProperties": false
+		},
+		"dogBreed": {
+			"$id": "#dogBreed",
+			"title": "Dog's breed",
+			"description": "Data to assign a breed to a dog",
+			"type": "object",
+			"properties": {
+				"dogId": {
+					"description": "ID of dog linked to a breed",
+					"type": "integer",
+					"minimum": 1,
+					"examples": [2]
+				},
+				"breedId": {
+					"description": "Id of breed linked to a dog",
+					"type": "integer",
+					"minimum": 1,
+					"examples": [1]
+				}
+			},
+			"required": ["dogId", "breedId"]
+		},
+		"dogBreedData": {
+			"$id": "#dogBreedData",
+			"title": "Dog's breed data",
+			"description": "Dog and breed link table",
+			"type": "object",
+			"properties": {
+				"dogId": {
+					"description": "ID of dog linked to a breed",
+					"type": "integer",
+					"examples": [2]
+				},
+				"breedId": {
+					"description": "Id of breed linked to a dog",
+					"type": "integer",
+					"examples": [1]
+				}
+			}
+		},
+		"dogBreedCreated": {
+			"$id": "#dogBreedCreated",
+			"title": "Dog breed created",
+			"description": "Confirmation of assigning a breed to a dog",
+			"type": "object",
+			"properties": {
+				"id": {
+					"description": "ID of the dog a breed was assigned to",
+					"type": "integer",
+					"examples": [1]
+				},
+				"created": {
+					"description": "Indiactor of creation success",
+					"type": "boolean"
+				},
+				"link": {
+					"description": "Path to the dog breed link",
+					"type": "string",
+					"format": "uri",
+					"examples": ["/dogs/2/breed"]
+				}
+			}
+		},
+		"dogBreedUpdated": {
+			"$id": "#dogBreedUpdated",
+			"title": "Dog breed updated",
+			"description": "Confirmation of dog breed update",
+			"type": "object",
+			"properties": {
+				"id": {
+					"description": "ID of the dog a breed was assigned to",
+					"type": "integer",
+					"examples": [1]
+				},
+				"created": {
+					"description": "Indiactor of updated success",
+					"type": "boolean"
+				},
+				"link": {
+					"description": "Path to the dog breed link",
+					"type": "string",
+					"format": "uri",
+					"examples": ["/dogs/2/breed"]
+				}
+			}
+		},
+		"dogBreedDeleted": {
+			"$id": "#dogBreedDeleted",
+			"title": "Dog breed deleted",
+			"description": "Confirmation of removal of link between breed and dog.",
+			"type": "object",
+			"properties": {
+				"id": {
+					"description": "ID of the dog a breed was removed from",
+					"type": "integer",
+					"examples": [1]
+				},
+				"deleted": {
+					"description": "Indiactor of removal success",
+					"type": "boolean"
+				}
+			}
+		},
+		"dogLocation": {
+			"$id": "#dogLocation",
+			"title": "Dog location",
+			"description": "Data to register a dog's location",
+			"type": "object",
+			"properties": {
+				"dogId": {
+					"description": "ID of dog to assign to a location",
+					"type": "integer",
+					"minimum": 1,
+					"examples": [2]
+				},
+				"breedId": {
+					"description": "ID of location to assign to a dog",
+					"type": "integer",
+					"minimum": 1,
+					"examples": [5]
+				}
+			},
+			"required": ["dogId", "breedId"]
+		},
+		"dogLocationData": {
+			"$id": "#dogLocationData",
+			"title": "Dog location data",
+			"description": "Dog and location link table",
+			"type": "object",
+			"properties": {
+				"dogId": {
+					"description": "ID of dog assigned to a location",
+					"type": "integer",
+					"examples": [2]
+				},
+				"breedId": {
+					"description": "ID of location assigned to a dog",
+					"type": "integer",
+					"examples": [5]
+				}
+			}
+		},
+		"dogLocationCreated": {
+			"$id": "#dogLocationCreated",
+			"title": "Dog location created",
+			"description": "Confirmation of assigning a location to a dog",
+			"type": "object",
+			"properties": {
+				"id": {
+					"description": "ID of the dog a location was assigned to",
+					"type": "integer",
+					"examples": [2]
+				},
+				"created": {
+					"description": "Indiactor of creation success",
+					"type": "boolean"
+				},
+				"link": {
+					"description": "Path to the dog location link",
+					"type": "string",
+					"format": "uri",
+					"examples": ["/dogs/2/location"]
+				}
+			}
+		},
+		"dogLocationUpdated": {
+			"$id": "#dogLocationUpdated",
+			"title": "Dog location updated",
+			"description": "Confirmation of dog location update",
+			"type": "object",
+			"properties": {
+				"id": {
+					"description": "ID of the dog a location was assigned to",
+					"type": "integer",
+					"examples": [2]
+				},
+				"created": {
+					"description": "Indiactor of updated success",
+					"type": "boolean"
+				},
+				"link": {
+					"description": "Path to the dog location link",
+					"type": "string",
+					"format": "uri",
+					"examples": ["/dogs/2/location"]
+				}
+			}
+		},
+		"dogLocationDeleted": {
+			"$id": "#dogLocationDeleted",
+			"title": "Dog location deleted",
+			"description": "Confirmation of removal of link between location and dog",
+			"type": "object",
+			"properties": {
+				"id": {
+					"description": "ID of the dog a location was removed from",
+					"type": "integer",
+					"examples": [2]
+				},
+				"deleted": {
+					"description": "Indiactor of removal success",
+					"type": "boolean"
+				}
+			}
+		},
+		"dogFavourites": {
+			"$id": "#dogFavourites",
+			"title": "Dog favourites",
+			"description": "List of favourites associated with a dog",
+			"type": "array",
+			"items": {
+				"$ref": "./users.json#/definitions/favouriteData"
+			}
+		}
+	}
+}
