@@ -1,5 +1,7 @@
 CREATE TABLE `users` (
     `id` int PRIMARY KEY NOT NULL AUTO_INCREMENT,
+    `role` varchar(32) NOT NULL,
+    `provider` varchar(32) DEFAULT 'local',
     `username` varchar(32) UNIQUE NOT NULL,
     `email` varchar(32) UNIQUE NOT NULL,
     `password` varchar(256),
@@ -7,5 +9,6 @@ CREATE TABLE `users` (
     `lastName` varchar(32) NOT NULL,
     `dateCreated` datetime DEFAULT CURRENT_TIMESTAMP,
     `dateModified` datetime ON UPDATE CURRENT_TIMESTAMP,
-    `imageUrl` varchar(2048)
+    `imageUrl` varchar(2048),
+    UNIQUE (`role`, `username`)
 );
