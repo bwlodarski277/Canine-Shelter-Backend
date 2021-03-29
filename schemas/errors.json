@@ -4,16 +4,16 @@
 		"validationError": {
 			"$id": "#validationErrors",
 			"title": "Validation Error",
-			"description": "A validation error thrown when validating form data.",
+			"description": "A validation error thrown when validating form data",
 			"type": "object",
 			"properties": {
 				"item": {
-					"description": "Item in the form that failed.",
+					"description": "Item in the form that failed",
 					"type": "string",
 					"examples": ["/name", ""]
 				},
 				"message": {
-					"description": "A description of the issue that occurred.",
+					"description": "A description of the issue that occurred",
 					"type": "string",
 					"examples": [
 						"should NOT have fewer than 3 characters",
@@ -25,7 +25,7 @@
 		"validationErrors": {
 			"$id": "#validationErrors",
 			"title": "Validation Error list",
-			"description": "A list of errors thrown when validating form data.",
+			"description": "A list of errors thrown when validating form data",
 			"type": "array",
 			"items": {
 				"$ref": "#/definitions/validationError"

@@ -4,7 +4,7 @@
 		"user": {
 			"$id": "#user",
 			"title": "User",
-			"description": "Data to register a new user.",
+			"description": "Data to register a new user",
 			"type": "object",
 			"properties": {
 				"username": {
@@ -15,31 +15,31 @@
 					"examples": ["userName"]
 				},
 				"email": {
-					"description": "User email address.",
+					"description": "User email address",
 					"type": "string",
 					"format": "email"
 				},
 				"password": {
-					"description": "User's password of choice.",
+					"description": "User's password of choice",
 					"type": "string",
 					"minLength": 8,
 					"maxLength": 72,
 					"examples": ["password"]
 				},
 				"firstName": {
-					"description": "User's first name.",
+					"description": "User's first name",
 					"type": "string",
 					"maxLength": 32,
 					"examples": ["John"]
 				},
 				"lastName": {
-					"description": "User's last name.",
+					"description": "User's last name",
 					"type": "string",
 					"maxLength": 32,
 					"examples": ["Doe"]
 				},
 				"imageUrl": {
-					"description": "Link to the user's profile picture.",
+					"description": "Link to the user's profile picture",
 					"type": "string",
 					"pattern": "uri",
 					"examples": ["https://picsum.photos/200"]
@@ -50,7 +50,7 @@
 		"userData": {
 			"$id": "#userData",
 			"title": "User data",
-			"description": "User information record.",
+			"description": "User information record",
 			"type": "object",
 			"properties": {
 				"id": {
@@ -64,32 +64,32 @@
 					"examples": ["JohnDoe2"]
 				},
 				"email": {
-					"description": "User email address.",
+					"description": "User email address",
 					"type": "string",
 					"format": "email"
 				},
 				"firstName": {
-					"description": "User's first name.",
+					"description": "User's first name",
 					"type": "string",
 					"examples": ["John"]
 				},
 				"lastName": {
-					"description": "User's last name.",
+					"description": "User's last name",
 					"type": "string",
 					"examples": ["Doe"]
 				},
 				"dateCreated": {
-					"description": "User creation date and time.",
+					"description": "User creation date and time",
 					"type": "string",
 					"examples": ["2021-02-25 13:14:56"]
 				},
 				"dateModified": {
-					"description": "Date and time of last user update.",
+					"description": "Date and time of last user update",
 					"type": "string",
 					"examples": ["2021-02-25 13:15:11"]
 				},
 				"imageUrl": {
-					"description": "Link to the user's profile picture.",
+					"description": "Link to the user's profile picture",
 					"type": "string",
 					"pattern": "uri",
 					"examples": ["https://picsum.photos/200"]
@@ -99,7 +99,7 @@
 		"users": {
 			"$id": "users",
 			"title": "Users",
-			"description": "List of users.",
+			"description": "List of users",
 			"type": "array",
 			"items": {
 				"$ref": "#/definitions/userData"
@@ -108,20 +108,20 @@
 		"userCreated": {
 			"$id": "#userCreated",
 			"title": "User created",
-			"description": "Confirmation of a created user.",
+			"description": "Confirmation of a created user",
 			"type": "object",
 			"properties": {
 				"id": {
-					"description": "ID of the newly created user.",
+					"description": "ID of the newly created user",
 					"type": "integer",
 					"examples": [4]
 				},
 				"created": {
-					"description": "Indiactor of creation success.",
+					"description": "Indiactor of creation success",
 					"type": "boolean"
 				},
 				"link": {
-					"description": "Path to the new user record.",
+					"description": "Path to the new user record",
 					"type": "string",
 					"format": "uri",
 					"examples": ["/users/4"]
@@ -131,20 +131,20 @@
 		"userUpdated": {
 			"$id": "#userUpdated",
 			"title": "User updated",
-			"description": "Confirmation of user update.",
+			"description": "Confirmation of user update",
 			"type": "object",
 			"properties": {
 				"id": {
-					"description": "ID of the updated user.",
+					"description": "ID of the updated user",
 					"type": "integer",
 					"examples": [4]
 				},
 				"updated": {
-					"description": "Indiactor of update success.",
+					"description": "Indiactor of update success",
 					"type": "boolean"
 				},
 				"link": {
-					"description": "Path to the updated user record.",
+					"description": "Path to the updated user record",
 					"type": "string",
 					"format": "uri",
 					"examples": ["/users/4"]
@@ -154,16 +154,16 @@
 		"userDeleted": {
 			"$id": "#userDeleted",
 			"title": "User deleted",
-			"description": "Confirmation of user removal.",
+			"description": "Confirmation of user removal",
 			"type": "object",
 			"properties": {
 				"id": {
-					"description": "ID of the deleted user.",
+					"description": "ID of the deleted user",
 					"type": "integer",
 					"examples": [4]
 				},
 				"deleted": {
-					"description": "Indiactor of removal success.",
+					"description": "Indiactor of removal success",
 					"type": "boolean"
 				}
 			}
@@ -171,17 +171,17 @@
 		"favourite": {
 			"$id": "#favourite",
 			"title": "Favourite",
-			"description": "Data to register a new favourite.",
+			"description": "Data to register a new favourite",
 			"type": "object",
 			"properties": {
 				"userId": {
-					"description": "ID of the user favouriting a dog.",
+					"description": "ID of the user favouriting a dog",
 					"type": "integer",
 					"minimum": 1,
 					"examples": [4]
 				},
 				"dogId": {
-					"description": "ID of the dog the user is favouriting.",
+					"description": "ID of the dog the user is favouriting",
 					"type": "integer",
 					"minimum": 1,
 					"examples": [2]
@@ -192,7 +192,7 @@
 		"favouriteData": {
 			"$id": "#favouriteData",
 			"title": "Favourite data",
-			"description": "Favourite information record.",
+			"description": "Favourite information record",
 			"type": "object",
 			"properties": {
 				"id": {
@@ -201,12 +201,12 @@
 					"examples": [1]
 				},
 				"userId": {
-					"description": "ID of the user favouriting a dog.",
+					"description": "ID of the user favouriting a dog",
 					"type": "integer",
 					"examples": [4]
 				},
 				"dogId": {
-					"description": "ID of the dog the user is favouriting.",
+					"description": "ID of the dog the user is favouriting",
 					"type": "integer",
 					"examples": [2]
 				}
@@ -215,7 +215,7 @@
 		"favourites": {
 			"$id": "favourites",
 			"title": "Favourites",
-			"description": "List of favourites for a given user.",
+			"description": "List of favourites for a given user",
 			"type": "array",
 			"items": {
 				"$ref": "#/definitions/favouriteData"
@@ -224,20 +224,20 @@
 		"favouriteCreated": {
 			"$id": "#favouriteCreated",
 			"title": "Favourite created",
-			"description": "Confirmation of a created favourite.",
+			"description": "Confirmation of a created favourite",
 			"type": "object",
 			"properties": {
 				"id": {
-					"description": "ID of the newly created favourite.",
+					"description": "ID of the newly created favourite",
 					"type": "integer",
 					"examples": [1]
 				},
 				"created": {
-					"description": "Indiactor of creation success.",
+					"description": "Indiactor of creation success",
 					"type": "boolean"
 				},
 				"link": {
-					"description": "Path to the new favourite record.",
+					"description": "Path to the new favourite record",
 					"type": "string",
 					"format": "uri",
 					"examples": ["/users/4/favourites/1"]
@@ -247,16 +247,16 @@
 		"favouriteDeleted": {
 			"$id": "#favouriteDeleted",
 			"title": "Favourite deleted",
-			"description": "Confirmation of favourite removal.",
+			"description": "Confirmation of favourite removal",
 			"type": "object",
 			"properties": {
 				"id": {
-					"description": "ID of the deleted favourite.",
+					"description": "ID of the deleted favourite",
 					"type": "integer",
 					"examples": [1]
 				},
 				"deleted": {
-					"description": "Indiactor of removal success.",
+					"description": "Indiactor of removal success",
 					"type": "boolean"
 				}
 			}

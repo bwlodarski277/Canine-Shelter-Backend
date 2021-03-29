@@ -4,7 +4,7 @@
 		"breed": {
 			"$id": "#breed",
 			"title": "Breed",
-			"description": "Data to register a new breed.",
+			"description": "Data to register a new breed",
 			"type": "object",
 			"properties": {
 				"name": {
@@ -14,7 +14,7 @@
 					"maxLength": 64
 				},
 				"description": {
-					"description": "Description talking about the breed.",
+					"description": "Description talking about the breed",
 					"type": "string",
 					"examples": ["Herding dog originating from Wales"]
 				}
@@ -24,7 +24,7 @@
 		},
 		"breedData": {
 			"$id": "#breedData",
-			"title": "Breed information record.",
+			"title": "Breed information record",
 			"type": "object",
 			"properties": {
 				"id": {
@@ -44,7 +44,7 @@
 		"breeds": {
 			"$id": "#breeds",
 			"title": "Breeds list",
-			"description": "List of breeds.",
+			"description": "List of breeds",
 			"type": "array",
 			"items": {
 				"$ref": "#/definitions/breedData"
@@ -53,20 +53,20 @@
 		"breedCreated": {
 			"$id": "#breedCreated",
 			"title": "Breed created",
-			"description": "Confirmation of a created breed.",
+			"description": "Confirmation of a created breed",
 			"type": "object",
 			"properties": {
 				"id": {
-					"description": "ID of the newly created breed.",
+					"description": "ID of the newly created breed",
 					"type": "integer",
 					"examples": [1]
 				},
 				"created": {
-					"description": "Indiactor of creation success.",
+					"description": "Indiactor of creation success",
 					"type": "boolean"
 				},
 				"link": {
-					"description": "Path to the new breed record.",
+					"description": "Path to the new breed record",
 					"type": "string",
 					"format": "uri",
 					"examples": ["/breeds/1"]
@@ -76,20 +76,20 @@
 		"breedUpdated": {
 			"$id": "#breedUpdated",
 			"title": "Breed updated",
-			"description": "Confirmation of breed update.",
+			"description": "Confirmation of breed update",
 			"type": "object",
 			"properties": {
 				"id": {
-					"description": "ID of the updated breed.",
+					"description": "ID of the updated breed",
 					"type": "integer",
 					"examples": [1]
 				},
 				"created": {
-					"description": "Indiactor of update success.",
+					"description": "Indiactor of update success",
 					"type": "boolean"
 				},
 				"link": {
-					"description": "Path to the updated breed record.",
+					"description": "Path to the updated breed record",
 					"type": "string",
 					"format": "uri",
 					"examples": ["/breeds/1"]
@@ -99,7 +99,7 @@
 		"breedDogs": {
 			"$id": "#breedDogs",
 			"title": "Breed dogs",
-			"description": "List of dogs of a certain breed.",
+			"description": "List of dogs of a certain breed",
 			"type": "array",
 			"items": {
 				"$ref": "./dogs.json#/definitions/dogBreedData"

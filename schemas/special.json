@@ -2,7 +2,7 @@
     "$schema": "http://json-schema.org/draft-07/schema",
     "$id": "#welcome",
     "title": "Welcome",
-    "description": "API welcome message.",
+    "description": "API welcome message",
     "type": "object",
     "properties": {
         "message": {

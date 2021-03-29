@@ -4,7 +4,7 @@
 		"location": {
 			"$id": "#location",
 			"title": "Location",
-			"description": "Data to register a new location.",
+			"description": "Data to register a new location",
 			"type": "object",
 			"properties": {
 				"name": {
@@ -27,7 +27,7 @@
 		"locationData": {
 			"$id": "#locationData",
 			"title": "Location data",
-			"description": "Location information record.",
+			"description": "Location information record",
 			"type": "object",
 			"properties": {
 				"id": {
@@ -52,7 +52,7 @@
 		"locations": {
 			"$id": "locations",
 			"title": "Locations",
-			"description": "List of locations.",
+			"description": "List of locations",
 			"type": "array",
 			"items": {
 				"$ref": "#/definitions/locationData"
@@ -61,20 +61,20 @@
 		"locationCreated": {
 			"$id": "#locationCreated",
 			"title": "Location created",
-			"description": "Confirmation of a created location.",
+			"description": "Confirmation of a created location",
 			"type": "object",
 			"properties": {
 				"id": {
-					"description": "ID of the newly created location.",
+					"description": "ID of the newly created location",
 					"type": "integer",
 					"examples": [1]
 				},
 				"created": {
-					"description": "Indiactor of creation success.",
+					"description": "Indiactor of creation success",
 					"type": "boolean"
 				},
 				"link": {
-					"description": "Path to the new location record.",
+					"description": "Path to the new location record",
 					"type": "string",
 					"format": "uri",
 					"examples": ["/locations/1"]
@@ -84,20 +84,20 @@
 		"locationUpdated": {
 			"$id": "#locationUpdated",
 			"title": "Location updated",
-			"description": "Confirmation of location update.",
+			"description": "Confirmation of location update",
 			"type": "object",
 			"properties": {
 				"id": {
-					"description": "ID of the updated location.",
+					"description": "ID of the updated location",
 					"type": "integer",
 					"examples": [1]
 				},
 				"updated": {
-					"description": "Indiactor of update success.",
+					"description": "Indiactor of update success",
 					"type": "boolean"
 				},
 				"link": {
-					"description": "Path to the updated location record.",
+					"description": "Path to the updated location record",
 					"type": "string",
 					"format": "uri",
 					"examples": ["/locations/1"]
@@ -107,16 +107,16 @@
 		"locationDeleted": {
 			"$id": "#locationDeleted",
 			"title": "Location deleted",
-			"description": "Confirmation of location removal.",
+			"description": "Confirmation of location removal",
 			"type": "object",
 			"properties": {
 				"id": {
-					"description": "ID of the deleted location.",
+					"description": "ID of the deleted location",
 					"type": "integer",
 					"examples": [1]
 				},
 				"deleted": {
-					"description": "Indiactor of removal success.",
+					"description": "Indiactor of removal success",
 					"type": "boolean"
 				}
 			}
@@ -124,7 +124,7 @@
 		"locationDogs": {
 			"$id": "#locationDogs",
 			"title": "Location dogs",
-			"description": "List of dogs at a given location.",
+			"description": "List of dogs at a given location",
 			"type": "array",
 			"items": {
 				"$ref": "./dogs.json#/definitions/dogLocationData"
@@ -132,16 +132,16 @@
 		},
 		"chat": {
 			"$id": "#chat",
-			"title": "Data to register a new chat.",
+			"title": "Data to register a new chat",
 			"type": "object",
 			"properties": {
 				"locationId": {
-					"description": "ID of location to create a new chat at.",
+					"description": "ID of location to create a new chat at",
 					"type": "integer",
 					"minimum": 1
 				},
 				"userId": {
-					"description": "ID of user to create chat with.",
+					"description": "ID of user to create chat with",
 					"type": "integer",
 					"minimum": 1
 				}
@@ -152,7 +152,7 @@
 		"chatData": {
 			"$id": "#chatdata",
 			"title": "Chat data",
-			"description": "Chat data record.",
+			"description": "Chat data record",
 			"type": "object",
 			"properties": {
 				"id": {
@@ -161,12 +161,12 @@
 					"examples": [1]
 				},
 				"locationId": {
-					"description": "ID of location linked to the chat.",
+					"description": "ID of location linked to the chat",
 					"type": "integer",
 					"examples": [2]
 				},
 				"userId": {
-					"description": "ID of user linked to the chat.",
+					"description": "ID of user linked to the chat",
 					"type": "integer",
 					"examples": [4]
 				}
@@ -175,7 +175,7 @@
 		"chats": {
 			"$id": "#chats",
 			"title": "Chats list",
-			"description": "List of chats at a given location.",
+			"description": "List of chats at a given location",
 			"type": "array",
 			"items": {
 				"$ref": "#/definitions/chatData"
@@ -184,20 +184,20 @@
 		"chatCreated": {
 			"$id": "#chatCreated",
 			"title": "Chat created",
-			"description": "Confirmation of a created chat.",
+			"description": "Confirmation of a created chat",
 			"type": "object",
 			"properties": {
 				"id": {
-					"description": "ID of the newly created chat.",
+					"description": "ID of the newly created chat",
 					"type": "integer",
 					"examples": [1]
 				},
 				"created": {
-					"description": "Indiactor of creation success.",
+					"description": "Indiactor of creation success",
 					"type": "boolean"
 				},
 				"link": {
-					"description": "Path to the new chat record.",
+					"description": "Path to the new chat record",
 					"type": "string",
 					"format": "uri",
 					"examples": ["/locations/1/chats/1"]
@@ -207,16 +207,16 @@
 		"chatDeleted": {
 			"$id": "#chatDeleted",
 			"title": "Chat deleted",
-			"description": "Confirmation of chat removal.",
+			"description": "Confirmation of chat removal",
 			"type": "object",
 			"properties": {
 				"id": {
-					"description": "ID of the deleted chat.",
+					"description": "ID of the deleted chat",
 					"type": "integer",
 					"examples": [1]
 				},
 				"deleted": {
-					"description": "Indiactor of removal success.",
+					"description": "Indiactor of removal success",
 					"type": "boolean"
 				}
 			}
@@ -224,16 +224,16 @@
 		"message": {
 			"$id": "#message",
 			"title": "Message",
-			"description": "Data to register a new message.",
+			"description": "Data to register a new message",
 			"type": "object",
 			"properties": {
 				"sender": {
-					"description": "Sender indicator. 0 for staff, 1 for user.",
+					"description": "Sender indicator. 0 for staff, 1 for user",
 					"type": "boolean",
 					"examples": [0]
 				},
 				"message": {
-					"description": "Message body.",
+					"description": "Message body",
 					"type": "string",
 					"examples": ["Example message"]
 				}
@@ -244,26 +244,26 @@
 		"messageData": {
 			"$id": "#messageData",
 			"title": "Message data",
-			"description": "Message information record.",
+			"description": "Message information record",
 			"type": "object",
 			"properties": {
 				"id": {
-					"description": "Message ID.",
+					"description": "Message ID",
 					"type": "integer",
 					"examples": [1]
 				},
 				"sender": {
-					"description": "Sender indicator. 0 for staff, 1 for user.",
+					"description": "Sender indicator. 0 for staff, 1 for user",
 					"type": "boolean",
 					"examples": [0]
 				},
 				"dateCreated": {
-					"description": "Date and time of message creation.",
+					"description": "Date and time of message creation",
 					"type": "string",
 					"examples": ["2021-02-25 13:15:11"]
 				},
 				"message": {
-					"description": "Message body.",
+					"description": "Message body",
 					"type": "string",
 					"examples": ["Example message"]
 				}
@@ -272,7 +272,7 @@
 		"messages": {
 			"$id": "#messages",
 			"title": "Messages list",
-			"description": "List of messages in a given chat.",
+			"description": "List of messages in a given chat",
 			"type": "array",
 			"items": {
 				"$ref": "#/definitions/messageData"
@@ -281,20 +281,20 @@
 		"messageCreated": {
 			"$id": "#messageCreated",
 			"title": "Message created",
-			"description": "Confirmation of a created message.",
+			"description": "Confirmation of a created message",
 			"type": "object",
 			"properties": {
 				"id": {
-					"description": "ID of the newly created message.",
+					"description": "ID of the newly created message",
 					"type": "integer",
 					"examples": [3]
 				},
 				"created": {
-					"description": "Indiactor of creation success.",
+					"description": "Indiactor of creation success",
 					"type": "boolean"
 				},
 				"link": {
-					"description": "Path to the new message record.",
+					"description": "Path to the new message record",
 					"type": "string",
 					"format": "uri",
 					"examples": ["/locations/1/chats/1/messages/3"]
@@ -304,16 +304,16 @@
 		"messageDeleted": {
 			"$id": "#messageDeleted",
 			"title": "Message deleted",
-			"description": "Confirmation of message removal.",
+			"description": "Confirmation of message removal",
 			"type": "object",
 			"properties": {
 				"id": {
-					"description": "ID of the deleted message.",
+					"description": "ID of the deleted message",
 					"type": "integer",
 					"examples": [3]
 				},
 				"deleted": {
-					"description": "Indiactor of removal success.",
+					"description": "Indiactor of removal success",
 					"type": "boolean"
 				}
 			}
