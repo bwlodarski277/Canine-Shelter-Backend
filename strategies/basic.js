@@ -16,8 +16,8 @@ const bcrypt = require('bcrypt');
  * @async
  */
 const verifyPassword = async (user, password) => {
-    return await bcrypt.compare(password, user.password);
-}
+	return await bcrypt.compare(password, user.password);
+};
 
 /**
  * User authenticator for basic strategy authentication.
@@ -27,32 +27,32 @@ const verifyPassword = async (user, password) => {
  * @async
  */
 const checkUser = async (username, password, done) => {
-    let user;
+	let user;
 
-    try {
-        user = await users.findByUsername(username);
-    } catch (error) {
-        console.error(`Error during authentication for user ${username}.`);
-        return done(error);
-    }
+	try {
+		user = await users.findByUsername(username);
+	} catch (error) {
+		console.error(`Error during authentication for user ${username}.`);
+		return done(error);
+	}
 
-    // If the user exists
-    if (user) {
-        const verified = await verifyPassword(user, password);
-        if (verified) {
-            console.log(`Successfully authenticated use ${username}.`);
-            // Overwriting the user variable to make sure password is not returned.
-            user = await users.getById(user.id);
-            return done(null, user);
-        } else {
-            console.log(`Incorrect password for user ${username}.`);
-            return done(null, false);
-        }
-    } else {
-        console.log(`No user found with username ${username}.`)
-    }
-    return done(null, false);
-    // return done(null, { role: 'guest' });
-}
+	// If the user exists
+	if (user) {
+		const verified = await verifyPassword(user, password);
+		if (verified) {
+			console.log(`Successfully authenticated user ${username}.`);
+			// Overwriting the user variable to make sure password is not returned.
+			user = await users.getById(user.id);
+			return done(null, user);
+		} else {
+			console.log(`Incorrect password for user ${username}.`);
+			return done(null, false);
+		}
+	} else {
+		console.log(`No user found with username ${username}.`);
+	}
+	return done(null, false);
+	// return done(null, { role: 'guest' });
+};
 
 module.exports = new BasicStrategy(checkUser);

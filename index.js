@@ -8,7 +8,7 @@ const users = require('./routes/users');
 const dogs = require('./routes/dogs');
 const breeds = require('./routes/breeds');
 const locations = require('./routes/locations');
-const login = require('./routes/login');
+const auth = require('./routes/auth');
 
 // Allowing the frontend box to access the API.
 const options = { origin: 'https://latin-kimono-3000.codio-box.uk' };
@@ -21,7 +21,7 @@ app.use(dogs.routes());
 app.use(breeds.routes());
 app.use(locations.routes());
 
-app.use(login.routes());
+app.use(auth.routes());
 
 const port = process.env.PORT || 3000;
 

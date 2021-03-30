@@ -10,7 +10,7 @@ const bodyParser = require('koa-bodyparser');
 const userModel = require('../models/users');
 const favsModel = require('../models/favourites');
 
-const auth = require('../controllers/auth');
+const { auth } = require('../controllers/auth');
 const { config } = require('../config');
 
 const router = new Router({ prefix: '/api/v1/users' });
@@ -33,7 +33,7 @@ router.del('/:id([0-9]+)/favourites/:favId([0-9]+)', auth, deleteUserFav);
  * @param {object} ctx context passed from Koa.
  */
 async function getAll(ctx) {
-    ctx.body = await userModel.getAll();
+	ctx.body = await userModel.getAll();
 }
 
 /**
@@ -41,11 +41,11 @@ async function getAll(ctx) {
  * @param {object} ctx context passed from Koa.
  */
 async function getUser(ctx) {
-    const id = ctx.params.id;
-    const user = await userModel.getById(id);
-    if (user) {
-        ctx.body = user;
-    }
+	const id = ctx.params.id;
+	const user = await userModel.getById(id);
+	if (user) {
+		ctx.body = user;
+	}
 }
 
 /**
@@ -53,14 +53,14 @@ async function getUser(ctx) {
  * @param {object} ctx context passed from Koa.
  */
 async function createUser(ctx) {
-    const { staffKey, role, ...body } = ctx.request.body;
-    // Giving the user the role 'staff' if they provide right key.
-    body.role = staffKey === config.staffKey ? 'staff' : 'user';
-    const id = await userModel.add(body);
-    if (id) {
-        ctx.status = 201;
-        ctx.body = { ID: id, created: true, link: `${ctx.request.path}/${id}` };
-    }
+	const { staffKey, role, ...body } = ctx.request.body;
+	// Giving the user the role 'staff' if they provide right key.
+	body.role = staffKey === config.staffKey ? 'staff' : 'user';
+	const id = await userModel.add(body);
+	if (id) {
+		ctx.status = 201;
+		ctx.body = { ID: id, created: true, link: `${ctx.request.path}/${id}` };
+	}
 }
 
 /**
@@ -68,19 +68,19 @@ async function createUser(ctx) {
  * @param {object} ctx context passed from Koa.
  */
 async function updateUser(ctx) {
-    const userId = ctx.params.id;
-    let user = await userModel.getById(userId);
-    if (user) {
-        // Excluding fields that must not be updated
-        const { id, dateCreated, ...body } = ctx.request.body;
+	const userId = ctx.params.id;
+	let user = await userModel.getById(userId);
+	if (user) {
+		// Excluding fields that must not be updated
+		const { id, dateCreated, ...body } = ctx.request.body;
 
-        const result = await userModel.update(userId, body);
+		const result = await userModel.update(userId, body);
 
-        // Knex returns amount of affected rows.
-        if (result) {
-            ctx.body = { id: userId, updated: true, link: ctx.request.path };
-        };
-    }
+		// Knex returns amount of affected rows.
+		if (result) {
+			ctx.body = { id: userId, updated: true, link: ctx.request.path };
+		}
+	}
 }
 
 /**
@@ -88,14 +88,14 @@ async function updateUser(ctx) {
  * @param {object} ctx context passed from Koa.
  */
 async function deleteUser(ctx) {
-    const id = ctx.params.id;
-    const user = await userModel.getById(id);
-    if (user) {
-        const result = await userModel.delete(id);
-        if (result) {
-            ctx.body = { id, deleted: true };
-        }
-    }
+	const id = ctx.params.id;
+	const user = await userModel.getById(id);
+	if (user) {
+		const result = await userModel.delete(id);
+		if (result) {
+			ctx.body = { id, deleted: true };
+		}
+	}
 }
 
 /**
@@ -103,11 +103,11 @@ async function deleteUser(ctx) {
  * @param {object} ctx context passed from Koa.
  */
 async function getUserFavs(ctx) {
-    const id = ctx.params.id;
-    const favourites = await favsModel.getByUserId(id);
-    if (favourites) {
-        ctx.body = favourites;
-    }
+	const id = ctx.params.id;
+	const favourites = await favsModel.getByUserId(id);
+	if (favourites) {
+		ctx.body = favourites;
+	}
 }
 
 /**
@@ -115,13 +115,17 @@ async function getUserFavs(ctx) {
  * @param {object} ctx context passed from Koa.
  */
 async function addUserFav(ctx) {
-    const userId = ctx.params.id;
-    const { dogId } = ctx.request.body;
-    const result = await favsModel.add(userId, dogId);
-    if (result) {
-        ctx.status = 201;
-        ctx.body = { id: userId, created: true, link: `${ctx.request.path}/${dogId}` };
-    }
+	const userId = ctx.params.id;
+	const { dogId } = ctx.request.body;
+	const result = await favsModel.add(userId, dogId);
+	if (result) {
+		ctx.status = 201;
+		ctx.body = {
+			id: userId,
+			created: true,
+			link: `${ctx.request.path}/${dogId}`
+		};
+	}
 }
 
 /**
@@ -129,11 +133,11 @@ async function addUserFav(ctx) {
  * @param {object} ctx context passed from Koa.
  */
 async function getUserFav(ctx) {
-    const favId = ctx.params.favId;
-    const result = await favsModel.getSingleFav(favId);
-    if (result) {
-        ctx.body = result;
-    }
+	const favId = ctx.params.favId;
+	const result = await favsModel.getSingleFav(favId);
+	if (result) {
+		ctx.body = result;
+	}
 }
 
 /**
@@ -141,11 +145,11 @@ async function getUserFav(ctx) {
  * @param {object} ctx context passed from Koa.
  */
 async function deleteUserFav(ctx) {
-    const favId = ctx.params.favId;
-    const result = await favsModel.delete(favId);
-    if (result) {
-        ctx.body = { id: favId, deleted: true };
-    }
+	const favId = ctx.params.favId;
+	const result = await favsModel.delete(favId);
+	if (result) {
+		ctx.body = { id: favId, deleted: true };
+	}
 }
 
 module.exports = router;

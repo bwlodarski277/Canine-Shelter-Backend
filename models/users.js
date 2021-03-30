@@ -37,11 +37,14 @@ const cols = [
  * Gets a user entry by their username.
  * Used for authentication only!
  * @param {string} username User's unique username.
+ * @param {string} [provider='local'] Provider to check (the same username may appear in multiple providers.)
  * @returns {Promise<User>} user's record from the DB.
  * @async
  */
-exports.findByUsername = async username => {
-	const [data] = await run(async () => await db('users').where({ username }));
+exports.findByUsername = async (username, provider = 'local') => {
+	const [data] = await run(
+		async () => await db('users').where({ username, provider })
+	);
 	return data;
 };
 
@@ -82,10 +85,12 @@ exports.getById = async id => {
  * @async
  */
 exports.add = async user => {
-	// Hashing the password and storing it back in the object
-	const { password } = user;
-	const hash = bcrypt.hashSync(password, 10);
-	user.password = hash;
+	if (user.password) {
+		// Hashing the password and storing it back in the object
+		const { password } = user;
+		const hash = bcrypt.hashSync(password, 10);
+		user.password = hash;
+	}
 	// Passing data to Knex
 	const [data] = await run(async () => await db('users').insert(user));
 	return data;
