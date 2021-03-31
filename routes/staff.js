@@ -1,3 +1,5 @@
+'use strict';
+
 /**
  * @file Staff route endpoints.
  * @module routes/staff
@@ -21,44 +23,36 @@ router.get('/:id([0-9]+)', auth, getStaff);
 router.put('/:id([0-9]+)', auth, updateStaff);
 router.del('/:id([0-9]+)', auth, deleteStaff);
 
-async function getAll(ctx) {
-    ctx.body = await staffModel.getAll();
-}
+const getAll = async ctx => {
+	ctx.body = await staffModel.getAll();
+};
 
-async function createStaff(ctx) {
-    const { staffKey, userId, locationId } = ctx.request.body;
-    if (staffKey === config.staffKey) {
-        const id = await staffModel.add(userId, locationId);
-        if (id) {
-            ctx.status = 201;
-            ctx.body = { id, created: true, link: `${ctx.request.path}/${id}` };
-        }
-    } else {
-        ctx.status = 401; //TODO: make sue this is right?
-    }
-}
+const createStaff = async ctx => {
+	const { staffKey, userId, locationId } = ctx.request.body;
+	if (staffKey === config.staffKey) {
+		const id = await staffModel.add(userId, locationId);
+		if (id) {
+			ctx.status = 201;
+			ctx.body = { id, created: true, link: `${ctx.request.path}/${id}` };
+		}
+	} else ctx.status = 401; //TODO: make sue this is right?
+};
 
-async function getStaff(ctx) {
-    const id = ctx.params.id;
-    const staff = await staffModel.getByStaffId(id);
-    if (staff) {
-        ctx.body = staff;
-    }
-}
+const getStaff = async ctx => {
+	const id = ctx.params.id;
+	const staff = await staffModel.getByStaffId(id);
+	if (staff) ctx.body = staff;
+};
 
-async function updateStaff(ctx) {
-    const id = ctx.params.id;
-    const { locationId } = ctx.request.body;
-    const result = await staffModel.update(id, locationId);
-    if (result) {
-        ctx.body = { id, updated: true, link: `${ctx.request.path}/${id}` };
-    }
-}
+const updateStaff = async ctx => {
+	const id = ctx.params.id;
+	const { locationId } = ctx.request.body;
+	const result = await staffModel.update(id, locationId);
+	if (result) ctx.body = { id, updated: true, link: `${ctx.request.path}/${id}` };
+};
 
-async function deleteStaff(ctx) {
-    const id = ctx.params.id;
-    const result = await staffModel.delete(id);
-    if (result) {
-        ctx.body = { id, deleted: true };
-    }
-}
+const deleteStaff = async ctx => {
+	const id = ctx.params.id;
+	const result = await staffModel.delete(id);
+	if (result) ctx.body = { id, deleted: true };
+};

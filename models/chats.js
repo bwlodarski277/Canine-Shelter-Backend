@@ -1,3 +1,5 @@
+'use strict';
+
 /**
  * @file Chats model to manage interactions with the database.
  * @module modules/chats
@@ -14,7 +16,6 @@ const { db, run } = require('../helpers/database');
  * @property {number} userId User ID (foreign key)
  */
 
-
 /**
  * Gets all the chats with a location.
  * @param {number} locationId ID of the location.
@@ -22,23 +23,21 @@ const { db, run } = require('../helpers/database');
  * @async
  */
 exports.getAll = async locationId => {
-    const data = await run(async () =>
-        await db('chats').where({ locationId }));
-    return data;
-}
+	const data = await run(async () => await db('chats').where({ locationId }));
+	return data;
+};
 
 /**
  * Creates a new chat between a location and user.
  * @param {number} locationId ID of the location being contacted.
  * @param {number} userId ID of the user contacting the location.
- * @returns {Promise<number>} ID of the newly inserted row. 
+ * @returns {Promise<number>} ID of the newly inserted row.
  * @async
  */
 exports.add = async (locationId, userId) => {
-    const [data] = await run(async () =>
-        await db('chats').insert({ locationId, userId }));
-    return data;
-}
+	const [data] = await run(async () => await db('chats').insert({ locationId, userId }));
+	return data;
+};
 
 /**
  * Gets a chat record by the chat ID.
@@ -47,19 +46,17 @@ exports.add = async (locationId, userId) => {
  * @async
  */
 exports.getById = async id => {
-    const [data] = await run(async () =>
-        await db('chats').where({ id }));
-    return data;
-}
+	const [data] = await run(async () => await db('chats').where({ id }));
+	return data;
+};
 
 /**
  * Deletes a chat entry from the DB.
  * @param {number} id ID of the chat to delete.
- * @returns {Promise<number>} number of affected rows (should be 1). 
+ * @returns {Promise<number>} number of affected rows (should be 1).
  * @async
  */
 exports.delete = async id => {
-    const data = await run(async () =>
-        await db('chats').where({ id }).delete());
-    return data;
-}
+	const data = await run(async () => await db('chats').where({ id }).delete());
+	return data;
+};

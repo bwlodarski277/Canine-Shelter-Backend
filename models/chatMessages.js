@@ -1,3 +1,5 @@
+'use strict';
+
 /**
  * @file Chat messages model to manage interactions with the database.
  * @module models/chatMessages
@@ -13,7 +15,6 @@ const { db, run } = require('../helpers/database');
  * @property {number} messageId Message ID (foreign key)
  */
 
-
 /**
  * Gets a list of chat messages by chat ID.
  * @param {int} chatId ID of the chat to lookup.
@@ -21,10 +22,9 @@ const { db, run } = require('../helpers/database');
  * @async
  */
 exports.getByChatId = async chatId => {
-    const data = await run(async () =>
-        await db('chatMessages').where({ chatId }));
-    return data;
-}
+	const data = await run(async () => await db('chatMessages').where({ chatId }));
+	return data;
+};
 
 /**
  * Creates a new chat message entry in the DB.
@@ -34,10 +34,9 @@ exports.getByChatId = async chatId => {
  * @async
  */
 exports.add = async (chatId, messageId) => {
-    const [data] = await run(async () =>
-        await db('chatMessages').insert({ chatId, messageId }));
-    return data;
-}
+	const [data] = await run(async () => await db('chatMessages').insert({ chatId, messageId }));
+	return data;
+};
 
 /**
  * Deletes a chat message entry from the DB.
@@ -46,7 +45,6 @@ exports.add = async (chatId, messageId) => {
  * @async
  */
 exports.delete = async messageId => {
-    const data = await run(async () =>
-        await db('chatMessages').where({ messageId }).delete());
-    return data;
-}
+	const data = await run(async () => await db('chatMessages').where({ messageId }).delete());
+	return data;
+};

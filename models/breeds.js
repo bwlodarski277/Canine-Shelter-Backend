@@ -1,3 +1,5 @@
+'use strict';
+
 /**
  * @file Breeds model to manage interactions with the database.
  * @module models/breeds
@@ -11,7 +13,7 @@ const { db, run } = require('../helpers/database');
  * @typedef {object} Breed
  * @property {number} id Breed ID
  * @property {string} name Name of the breed
- * @property {string} description Breed description 
+ * @property {string} description Breed description
  */
 
 /**
@@ -20,9 +22,9 @@ const { db, run } = require('../helpers/database');
  * @async
  */
 exports.getAll = async () => {
-    const data = await run(async () => await db('breeds'));
-    return data;
-}
+	const data = await run(async () => await db('breeds'));
+	return data;
+};
 
 /**
  * Gets a single breed entry from the DB by its ID.
@@ -31,10 +33,9 @@ exports.getAll = async () => {
  * @async
  */
 exports.getById = async id => {
-    const [data] = await run(async () =>
-        await db('breeds').where({ id }));
-    return data;
-}
+	const [data] = await run(async () => await db('breeds').where({ id }));
+	return data;
+};
 
 /**
  * Creates a new breed entry in the DB.
@@ -43,10 +44,9 @@ exports.getById = async id => {
  * @async
  */
 exports.add = async breed => {
-    const [data] = await run(async () =>
-        await db('breeds').insert(breed));
-    return data;
-}
+	const [data] = await run(async () => await db('breeds').insert(breed));
+	return data;
+};
 
 /**
  * Updates a breed entry in the DB.
@@ -56,10 +56,9 @@ exports.add = async breed => {
  * @async
  */
 exports.update = async (id, breed) => {
-    const data = await run(async () =>
-        await db('breeds').where({ id }).update(breed));
-    return data;
-}
+	const data = await run(async () => await db('breeds').where({ id }).update(breed));
+	return data;
+};
 
 /**
  * Deletes a breed entry from the DB.
@@ -68,7 +67,6 @@ exports.update = async (id, breed) => {
  * @async
  */
 exports.delete = async id => {
-    const data = await run(async () =>
-        await db('breeds').where({ id }).delete());
-    return data;
-}
+	const data = await run(async () => await db('breeds').where({ id }).delete());
+	return data;
+};

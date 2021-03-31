@@ -1,3 +1,5 @@
+'use strict';
+
 /**
  * @file Dogs model to manage interactions with the database.
  * @module models/dogs
@@ -90,9 +92,7 @@ exports.add = async dog => {
  * @async
  */
 exports.update = async (id, dog) => {
-	const data = await run(
-		async () => await db('dogs').where({ id }).update(dog)
-	);
+	const data = await run(async () => await db('dogs').where({ id }).update(dog));
 	return data;
 };
 

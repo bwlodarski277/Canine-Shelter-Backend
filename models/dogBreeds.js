@@ -1,3 +1,5 @@
+'use strict';
+
 /**
  * @file Dog breeds model to manage interactions with the database.
  * @module models/dogBreeds
@@ -20,10 +22,9 @@ const { db, run } = require('../helpers/database');
  * @async
  */
 exports.getByDogId = async dogId => {
-    const [data] = await run(async () =>
-        await db('dogBreeds').where({ dogId }));
-    return data;
-}
+	const [data] = await run(async () => await db('dogBreeds').where({ dogId }));
+	return data;
+};
 
 /**
  * Gets all the dogs with a breed ID.
@@ -32,10 +33,9 @@ exports.getByDogId = async dogId => {
  * @async
  */
 exports.getByBreedId = async breedId => {
-    const data = await run(async () =>
-        await db('dogBreeds').where({ breedId }));
-    return data;
-}
+	const data = await run(async () => await db('dogBreeds').where({ breedId }));
+	return data;
+};
 
 /**
  * Sets a dog's breed in the database.
@@ -45,12 +45,11 @@ exports.getByBreedId = async breedId => {
  * @async
  */
 exports.add = async (dogId, breedId) => {
-    // Not retrieving any data, as the insert method returns PK of inserted row.
-    // There is no PK in this row, as it is a composite key.
-    await run(async () =>
-        await db('dogBreeds').insert({ dogId, breedId }));
-    return true;
-}
+	// Not retrieving any data, as the insert method returns PK of inserted row.
+	// There is no PK in this row, as it is a composite key.
+	await run(async () => await db('dogBreeds').insert({ dogId, breedId }));
+	return true;
+};
 
 /**
  * Updates a breed entry in the DB.
@@ -60,10 +59,9 @@ exports.add = async (dogId, breedId) => {
  * @async
  */
 exports.update = async (dogId, breedId) => {
-    const data = await run(async () =>
-        await db('dogBreeds').where({ dogId }).update({ breedId }));
-    return data;
-}
+	const data = await run(async () => await db('dogBreeds').where({ dogId }).update({ breedId }));
+	return data;
+};
 
 /**
  * Deletes a dog breed entry from the DB.
@@ -72,7 +70,6 @@ exports.update = async (dogId, breedId) => {
  * @async
  */
 exports.delete = async dogId => {
-    const data = await run(async () =>
-        await db('dogBreeds').where({ dogId }).delete());
-    return data;
-}
+	const data = await run(async () => await db('dogBreeds').where({ dogId }).delete());
+	return data;
+};

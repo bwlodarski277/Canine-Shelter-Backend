@@ -1,3 +1,5 @@
+'use strict';
+
 /**
  * @file Users model to manage interactions with the database.
  * @module models/users
@@ -42,9 +44,7 @@ const cols = [
  * @async
  */
 exports.findByUsername = async (username, provider = 'local') => {
-	const [data] = await run(
-		async () => await db('users').where({ username, provider })
-	);
+	const [data] = await run(async () => await db('users').where({ username, provider }));
 	return data;
 };
 
@@ -110,9 +110,7 @@ exports.update = async (id, user) => {
 		const hash = bcrypt.hashSync(password, 10);
 		user.password = hash;
 	}
-	const data = await run(
-		async () => await db('users').where({ id }).update(user)
-	);
+	const data = await run(async () => await db('users').where({ id }).update(user));
 	return data;
 };
 
@@ -123,8 +121,6 @@ exports.update = async (id, user) => {
  * @async
  */
 exports.delete = async id => {
-	const data = await run(
-		async () => await db('users').where({ id }).delete()
-	);
+	const data = await run(async () => await db('users').where({ id }).delete());
 	return data;
 };

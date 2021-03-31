@@ -1,3 +1,5 @@
+'use strict';
+
 /**
  * @file JWT authentication strategy.
  * @module strategies/jwt
@@ -10,10 +12,6 @@ const ExtractJwt = require('passport-jwt').ExtractJwt;
 const { config } = require('../config');
 const userModel = require('../models/users');
 
-/**
- * JWT options object
- * @type {import('passport-jwt').StrategyOptions}
- */
 const opts = {
 	jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
 	secretOrKey: config.jwtSecret
@@ -31,19 +29,16 @@ const checkUser = async (jwtPayload, done) => {
 	try {
 		user = await userModel.getById(jwtPayload.sub);
 	} catch (error) {
-		console.error(
-			`Error during authentication for user ${jwtPayload.name}`
-		);
+		console.error(`Error during authentication for user ${jwtPayload.name}`);
 		return done(error);
 	}
 
 	if (user) {
 		console.log(`Successfully authenticated user ${jwtPayload.name}.`);
 		return done(null, user);
-	} else {
-		return done(null, false);
-		// return done(null, { role: 'guest' });
 	}
+	return done(null, false);
+	// return done(null, { role: 'guest' });
 };
 
 module.exports = new JwtStrategy(opts, checkUser);

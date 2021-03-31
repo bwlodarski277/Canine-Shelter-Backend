@@ -1,11 +1,9 @@
+'use strict';
+
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const { googleOauth } = require('../config').config;
 const userModel = require('../models/users');
 
-/**
- * Google Oauth2.0 options object
- * @type {import('passport-google-oauth20').StrategyOptions}
- */
 const options = {
 	clientID: googleOauth.clientID,
 	clientSecret: googleOauth.clientSecret,
@@ -19,26 +17,23 @@ const checkUser = async (_accesToken, _refreshToken, profile, done) => {
 		if (user) {
 			console.log(`Authenticated user ${person.name}`);
 			return done(null, user);
-		} else {
-			const newUser = {
-				role: 'user',
-				provider: 'google',
-				username: person.name,
-				email: person.email,
-				firstName: person.given_name,
-				lastName: person.family_name,
-				imageUrl: person.picture
-			};
-			const id = await userModel.add(newUser);
-			user = await userModel.getById(id);
-
-			console.log(`Created new user ${person.name}`);
-			return done(null, user);
 		}
+		const newUser = {
+			role: 'user',
+			provider: 'google',
+			username: person.name,
+			email: person.email,
+			firstName: person.given_name,
+			lastName: person.family_name,
+			imageUrl: person.picture
+		};
+		const id = await userModel.add(newUser);
+		user = await userModel.getById(id);
+
+		console.log(`Created new user ${person.name}`);
+		return done(null, user);
 	} catch (error) {
-		console.error(
-			`Error during authentication for user ${profile.displayName}`
-		);
+		console.error(`Error during authentication for user ${profile.displayName}`);
 		return done(error);
 	}
 };
