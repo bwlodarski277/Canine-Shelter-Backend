@@ -1,16 +1,15 @@
 {
-    "source": {
-        "includePattern": ".+\\.js(doc|x)?$",
-        "include": [
-            "."
-        ],
-        "exclude": [
-            "node_modules"
-        ]
-    },
-    "recurseDepth": 10,
-    "opts": {
-        "destination": "./docs/jsdocs",
-        "recurse": true
-    }
+	"source": {
+		"includePattern": ".+\\.js(doc|x)?$",
+		"include": ["."],
+		"exclude": ["node_modules", "docs"]
+	},
+	"recurseDepth": 10,
+	"opts": {
+		"destination": "./docs",
+		"readme": "./README.md",
+		"recurse": true,
+		"cleverlinks": true,
+		"template": "node_modules/docdash"
+	}
 }
