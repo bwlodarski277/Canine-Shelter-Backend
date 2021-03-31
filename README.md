@@ -1,2 +1,4 @@
-# 6003CEM_backend
-6003CEM coursework backend
+# Canine Shelter API documentation
+
+Welcome to the Canine Shelter API documentation homepage.
+
