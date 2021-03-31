@@ -16,3 +16,7 @@ const users = await run(async () => await db('dogs'));
 ## JSON Web Token - [`jwt.js`](./jwt.js)
 
 The [`jwt.js`](./jwt.js) module is used for verifying and generating JWT and refresh tokens for use in the [`auth.js`](../routes/auth.js) route file.
+
+## Twitter - [`twitter.js`](./twitter.js)
+
+The [`twitter.js`](./twitter.js) module is used for sending tweets when a new dog is added to the system.
