@@ -1,74 +1,79 @@
-/* global document */
-function hideSearchList() {
-    document.getElementById('search-item-ul').style.display = 'none';
+let searchAttr = 'data-search-mode';
+function contains(a, m) {
+	return (a.textContent || a.innerText || '').toUpperCase().indexOf(m) !== -1;
 }
 
-function showSearchList() {
-    document.getElementById('search-item-ul').style.display = 'block';
-}
+//on search
+document
+	.getElementById('nav-search')
+	.addEventListener('keyup', function (event) {
+		let search = this.value.toUpperCase();
 
-function checkClick(e) {
-    if ( e.target.id !== 'search-box-input') {
-        setTimeout(function() {
-            hideSearchList();
-        }, 60);
+		if (!search) {
+			//no search, show all results
+			document.documentElement.removeAttribute(searchAttr);
 
-        /* eslint-disable-next-line */
-        window.removeEventListener('click', checkClick);
-    }
-}
+			document
+				.querySelectorAll('nav > ul > li:not(.level-hide)')
+				.forEach(elem => {
+					elem.style.display = 'block';
+				});
 
-function search(list, options, keys, searchKey) {
-    var defaultOptions = {
-        shouldSort: true,
-        threshold: 0.4,
-        location: 0,
-        distance: 100,
-        maxPatternLength: 32,
-        minMatchCharLength: 1,
-        keys: keys
-    };
+			if (typeof hideAllButCurrent === 'function')
+				//let's do what ever collapse wants to do
+				hideAllButCurrent();
+			//menu by default should be opened
+			else
+				document
+					.querySelectorAll('nav > ul > li > ul li')
+					.forEach(elem => {
+						elem.style.display = 'block';
+					});
+		} else {
+			//we are searching
+			document.documentElement.setAttribute(searchAttr, '');
 
-    var op = Object.assign({}, defaultOptions, options);
+			//show all parents
+			document.querySelectorAll('nav > ul > li').forEach(elem => {
+				elem.style.display = 'block';
+			});
+			//hide all results
+			document.querySelectorAll('nav > ul > li > ul li').forEach(elem => {
+				elem.style.display = 'none';
+			});
+			//show results matching filter
+			document.querySelectorAll('nav > ul > li > ul a').forEach(elem => {
+				if (!contains(elem.parentNode, search)) return;
 
-    /* eslint-disable-next-line */
-    var fuse = new Fuse(list, op);
-    var result = fuse.search(searchKey);
-    var searchUL = document.getElementById('search-item-ul');
+				elem.parentNode.style.display = 'block';
+			});
+			//hide parents without children
+			document.querySelectorAll('nav > ul > li').forEach(parent => {
+				let countSearchA = 0;
+				parent.querySelectorAll('a').forEach(elem => {
+					if (contains(elem, search)) countSearchA++;
+				});
 
-    searchUL.innerHTML = '';
+				let countUl = 0;
+				let countUlVisible = 0;
+				parent.querySelectorAll('ul').forEach(ulP => {
+					// count all elements that match the search
+					if (contains(ulP, search)) countUl++;
 
-    if (result.length === 0) {
-        searchUL.innerHTML += '<li class="p-h-n"> No Result Found </li>';
-    } else {
-        result.forEach(function(item) {
-            searchUL.innerHTML += '<li>' + item.link + '</li>';
-        });
-    }
-}
+					// count all visible elements
+					let children = ulP.children;
+					for (i = 0; i < children.length; i++) {
+						let elem = children[i];
+						if (elem.style.display != 'none') countUlVisible++;
+					}
+				});
 
-/* eslint-disable-next-line */
-function setupSearch(list, options) {
-    var inputBox = document.getElementById('search-box-input');
-    var keys = ['title'];
-
-    inputBox.addEventListener('keyup', function() {
-        if (inputBox.value !== '') {
-            showSearchList();
-            search(list, options, keys, inputBox.value);
-        }
-        else { hideSearchList(); }
-    });
-
-    inputBox.addEventListener('focus', function() {
-        showSearchList();
-        if (inputBox.value !== '') {
-            search(list, options, keys, inputBox.value);
-        }
-
-        /* eslint-disable-next-line */
-        window.addEventListener('click', checkClick);
-    });
-}
-
-
+				if (countSearchA == 0 && countUl === 0)
+					//has no child at all and does not contain text
+					parent.style.display = 'none';
+				else if (countSearchA == 0 && countUlVisible == 0)
+					//has no visible child and does not contain text
+					parent.style.display = 'none';
+			});
+		}
+	});
