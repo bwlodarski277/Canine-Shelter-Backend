@@ -3,7 +3,7 @@
 <head>
     
     <meta charset="utf-8">
-    <title>models/dogs.js - Documentation</title>
+    <title>permissions/dogs.js - Documentation</title>
     
     
     <script src="scripts/prettify/prettify.js"></script>
@@ -32,7 +32,7 @@
 
 <div id="main">
     
-    <h1 class="page-title">models/dogs.js</h1>
+    <h1 class="page-title">permissions/dogs.js</h1>
     
 
     
@@ -45,113 +45,54 @@
             <pre class="prettyprint source linenums"><code>'use strict';
 
 /**
- * @file Dogs model to manage interactions with the database.
- * @module models/dogs
+ * @file RBAC permissions for /dogs routes.
+ * @module permissions/dogs
  * @author Bartlomiej Wlodarski
  */
 
-const { db, run } = require('../helpers/database');
+const { AccessControl } = require('role-acl');
+const ac = new AccessControl();
 
-/**
- * Dog object returned from the DB.
- * @typedef {object} Dog
- * @property {number} id Dog ID
- * @property {string} name Dog name
- * @property {string} description Dog description
- * @property {number} age Dog age
- * @property {booolean} gender Dog gender (1 for male, 0 for female)
- * @property {string} dateCreated Dog entry creation date
- * @property {string} dateModified Dog entry modification date
- * @property {string} imageUrl Dog image URL
- */
+//#region /dogs and /dogs/{id}
 
-/**
- * Get a list of dog entries from the DB.
- * Allows for searching, filtering and sorting.
- * @param {string} [query] search for dogs by name and description.
- * @param {number} [page=1] which page to get data from.
- * @param {number} [limit=50] number of items on a page.
- * @param {string} [order='id'] what parameter to order by.
- * @param {'asc'|'desc'} [direction='asc'] direction to sort (asc. or desc.).
- * @param {object} [filters] object of filters from the query.
- * @returns {Promise&lt;Array&lt;Dog>>} array of selected dog records.
- * @async
- */
-exports.getAll = async (
-	query = '',
-	page = 1,
-	limit = 50,
-	order = 'id',
-	direction = 'asc',
-	filters = {}
-) => {
-	// If direction is anything but descending, use ascending.
-	direction = direction === 'desc' ? 'desc' : 'asc';
-	const offset = (page - 1) * limit;
-	const data = await run(
-		async () =>
-			await db('dogs')
-				// applying user filters (like age, gender).
-				.where(filters)
-				// ... WHERE &lt;filters> AND (&lt;name> OR &lt;description>)
-				.andWhere(builder =>
-					// Applying search query
-					builder
-						// Safe as it is escaped by driver
-						.where('name', 'like', `%${query}%`)
-						.orWhere('description', 'like', `%${query}%`)
-				) // same as line above
-				.orderBy(order, direction)
-				.limit(limit)
-				.offset(offset)
-	);
-	return data;
-};
+// Staff may add dogs
+ac.grant('staff').execute('create').on('dogs');
 
-/**
- * Gets a single dog entry from the DB by their ID.
- * @param {number} id ID of the dog to fetch.
- * @returns {Promise&lt;Dog>} object containing the dog's record.
- * @async
- */
-exports.getById = async id => {
-	const [data] = await run(async () => await db('dogs').where({ id }));
-	return data;
-};
+// Staff may modify dogs at their location
+ac.grant('staff')
+	.condition({ Fn: 'EQUALS', args: { location: '$.owner' } })
+	.execute('modify')
+	.on('dog');
 
-/**
- * Creates a new dog entry in the DB.
- * @param {Dog} dog dog data to pass to the DB.
- * @returns {Promise&lt;number>} ID of the newly inserted row.
- * @async
- */
-exports.add = async dog => {
-	const [data] = await run(async () => await db('dogs').insert(dog));
-	return data;
-};
+// Staff may delete dogs at their location
+ac.grant('staff')
+	.condition({ Fn: 'EQUALS', args: { location: '$.owner' } })
+	.execute('delete')
+	.on('dog');
 
-/**
- * Updates a dog entry in the DB.
- * @param {number} id ID of the dog to update.
- * @param {Dog} dog data to pass to the DB.
- * @returns {Promise&lt;number>} number of updated rows (should be 1).
- * @async
- */
-exports.update = async (id, dog) => {
-	const data = await run(async () => await db('dogs').where({ id }).update(dog));
-	return data;
-};
+// Admins may do all of the above.
+ac.grant('admin').execute('read').on('dog');
+ac.grant('admin').execute('read').on('dogs');
+ac.grant('admin').execute('create').on('dogs');
+ac.grant('admin').execute('modify').on('dog');
+ac.grant('admin').execute('delete').on('dog');
 
-/**
- * Deletes a dog entry from the DB.
- * @param {number} id ID of the dog to delete.
- * @returns {Promise&lt;number>} number of affected rows (should be 1).
- * @async
- */
-exports.delete = async id => {
-	const data = await run(async () => await db('dogs').where({ id }).delete());
-	return data;
-};
+//#endregion
+
+//#region /dogs/{id}/breed
+
+// Staff may set the dog breed
+ac.grant('staff')
+	.condition({ Fn: 'EQUALS', args: { location: '$.owner' } })
+	.execute('set')
+	.on('dogBreed');
+
+ac.grant('staff')
+	.condition({ Fn: 'EQUALS', args: { location: '$.owner' } })
+	.execute('modify')
+	.on('dogBreed');
+
+//#endregion
 </code></pre>
         </article>
     </section>

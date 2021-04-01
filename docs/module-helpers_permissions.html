@@ -3,7 +3,7 @@
 <head>
     
     <meta charset="utf-8">
-    <title>models/dogs.js - Documentation</title>
+    <title>helpers/permissions - Documentation</title>
     
     
     <script src="scripts/prettify/prettify.js"></script>
@@ -32,129 +32,847 @@
 
 <div id="main">
     
-    <h1 class="page-title">models/dogs.js</h1>
+    <h1 class="page-title">helpers/permissions</h1>
     
 
     
 
 
 
+
+<section>
+
+<header>
     
-    <section>
-        <article>
-            <pre class="prettyprint source linenums"><code>'use strict';
+        
+            
+        
+    
+</header>
 
-/**
- * @file Dogs model to manage interactions with the database.
- * @module models/dogs
- * @author Bartlomiej Wlodarski
- */
+<article>
+    
+        <div class="container-overview">
+        
+            
+                <div class="description usertext">Permission helper. Used for generating a permission generator.</div>
+            
 
-const { db, run } = require('../helpers/database');
+            
+                
 
-/**
- * Dog object returned from the DB.
- * @typedef {object} Dog
- * @property {number} id Dog ID
- * @property {string} name Dog name
- * @property {string} description Dog description
- * @property {number} age Dog age
- * @property {booolean} gender Dog gender (1 for male, 0 for female)
- * @property {string} dateCreated Dog entry creation date
- * @property {string} dateModified Dog entry modification date
- * @property {string} imageUrl Dog image URL
- */
 
-/**
- * Get a list of dog entries from the DB.
- * Allows for searching, filtering and sorting.
- * @param {string} [query] search for dogs by name and description.
- * @param {number} [page=1] which page to get data from.
- * @param {number} [limit=50] number of items on a page.
- * @param {string} [order='id'] what parameter to order by.
- * @param {'asc'|'desc'} [direction='asc'] direction to sort (asc. or desc.).
- * @param {object} [filters] object of filters from the query.
- * @returns {Promise&lt;Array&lt;Dog>>} array of selected dog records.
- * @async
- */
-exports.getAll = async (
-	query = '',
-	page = 1,
-	limit = 50,
-	order = 'id',
-	direction = 'asc',
-	filters = {}
-) => {
-	// If direction is anything but descending, use ascending.
-	direction = direction === 'desc' ? 'desc' : 'asc';
-	const offset = (page - 1) * limit;
-	const data = await run(
-		async () =>
-			await db('dogs')
-				// applying user filters (like age, gender).
-				.where(filters)
-				// ... WHERE &lt;filters> AND (&lt;name> OR &lt;description>)
-				.andWhere(builder =>
-					// Applying search query
-					builder
-						// Safe as it is escaped by driver
-						.where('name', 'like', `%${query}%`)
-						.orWhere('description', 'like', `%${query}%`)
-				) // same as line above
-				.orderBy(order, direction)
-				.limit(limit)
-				.offset(offset)
-	);
-	return data;
-};
 
-/**
- * Gets a single dog entry from the DB by their ID.
- * @param {number} id ID of the dog to fetch.
- * @returns {Promise&lt;Dog>} object containing the dog's record.
- * @async
- */
-exports.getById = async id => {
-	const [data] = await run(async () => await db('dogs').where({ id }));
-	return data;
-};
 
-/**
- * Creates a new dog entry in the DB.
- * @param {Dog} dog dog data to pass to the DB.
- * @returns {Promise&lt;number>} ID of the newly inserted row.
- * @async
- */
-exports.add = async dog => {
-	const [data] = await run(async () => await db('dogs').insert(dog));
-	return data;
-};
+<dl class="details">
 
-/**
- * Updates a dog entry in the DB.
- * @param {number} id ID of the dog to update.
- * @param {Dog} dog data to pass to the DB.
- * @returns {Promise&lt;number>} number of updated rows (should be 1).
- * @async
- */
-exports.update = async (id, dog) => {
-	const data = await run(async () => await db('dogs').where({ id }).update(dog));
-	return data;
-};
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="helpers_permissions.js.html">helpers/permissions.js</a>, <a href="helpers_permissions.js.html#line3">line 3</a>
+    </li></ul></dd>
+    
 
-/**
- * Deletes a dog entry from the DB.
- * @param {number} id ID of the dog to delete.
- * @returns {Promise&lt;number>} number of affected rows (should be 1).
- * @async
- */
-exports.delete = async id => {
-	const data = await run(async () => await db('dogs').where({ id }).delete());
-	return data;
-};
-</code></pre>
-        </article>
-    </section>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-author">Author:</dt>
+    <dd class="tag-author">
+        <ul>
+            <li>Bartlomiej Wlodarski</li>
+        </ul>
+    </dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            
+        
+        </div>
+    
+
+    
+
+    
+
+    
+    
+    
+
+     
+
+    
+
+    
+
+    
+        <h3 class="subsection-title">Methods</h3>
+
+        
+            
+
+    
+
+    <h4 class="name" id="~checker"><span class="type-signature">(async, inner) </span>checker<span class="signature">(role, value, toCheck)</span><span class="type-signature"> &rarr; {Promise.&lt;function()>}</span></h4>
+
+    
+
+
+
+
+<dl class="details">
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="helpers_permissions.js.html">helpers/permissions.js</a>, <a href="helpers_permissions.js.html#line39">line 39</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-see">See:</dt>
+    <dd class="tag-see">
+        <ul>
+            <li><a href="module-models_users.html#~User">module:models/users~User</a></li>
+        
+            <li><a href="module-helpers_permissions.html#~simple">module:helpers/permissions~simple</a></li>
+        </ul>
+    </dd>
+    
+
+    
+</dl>
+
+
+
+
+
+<div class="description usertext">
+    Checks whether a user may perform an action on a resource.
+</div>
+
+
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>role</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">role to check.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>value</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">simple</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">data to validate.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>toCheck</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">simple</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">data to validate against.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    AccessControl validator.
+</div>
+
+
+
+<dl class="param-type">
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise.&lt;function()></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="~generatePerms"><span class="type-signature">(inner) </span>generatePerms<span class="signature">(action, onResource)</span><span class="type-signature"> &rarr; {function}</span></h4>
+
+    
+
+
+
+
+<dl class="details">
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="helpers_permissions.js.html">helpers/permissions.js</a>, <a href="helpers_permissions.js.html#line25">line 25</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-see">See:</dt>
+    <dd class="tag-see">
+        <ul>
+            <li><a href="module-helpers_permissions.html#~checker">module:helpers/permissions~checker</a></li>
+        
+            <li><a href="module-helpers_permissions.html#~simple">module:helpers/permissions~simple</a></li>
+        </ul>
+    </dd>
+    
+
+    
+</dl>
+
+
+
+
+
+<div class="description usertext">
+    Generates an authorizer function.
+Used in instances where we only need to check if
+a user can modify their own data.
+</div>
+
+
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>action</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">action to perform on resource.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>onResource</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">resource to perform action on.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    AccessControl perm. checker generator.
+</div>
+
+
+
+<dl class="param-type">
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">function</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="~permGenerator"><span class="type-signature">(inner) </span>permGenerator<span class="signature">(ac, current, expected)</span><span class="type-signature"> &rarr; {function}</span></h4>
+
+    
+
+
+
+
+<dl class="details">
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="helpers_permissions.js.html">helpers/permissions.js</a>, <a href="helpers_permissions.js.html#line24">line 24</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-see">See:</dt>
+    <dd class="tag-see">
+        <ul>
+            <li><a href="module-helpers_permissions.html#~generatePerms">module:helpers/permissions~generatePerms</a></li>
+        </ul>
+    </dd>
+    
+
+    
+</dl>
+
+
+
+
+
+<div class="description usertext">
+    Generates a perms generator using an AccessControl object.
+Used to avoid duplicate code in permissions files.
+</div>
+
+
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>ac</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">AccessControl object from role-acl.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>current</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">context value to check.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>expected</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">expected context value.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    generatePerms function generator.
+</div>
+
+
+
+<dl class="param-type">
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">function</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+        
+    
+
+    
+        <h3 class="subsection-title">Type Definitions</h3>
+
+        
+                
+<h4 class="name" id="~simple">simple</h4>
+
+
+
+
+
+<dl class="details">
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="helpers_permissions.js.html">helpers/permissions.js</a>, <a href="helpers_permissions.js.html#line9">line 9</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+<div class="description usertext">
+    Simple type union.
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">number</span>
+|
+
+<span class="param-type">string</span>
+|
+
+<span class="param-type">boolean</span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+
+            
+    
+
+    
+</article>
+
+</section>
 
 
 

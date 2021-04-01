@@ -3,7 +3,7 @@
 <head>
     
     <meta charset="utf-8">
-    <title>models/dogs.js - Documentation</title>
+    <title>permissions/dogs - Documentation</title>
     
     
     <script src="scripts/prettify/prettify.js"></script>
@@ -32,129 +32,143 @@
 
 <div id="main">
     
-    <h1 class="page-title">models/dogs.js</h1>
+    <h1 class="page-title">permissions/dogs</h1>
     
 
     
 
 
 
+
+<section>
+
+<header>
     
-    <section>
-        <article>
-            <pre class="prettyprint source linenums"><code>'use strict';
+        
+            
+        
+    
+</header>
 
-/**
- * @file Dogs model to manage interactions with the database.
- * @module models/dogs
- * @author Bartlomiej Wlodarski
- */
+<article>
+    
+        <div class="container-overview">
+        
+            
+                <div class="description usertext">RBAC permissions for /dogs routes.</div>
+            
 
-const { db, run } = require('../helpers/database');
+            
+                
 
-/**
- * Dog object returned from the DB.
- * @typedef {object} Dog
- * @property {number} id Dog ID
- * @property {string} name Dog name
- * @property {string} description Dog description
- * @property {number} age Dog age
- * @property {booolean} gender Dog gender (1 for male, 0 for female)
- * @property {string} dateCreated Dog entry creation date
- * @property {string} dateModified Dog entry modification date
- * @property {string} imageUrl Dog image URL
- */
 
-/**
- * Get a list of dog entries from the DB.
- * Allows for searching, filtering and sorting.
- * @param {string} [query] search for dogs by name and description.
- * @param {number} [page=1] which page to get data from.
- * @param {number} [limit=50] number of items on a page.
- * @param {string} [order='id'] what parameter to order by.
- * @param {'asc'|'desc'} [direction='asc'] direction to sort (asc. or desc.).
- * @param {object} [filters] object of filters from the query.
- * @returns {Promise&lt;Array&lt;Dog>>} array of selected dog records.
- * @async
- */
-exports.getAll = async (
-	query = '',
-	page = 1,
-	limit = 50,
-	order = 'id',
-	direction = 'asc',
-	filters = {}
-) => {
-	// If direction is anything but descending, use ascending.
-	direction = direction === 'desc' ? 'desc' : 'asc';
-	const offset = (page - 1) * limit;
-	const data = await run(
-		async () =>
-			await db('dogs')
-				// applying user filters (like age, gender).
-				.where(filters)
-				// ... WHERE &lt;filters> AND (&lt;name> OR &lt;description>)
-				.andWhere(builder =>
-					// Applying search query
-					builder
-						// Safe as it is escaped by driver
-						.where('name', 'like', `%${query}%`)
-						.orWhere('description', 'like', `%${query}%`)
-				) // same as line above
-				.orderBy(order, direction)
-				.limit(limit)
-				.offset(offset)
-	);
-	return data;
-};
 
-/**
- * Gets a single dog entry from the DB by their ID.
- * @param {number} id ID of the dog to fetch.
- * @returns {Promise&lt;Dog>} object containing the dog's record.
- * @async
- */
-exports.getById = async id => {
-	const [data] = await run(async () => await db('dogs').where({ id }));
-	return data;
-};
 
-/**
- * Creates a new dog entry in the DB.
- * @param {Dog} dog dog data to pass to the DB.
- * @returns {Promise&lt;number>} ID of the newly inserted row.
- * @async
- */
-exports.add = async dog => {
-	const [data] = await run(async () => await db('dogs').insert(dog));
-	return data;
-};
+<dl class="details">
 
-/**
- * Updates a dog entry in the DB.
- * @param {number} id ID of the dog to update.
- * @param {Dog} dog data to pass to the DB.
- * @returns {Promise&lt;number>} number of updated rows (should be 1).
- * @async
- */
-exports.update = async (id, dog) => {
-	const data = await run(async () => await db('dogs').where({ id }).update(dog));
-	return data;
-};
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="permissions_dogs.js.html">permissions/dogs.js</a>, <a href="permissions_dogs.js.html#line3">line 3</a>
+    </li></ul></dd>
+    
 
-/**
- * Deletes a dog entry from the DB.
- * @param {number} id ID of the dog to delete.
- * @returns {Promise&lt;number>} number of affected rows (should be 1).
- * @async
- */
-exports.delete = async id => {
-	const data = await run(async () => await db('dogs').where({ id }).delete());
-	return data;
-};
-</code></pre>
-        </article>
-    </section>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-author">Author:</dt>
+    <dd class="tag-author">
+        <ul>
+            <li>Bartlomiej Wlodarski</li>
+        </ul>
+    </dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            
+        
+        </div>
+    
+
+    
+
+    
+
+    
+    
+    
+
+     
+
+    
+
+    
+
+    
+
+    
+
+    
+</article>
+
+</section>
 
 
 
