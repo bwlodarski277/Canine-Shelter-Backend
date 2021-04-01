@@ -9,18 +9,6 @@
 const { db, run } = require('../helpers/database');
 const bcrypt = require('bcrypt');
 
-/** List of columns to return from the DB (excludes password). */
-const cols = [
-	'id',
-	'username',
-	'email',
-	'firstName',
-	'lastName',
-	'dateCreated',
-	'dateModified',
-	'imageUrl'
-];
-
 /**
  * User object returned from the DB.
  * @typedef {object} User
@@ -54,11 +42,7 @@ exports.findByUsername = async (username, provider = 'local') => {
  * @async
  */
 exports.getAll = async () => {
-	const data = await run(
-		async () =>
-			// ...cols is to make sure password is not returned.
-			await db('users').select(...cols)
-	);
+	const data = await run(async () => await db('users'));
 	return data;
 };
 
@@ -69,12 +53,7 @@ exports.getAll = async () => {
  * @async
  */
 exports.getById = async id => {
-	const [data] = await run(
-		async () =>
-			await db('users')
-				.where({ id })
-				.select(...cols)
-	);
+	const [data] = await run(async () => await db('users').where({ id }));
 	return data;
 };
 
