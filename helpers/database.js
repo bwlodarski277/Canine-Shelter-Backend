@@ -42,7 +42,7 @@ exports.run = async dbQuery => {
 		return data;
 	} catch (err) {
 		console.error(err);
-		throw new DatabaseException('Database error', err.code);
+		throw new DatabaseException('A database error has occurred', err.code, err.errno);
 	}
 };
 
@@ -56,9 +56,10 @@ class DatabaseException {
 	 * @param {string} message error message to provide
 	 * @param {number|string} code exception's error code
 	 */
-	constructor(message, code) {
+	constructor(message, code, errno) {
 		this.message = message;
 		this.code = code;
+		this.errno = errno;
 		this.name = 'DatabaseException';
 	}
 }
