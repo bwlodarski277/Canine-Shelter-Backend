@@ -14,14 +14,7 @@ const { basic, google } = require('../controllers/auth');
 const { config } = require('../config');
 
 const router = new Router({ prefix: '/api/v1/auth' });
-
-router.get('/jwt', basic, getJWT);
-
-router.post('/jwt/refresh', bodyParser(), refresh);
-
-router.get('/google', google);
-
-router.get('/google/callback', google, googleCallback);
+router.use(bodyParser());
 
 /**
  * Login route which generates a JWT token. Requires authentication.
@@ -61,5 +54,10 @@ const googleCallback = async ctx => {
 
 	ctx.body = { access, refresh };
 };
+
+router.get('/jwt', basic, getJWT);
+router.post('/jwt/refresh', refresh);
+router.get('/google', google);
+router.get('/google/callback', google, googleCallback);
 
 module.exports = router;

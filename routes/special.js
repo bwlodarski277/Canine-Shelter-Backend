@@ -10,10 +10,6 @@ const Router = require('koa-router');
 
 const router = new Router({ prefix: '/api/v1' });
 
-router.get('/', welcome);
-
-router.get('//', easterEgg);
-
 const welcome = async ctx => {
 	const data = { message: 'The Canine Shelter API' };
 	ctx.body = data;
@@ -24,5 +20,8 @@ const easterEgg = async ctx => {
 	ctx.status = 418;
 	ctx.body = data;
 };
+
+router.get('/', welcome);
+router.get('//', easterEgg);
 
 module.exports = router;

@@ -15,38 +15,37 @@ const dogLocationModel = require('../models/dogLocations');
 const favouritesModel = require('../models/favourites');
 
 const { validateDog, validateDogBreed, validateDogLocation } = require('../controllers/validation');
+const can = require('../permissions/dogs');
 
 const { auth } = require('../controllers/auth');
+const { clamp } = require('../helpers/utils');
 
 const router = new Router({ prefix: '/api/v1/dogs' });
-
-router.get('/', getAll);
-router.post('/', auth, bodyParser(), validateDog, addDog);
-
-router.get('/:id([0-9]+)', getDog);
-router.put('/:id([0-9]+)', auth, bodyParser(), validateDog, updateDog);
-router.del('/:id([0-9]+)', auth, deleteDog);
-
-router.get('/:id([0-9]+)/breed', getDogBreed);
-router.post('/:id([0-9]+)/breed', auth, bodyParser(), validateDogBreed, addDogBreed);
-router.put('/:id([0-9]+)/breed', auth, bodyParser(), validateDogBreed, updateDogBreed);
-router.del('/:id([0-9]+)/breed', auth, deleteDogBreed);
-
-router.get('/:id([0-9]+)/location', getDogLocation);
-router.post('/:id([0-9]+)/location', auth, bodyParser(), validateDogLocation, addDogLocation);
-router.put('/:id([0-9]+)/location', auth, bodyParser(), validateDogLocation, updateDogLocation);
-router.del('/:id([0-9]+)/location', auth, deleteDogLocation);
-
-router.get('/:id([0-9]+)/favourites', getFavourites);
+router.use(bodyParser());
 
 /**
  * Gets all the dogs from the database.
  * @param {object} ctx context passed from Koa.
  */
 const getAll = async ctx => {
-	const { query, page, limit, order, direction } = ctx.request.query;
-	const dogs = await dogModel.getAll(query, page, limit, order, direction);
-	if (dogs.length) ctx.body = dogs;
+	let {
+		query = '',
+		select = ['*'],
+		page = 1,
+		limit = 10,
+		order = 'id',
+		direction
+	} = ctx.request.query;
+	limit = clamp(limit, 1, 20); // Clamping the limit to be between 1 and 20.
+	direction = direction === 'desc' ? 'desc' : 'asc';
+	if (!Array.isArray(select)) select = Array(select);
+	try {
+		const dogs = await dogModel.getAll(query, select, page, limit, order, direction);
+		if (dogs.length) ctx.body = dogs;
+	} catch (err) {
+		ctx.status = 500;
+		ctx.body = err;
+	}
 };
 
 /**
@@ -55,8 +54,13 @@ const getAll = async ctx => {
  */
 const getDog = async ctx => {
 	const id = ctx.params.id;
-	const dog = await dogModel.getById(id);
-	if (dog) ctx.body = dog;
+	try {
+		const dog = await dogModel.getById(id);
+		if (dog) ctx.body = dog;
+	} catch (err) {
+		ctx.status = 500;
+		ctx.body = err;
+	}
 };
 
 /**
@@ -64,11 +68,22 @@ const getDog = async ctx => {
  * @param {object} ctx context passed from Koa.
  */
 const addDog = async ctx => {
+	const { role } = ctx.state.user;
+	const permission = await can.dog.create(role);
+	if (!permission.granted) {
+		ctx.status = 403;
+		return;
+	}
 	const body = ctx.request.body;
-	const id = await dogModel.add(body);
-	if (id) {
-		ctx.status = 201;
-		ctx.body = { ID: id, created: true, link: `${ctx.request.path}/${id}` };
+	try {
+		const id = await dogModel.add(body);
+		if (id) {
+			ctx.status = 201;
+			ctx.body = { ID: id, created: true, link: `${ctx.request.path}/${id}` };
+		}
+	} catch (err) {
+		ctx.status = 500;
+		ctx.body = err;
 	}
 };
 
@@ -78,18 +93,23 @@ const addDog = async ctx => {
  */
 const updateDog = async ctx => {
 	const dogId = ctx.params.id;
-	const dog = await dogModel.getById(dogId);
-	if (dog) {
-		// Excluding fields that must not be updated
-		const { id, dateCreated, dateModified, ...body } = ctx.request.body;
-
-		const result = await dogModel.update(dogId, body);
-
-		// Knex returns amount of affected rows.
-		if (result) {
-			ctx.status = 201;
-			ctx.body = { id: dogId, updated: true, link: ctx.request.path };
+	try {
+		const dog = await dogModel.getById(dogId);
+		if (dog) {
+			const location = await dogLocationModel.getByDogId(dogId);
+			const permission = await can.
+			// Excluding fields that must not be updated
+			const { id, dateCreated, dateModified, ...body } = ctx.request.body;
+			const result = await dogModel.update(dogId, body);
+			// Knex returns amount of affected rows.
+			if (result) {
+				ctx.status = 201;
+				ctx.body = { id: dogId, updated: true, link: ctx.request.path };
+			}
 		}
+	} catch (err) {
+		ctx.status = 500;
+		ctx.body = err;
 	}
 };
 
@@ -99,10 +119,15 @@ const updateDog = async ctx => {
  */
 const deleteDog = async ctx => {
 	const id = ctx.params.id;
-	const dog = await dogModel.getById(id);
-	if (dog) {
-		const result = await dogModel.delete(id);
-		if (result) ctx.stbody = { id, deleted: true };
+	try {
+		const dog = await dogModel.getById(id);
+		if (dog) {
+			const result = await dogModel.delete(id);
+			if (result) ctx.stbody = { id, deleted: true };
+		}
+	} catch (err) {
+		ctx.status = 500;
+		ctx.body = err;
 	}
 };
 
@@ -112,8 +137,13 @@ const deleteDog = async ctx => {
  */
 const getDogBreed = async ctx => {
 	const id = ctx.params.id;
-	const dogBreed = await dogBreedModel.getByDogId(id);
-	if (dogBreed) ctx.body = dogBreed;
+	try {
+		const dogBreed = await dogBreedModel.getByDogId(id);
+		if (dogBreed) ctx.body = dogBreed;
+	} catch (err) {
+		ctx.status = 500;
+		ctx.body = err;
+	}
 };
 
 /**
@@ -123,10 +153,15 @@ const getDogBreed = async ctx => {
 const addDogBreed = async ctx => {
 	const dogId = ctx.params.id;
 	const { breedId } = ctx.request.body;
-	const result = await dogBreedModel.add(dogId, breedId);
-	if (result) {
-		ctx.status = 201;
-		ctx.body = { id: dogId, created: true, link: ctx.request.path };
+	try {
+		const result = await dogBreedModel.add(dogId, breedId);
+		if (result) {
+			ctx.status = 201;
+			ctx.body = { id: dogId, created: true, link: ctx.request.path };
+		}
+	} catch (err) {
+		ctx.status = 500;
+		ctx.body = err;
 	}
 };
 
@@ -137,8 +172,13 @@ const addDogBreed = async ctx => {
 const updateDogBreed = async ctx => {
 	const dogId = ctx.params.id;
 	const { breedId } = ctx.request.body;
-	const result = await dogBreedModel.update(dogId, breedId);
-	if (result) ctx.body = { id: dogId, updated: true, link: ctx.request.path };
+	try {
+		const result = await dogBreedModel.update(dogId, breedId);
+		if (result) ctx.body = { id: dogId, updated: true, link: ctx.request.path };
+	} catch (err) {
+		ctx.status = 500;
+		ctx.body = err;
+	}
 };
 
 /**
@@ -147,8 +187,13 @@ const updateDogBreed = async ctx => {
  */
 const deleteDogBreed = async ctx => {
 	const dogId = ctx.params.id;
-	const result = await dogBreedModel.delete(dogId);
-	if (result) ctx.body = { id: dogId, deleted: true };
+	try {
+		const result = await dogBreedModel.delete(dogId);
+		if (result) ctx.body = { id: dogId, deleted: true };
+	} catch (err) {
+		ctx.status = 500;
+		ctx.body = err;
+	}
 };
 
 /**
@@ -157,8 +202,13 @@ const deleteDogBreed = async ctx => {
  */
 const getDogLocation = async ctx => {
 	const id = ctx.params.id;
-	const dogLocation = await dogLocationModel.getByDogId(id);
-	if (dogLocation) ctx.body = dogLocation;
+	try {
+		const dogLocation = await dogLocationModel.getByDogId(id);
+		if (dogLocation) ctx.body = dogLocation;
+	} catch (err) {
+		ctx.status = 500;
+		ctx.body = err;
+	}
 };
 
 /**
@@ -168,10 +218,15 @@ const getDogLocation = async ctx => {
 const addDogLocation = async ctx => {
 	const dogId = ctx.params.id;
 	const { locationId } = ctx.request.body;
-	const result = await dogLocationModel.add(dogId, locationId);
-	if (result) {
-		ctx.status = 201;
-		ctx.body = { id: dogId, created: true, link: ctx.request.path };
+	try {
+		const result = await dogLocationModel.add(dogId, locationId);
+		if (result) {
+			ctx.status = 201;
+			ctx.body = { id: dogId, created: true, link: ctx.request.path };
+		}
+	} catch (err) {
+		ctx.status = 500;
+		ctx.body = err;
 	}
 };
 
@@ -182,8 +237,13 @@ const addDogLocation = async ctx => {
 const updateDogLocation = async ctx => {
 	const dogId = ctx.params.id;
 	const { locationId } = ctx.request.body;
-	const result = await dogLocationModel.update(dogId, locationId);
-	if (result) ctx.body = { id: dogId, updated: true, link: ctx.request.path };
+	try {
+		const result = await dogLocationModel.update(dogId, locationId);
+		if (result) ctx.body = { id: dogId, updated: true, link: ctx.request.path };
+	} catch (err) {
+		ctx.status = 500;
+		ctx.body = err;
+	}
 };
 
 /**
@@ -192,8 +252,13 @@ const updateDogLocation = async ctx => {
  */
 const deleteDogLocation = async ctx => {
 	const dogId = ctx.params.id;
-	const result = await dogLocationModel.delete(dogId);
-	if (result) ctx.body = { id: dogId, deleted: true };
+	try {
+		const result = await dogLocationModel.delete(dogId);
+		if (result) ctx.body = { id: dogId, deleted: true };
+	} catch (err) {
+		ctx.status = 500;
+		ctx.body = err;
+	}
 };
 
 /**
@@ -202,8 +267,32 @@ const deleteDogLocation = async ctx => {
  */
 const getFavourites = async ctx => {
 	const id = ctx.params.id;
-	const count = await favouritesModel.getFavCount(id);
-	ctx.body = count;
+	try {
+		const count = await favouritesModel.getFavCount(id);
+		ctx.body = count;
+	} catch (err) {
+		ctx.status = 500;
+		ctx.body = err;
+	}
 };
+
+router.get('/', getAll);
+router.post('/', auth, validateDog, addDog);
+
+router.get('/:id([0-9]+)', getDog);
+router.put('/:id([0-9]+)', auth, validateDog, updateDog);
+router.del('/:id([0-9]+)', auth, deleteDog);
+
+router.get('/:id([0-9]+)/breed', getDogBreed);
+router.post('/:id([0-9]+)/breed', auth, validateDogBreed, addDogBreed);
+router.put('/:id([0-9]+)/breed', auth, validateDogBreed, updateDogBreed);
+router.del('/:id([0-9]+)/breed', auth, deleteDogBreed);
+
+router.get('/:id([0-9]+)/location', getDogLocation);
+router.post('/:id([0-9]+)/location', auth, validateDogLocation, addDogLocation);
+router.put('/:id([0-9]+)/location', auth, validateDogLocation, updateDogLocation);
+router.del('/:id([0-9]+)/location', auth, deleteDogLocation);
+
+router.get('/:id([0-9]+)/favourites', getFavourites);
 
 module.exports = router;
