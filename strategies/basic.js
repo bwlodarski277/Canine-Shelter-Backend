@@ -42,7 +42,7 @@ const checkUser = async (username, password, done) => {
 		if (verified) {
 			console.log(`Successfully authenticated user ${username}.`);
 			// Overwriting the user variable to make sure password is not returned.
-			user = await users.getById(user.id);
+			user = await users.getById(user.id, []);
 			return done(null, user);
 		}
 		console.log(`Incorrect password for user ${username}.`);
