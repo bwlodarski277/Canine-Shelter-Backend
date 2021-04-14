@@ -51,6 +51,17 @@ exports.getById = async id => {
 };
 
 /**
+ * Gets a list of a user's chats by ID.
+ * @param {number} userId ID of a user.
+ * @returns {Promise<Chat>} object containing the chat record.
+ * @async
+ */
+exports.getByUserId = async userId => {
+	const data = await run(async () => await db('chats').where({ userId }));
+	return data;
+};
+
+/**
  * Deletes a chat entry from the DB.
  * @param {number} id ID of the chat to delete.
  * @returns {Promise<number>} number of affected rows (should be 1).
