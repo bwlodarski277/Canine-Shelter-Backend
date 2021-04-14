@@ -9,12 +9,12 @@
 const { AccessControl } = require('role-acl');
 const ac = new AccessControl();
 
-const checkMessage = ctx => {
-	// If is staff check location, else check user ID.
-	// TODO: check the role in this function? (not sure if this is needed, since we check the sender stuff.)
-	if (ctx.sender === 0) return ctx.staffLocation === ctx.chatLocation;
-	return ctx.userId === ctx.chatUser;
-};
+// const checkMessage = ctx => {
+// 	// If is staff check location, else check user ID.
+// 	// TODO: check the role in this function? (not sure if this is needed, since we check the sender stuff.)
+// 	if (ctx.sender === 0) return ctx.staffLocation === ctx.chatLocation;
+// 	return ctx.userId === ctx.chatUser;
+// };
 
 // Not used, but created so that the 'user' role is registered.
 // ac.grant('user').execute('none').on('none');
@@ -40,7 +40,7 @@ ac.grant('user')
 
 // Staff may view a single chat at their location
 ac.grant('staff')
-	.condition({ Fn: 'EQUAlS', args: { staffLocation: '$.chatLocation' } })
+	.condition({ Fn: 'EQUALS', args: { staffLocation: '$.chatLocation' } })
 	.execute('read')
 	.on('chat');
 
