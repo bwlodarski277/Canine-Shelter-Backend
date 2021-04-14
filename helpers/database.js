@@ -7,21 +7,17 @@
  */
 
 const knex = require('knex');
-const { config } = require('../config');
+// const { config } = require('../config');
+const knexfile = require('../knexfile');
+
+require('dotenv').config();
+
+const knexConfig = knexfile[process.env.NODE_ENV];
 
 /**
  * Knex database object. Used for interacting with the DB.
  */
-exports.db = knex({
-	client: 'mysql2',
-	connection: {
-		host: config.host,
-		port: config.port,
-		user: config.user,
-		password: config.password,
-		database: config.database
-	}
-});
+exports.db = knex(knexConfig);
 
 /**
  * Wrapper for DB queries.
