@@ -13,7 +13,7 @@ const { config } = require('../config');
  * Knex database object. Used for interacting with the DB.
  */
 exports.db = knex({
-	client: 'mysql',
+	client: 'mysql2',
 	connection: {
 		host: config.host,
 		port: config.port,
