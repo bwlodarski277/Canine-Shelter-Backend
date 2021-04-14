@@ -1,3 +1,5 @@
+'use strict';
+
 /**
  * @file Messages model to manage interactions with the database.
  * @module models/messages
@@ -22,10 +24,9 @@ const { db, run } = require('../helpers/database');
  * @async
  */
 exports.add = async message => {
-    const [data] = await run(async () =>
-        db('messages').insert(message));
-    return data;
-}
+	const [data] = await run(async () => db('messages').insert(message));
+	return data;
+};
 
 /**
  * Gets a single message entry from the DB by its ID.
@@ -34,10 +35,9 @@ exports.add = async message => {
  * @async
  */
 exports.getById = async id => {
-    const [data] = await run(async () =>
-        db('messages').where({ id }));
-    return data;
-}
+	const [data] = await run(async () => db('messages').where({ id }));
+	return data;
+};
 
 /**
  * Deletes a message entry from the DB.
@@ -46,7 +46,6 @@ exports.getById = async id => {
  * @async
  */
 exports.delete = async id => {
-    const data = await run(async () =>
-        db('messages').where({ id }).delete());
-    return data;
-}
+	const data = await run(async () => db('messages').where({ id }).delete());
+	return data;
+};

@@ -1,110 +1,46 @@
 <!DOCTYPE html>
 <html lang="en">
-
-  <head>
+<head>
+    
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <!-- Adding meta -->
+    <title>models/dogLocations - Documentation</title>
     
-
-    <!-- Adding external script-->
     
-
-    <!-- Adding external style-->
-    
-
-    <!-- Adding scripts-->
-    
-
-    <!-- Adding style-->
-    
-
-    <!-- Adding overlay script-->
-    
-
-    <!-- Adding overlay style-->
-    
-
-
-    <title>
-      models/dogLocations
-    </title>
-
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
     <!--[if lt IE 9]>
       <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
-    <link type="text/css" rel="stylesheet" href="styles/third-party/ionicons.min.css">
-    <link type="text/css" rel="stylesheet" href="styles/third-party/prettify-tomorrow.css">
-    <link type="text/css" rel="stylesheet" href="styles/reset.css">
-    <link type="text/css" rel="stylesheet" href="styles/heading.css">
-    <link type="text/css" rel="stylesheet" href="styles/clean-jsdoc-theme-base.css">
-    <link type="text/css" rel="stylesheet" href="styles/clean-jsdoc-theme-light.css">
+    <link type="text/css" rel="stylesheet" href="styles/prettify.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc.css">
+    <script src="scripts/nav.js" defer></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav >
     
-    <svg aria-hidden="true" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
-    style="display:none">
-    <defs>
-        <symbol id="copy-icon" viewbox="0 0 488.3 488.3">
-            <g>
-                <path
-                    d="M314.25,85.4h-227c-21.3,0-38.6,17.3-38.6,38.6v325.7c0,21.3,17.3,38.6,38.6,38.6h227c21.3,0,38.6-17.3,38.6-38.6V124    C352.75,102.7,335.45,85.4,314.25,85.4z M325.75,449.6c0,6.4-5.2,11.6-11.6,11.6h-227c-6.4,0-11.6-5.2-11.6-11.6V124    c0-6.4,5.2-11.6,11.6-11.6h227c6.4,0,11.6,5.2,11.6,11.6V449.6z" />
-                <path
-                    d="M401.05,0h-227c-21.3,0-38.6,17.3-38.6,38.6c0,7.5,6,13.5,13.5,13.5s13.5-6,13.5-13.5c0-6.4,5.2-11.6,11.6-11.6h227    c6.4,0,11.6,5.2,11.6,11.6v325.7c0,6.4-5.2,11.6-11.6,11.6c-7.5,0-13.5,6-13.5,13.5s6,13.5,13.5,13.5c21.3,0,38.6-17.3,38.6-38.6    V38.6C439.65,17.3,422.35,0,401.05,0z" />
-            </g>
-        </symbol>
-        <symbol id='search-icon' viewBox="0 0 512 512">
-            <g>
-                <g>
-                    <path
-                        d="M225.474,0C101.151,0,0,101.151,0,225.474c0,124.33,101.151,225.474,225.474,225.474    c124.33,0,225.474-101.144,225.474-225.474C450.948,101.151,349.804,0,225.474,0z M225.474,409.323    c-101.373,0-183.848-82.475-183.848-183.848S124.101,41.626,225.474,41.626s183.848,82.475,183.848,183.848    S326.847,409.323,225.474,409.323z" />
-                </g>
-            </g>
-            <g>
-                <g>
-                    <path
-                        d="M505.902,476.472L386.574,357.144c-8.131-8.131-21.299-8.131-29.43,0c-8.131,8.124-8.131,21.306,0,29.43l119.328,119.328    c4.065,4.065,9.387,6.098,14.715,6.098c5.321,0,10.649-2.033,14.715-6.098C514.033,497.778,514.033,484.596,505.902,476.472z" />
-                </g>
-            </g>
-        </symbol>
-        <symbol id="down-icon" viewBox="0 0 16 16">
-            <path 
-                fill-rule="evenodd" 
-                clip-rule="evenodd" 
-                d="M12.7803 6.21967C13.0732 6.51256 13.0732 6.98744 12.7803 7.28033L8.53033 11.5303C8.23744 11.8232 7.76256 11.8232 7.46967 11.5303L3.21967 7.28033C2.92678 6.98744 2.92678 6.51256 3.21967 6.21967C3.51256 5.92678 3.98744 5.92678 4.28033 6.21967L8 9.93934L11.7197 6.21967C12.0126 5.92678 12.4874 5.92678 12.7803 6.21967Z"
-            >
-            </path>
-        </symbol>
-    </defs>
-</svg>
-  </head>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="helpers_database.DatabaseException.html">DatabaseException</a></li></ul><h3>Modules</h3><ul><li><a href="module-controllers_authenticator.html">controllers/authenticator</a></li><li><a href="module-controllers_validator.html">controllers/validator</a><ul class='methods'><li data-type='method'><a href="module-controllers_validator.html#~makeValidator">makeValidator</a></li></ul></li><li><a href="module-helpers_database.html">helpers/database</a><ul class='methods'><li data-type='method'><a href="module-helpers_database.html#.run">run</a></li></ul></li><li><a href="module-helpers_jwt.html">helpers/jwt</a><ul class='methods'><li data-type='method'><a href="module-helpers_jwt.html#.generate">generate</a></li><li data-type='method'><a href="module-helpers_jwt.html#.verify">verify</a></li></ul></li><li><a href="module-helpers_permissions.html">helpers/permissions</a><ul class='methods'><li data-type='method'><a href="module-helpers_permissions.html#~checker">checker</a></li><li data-type='method'><a href="module-helpers_permissions.html#~generatePerms">generatePerms</a></li><li data-type='method'><a href="module-helpers_permissions.html#~permGenerator">permGenerator</a></li></ul></li><li><a href="module-models_breeds.html">models/breeds</a><ul class='methods'><li data-type='method'><a href="module-models_breeds.html#.add">add</a></li><li data-type='method'><a href="module-models_breeds.html#.delete">delete</a></li><li data-type='method'><a href="module-models_breeds.html#.getAll">getAll</a></li><li data-type='method'><a href="module-models_breeds.html#.getById">getById</a></li><li data-type='method'><a href="module-models_breeds.html#.update">update</a></li></ul></li><li><a href="module-models_chatMessages.html">models/chatMessages</a><ul class='methods'><li data-type='method'><a href="module-models_chatMessages.html#.add">add</a></li><li data-type='method'><a href="module-models_chatMessages.html#.delete">delete</a></li><li data-type='method'><a href="module-models_chatMessages.html#.getByChatId">getByChatId</a></li></ul></li><li><a href="module-models_dogBreeds.html">models/dogBreeds</a><ul class='methods'><li data-type='method'><a href="module-models_dogBreeds.html#.add">add</a></li><li data-type='method'><a href="module-models_dogBreeds.html#.delete">delete</a></li><li data-type='method'><a href="module-models_dogBreeds.html#.getByBreedId">getByBreedId</a></li><li data-type='method'><a href="module-models_dogBreeds.html#.getByDogId">getByDogId</a></li><li data-type='method'><a href="module-models_dogBreeds.html#.update">update</a></li></ul></li><li><a href="module-models_dogLocations.html">models/dogLocations</a><ul class='methods'><li data-type='method'><a href="module-models_dogLocations.html#.add">add</a></li><li data-type='method'><a href="module-models_dogLocations.html#.delete">delete</a></li><li data-type='method'><a href="module-models_dogLocations.html#.getByDogId">getByDogId</a></li><li data-type='method'><a href="module-models_dogLocations.html#.getByLocationId">getByLocationId</a></li><li data-type='method'><a href="module-models_dogLocations.html#.update">update</a></li></ul></li><li><a href="module-models_dogs.html">models/dogs</a><ul class='methods'><li data-type='method'><a href="module-models_dogs.html#.add">add</a></li><li data-type='method'><a href="module-models_dogs.html#.delete">delete</a></li><li data-type='method'><a href="module-models_dogs.html#.getAll">getAll</a></li><li data-type='method'><a href="module-models_dogs.html#.getById">getById</a></li><li data-type='method'><a href="module-models_dogs.html#.update">update</a></li></ul></li><li><a href="module-models_favourites.html">models/favourites</a><ul class='methods'><li data-type='method'><a href="module-models_favourites.html#.add">add</a></li><li data-type='method'><a href="module-models_favourites.html#.delete">delete</a></li><li data-type='method'><a href="module-models_favourites.html#.getByDogId">getByDogId</a></li><li data-type='method'><a href="module-models_favourites.html#.getByUserId">getByUserId</a></li><li data-type='method'><a href="module-models_favourites.html#.getFavCount">getFavCount</a></li><li data-type='method'><a href="module-models_favourites.html#.getSingleFav">getSingleFav</a></li></ul></li><li><a href="module-models_locations.html">models/locations</a><ul class='methods'><li data-type='method'><a href="module-models_locations.html#.add">add</a></li><li data-type='method'><a href="module-models_locations.html#.delete">delete</a></li><li data-type='method'><a href="module-models_locations.html#.getAll">getAll</a></li><li data-type='method'><a href="module-models_locations.html#.getById">getById</a></li><li data-type='method'><a href="module-models_locations.html#.update">update</a></li></ul></li><li><a href="module-models_messages.html">models/messages</a><ul class='methods'><li data-type='method'><a href="module-models_messages.html#.add">add</a></li><li data-type='method'><a href="module-models_messages.html#.delete">delete</a></li><li data-type='method'><a href="module-models_messages.html#.getById">getById</a></li></ul></li><li><a href="module-models_staff.html">models/staff</a><ul class='methods'><li data-type='method'><a href="module-models_staff.html#.add">add</a></li><li data-type='method'><a href="module-models_staff.html#.delete">delete</a></li><li data-type='method'><a href="module-models_staff.html#.getAll">getAll</a></li><li data-type='method'><a href="module-models_staff.html#.getByStaffId">getByStaffId</a></li><li data-type='method'><a href="module-models_staff.html#.getByUserId">getByUserId</a></li><li data-type='method'><a href="module-models_staff.html#.update">update</a></li></ul></li><li><a href="module-models_users.html">models/users</a><ul class='methods'><li data-type='method'><a href="module-models_users.html#.add">add</a></li><li data-type='method'><a href="module-models_users.html#.delete">delete</a></li><li data-type='method'><a href="module-models_users.html#.findByUsername">findByUsername</a></li><li data-type='method'><a href="module-models_users.html#.getAll">getAll</a></li><li data-type='method'><a href="module-models_users.html#.getById">getById</a></li><li data-type='method'><a href="module-models_users.html#.update">update</a></li></ul></li><li><a href="module-modules_chats.html">modules/chats</a><ul class='methods'><li data-type='method'><a href="module-modules_chats.html#.add">add</a></li><li data-type='method'><a href="module-modules_chats.html#.delete">delete</a></li><li data-type='method'><a href="module-modules_chats.html#.getAll">getAll</a></li><li data-type='method'><a href="module-modules_chats.html#.getById">getById</a></li></ul></li><li><a href="module-permissions_dogs.html">permissions/dogs</a></li><li><a href="module-permissions_users.html">permissions/users</a></li><li><a href="module-routes_breeds.html">routes/breeds</a><ul class='methods'><li data-type='method'><a href="module-routes_breeds.html#~addBreed">addBreed</a></li><li data-type='method'><a href="module-routes_breeds.html#~deleteBreed">deleteBreed</a></li><li data-type='method'><a href="module-routes_breeds.html#~getAll">getAll</a></li><li data-type='method'><a href="module-routes_breeds.html#~getBreed">getBreed</a></li><li data-type='method'><a href="module-routes_breeds.html#~updateBreed">updateBreed</a></li></ul></li><li><a href="module-routes_dogs.html">routes/dogs</a><ul class='methods'><li data-type='method'><a href="module-routes_dogs.html#~addDog">addDog</a></li><li data-type='method'><a href="module-routes_dogs.html#~addDogBreed">addDogBreed</a></li><li data-type='method'><a href="module-routes_dogs.html#~addDogLocation">addDogLocation</a></li><li data-type='method'><a href="module-routes_dogs.html#~deleteDog">deleteDog</a></li><li data-type='method'><a href="module-routes_dogs.html#~deleteDogBreed">deleteDogBreed</a></li><li data-type='method'><a href="module-routes_dogs.html#~deleteDogLocation">deleteDogLocation</a></li><li data-type='method'><a href="module-routes_dogs.html#~getAll">getAll</a></li><li data-type='method'><a href="module-routes_dogs.html#~getDog">getDog</a></li><li data-type='method'><a href="module-routes_dogs.html#~getDogBreed">getDogBreed</a></li><li data-type='method'><a href="module-routes_dogs.html#~getDogLocation">getDogLocation</a></li><li data-type='method'><a href="module-routes_dogs.html#~getFavourites">getFavourites</a></li><li data-type='method'><a href="module-routes_dogs.html#~updateDog">updateDog</a></li><li data-type='method'><a href="module-routes_dogs.html#~updateDogBreed">updateDogBreed</a></li><li data-type='method'><a href="module-routes_dogs.html#~updateDogLocation">updateDogLocation</a></li></ul></li><li><a href="module-routes_locations.html">routes/locations</a><ul class='methods'><li data-type='method'><a href="module-routes_locations.html#~addLocation">addLocation</a></li><li data-type='method'><a href="module-routes_locations.html#~deleteLocation">deleteLocation</a></li><li data-type='method'><a href="module-routes_locations.html#~getAll">getAll</a></li><li data-type='method'><a href="module-routes_locations.html#~getLocation">getLocation</a></li><li data-type='method'><a href="module-routes_locations.html#~getLocationDogs">getLocationDogs</a></li><li data-type='method'><a href="module-routes_locations.html#~updateLocation">updateLocation</a></li></ul></li><li><a href="module-routes_login.html">routes/login</a><ul class='methods'><li data-type='method'><a href="module-routes_login.html#~getJWT">getJWT</a></li><li data-type='method'><a href="module-routes_login.html#~refresh">refresh</a></li></ul></li><li><a href="module-routes_special.html">routes/special</a></li><li><a href="module-routes_staff.html">routes/staff</a></li><li><a href="module-routes_users.html">routes/users</a><ul class='methods'><li data-type='method'><a href="module-routes_users.html#~addUserFav">addUserFav</a></li><li data-type='method'><a href="module-routes_users.html#~createUser">createUser</a></li><li data-type='method'><a href="module-routes_users.html#~deleteUser">deleteUser</a></li><li data-type='method'><a href="module-routes_users.html#~deleteUserFav">deleteUserFav</a></li><li data-type='method'><a href="module-routes_users.html#~getAll">getAll</a></li><li data-type='method'><a href="module-routes_users.html#~getUser">getUser</a></li><li data-type='method'><a href="module-routes_users.html#~getUserFav">getUserFav</a></li><li data-type='method'><a href="module-routes_users.html#~getUserFavs">getUserFavs</a></li><li data-type='method'><a href="module-routes_users.html#~updateUser">updateUser</a></li></ul></li><li><a href="module-strategies_basic.html">strategies/basic</a><ul class='methods'><li data-type='method'><a href="module-strategies_basic.html#~checkUser">checkUser</a></li><li data-type='method'><a href="module-strategies_basic.html#~verifyPassword">verifyPassword</a></li></ul></li><li><a href="module-strategies_jwt.html">strategies/jwt</a><ul class='methods'><li data-type='method'><a href="module-strategies_jwt.html#~checkUser">checkUser</a></li></ul></li></ul><h3>Global</h3><ul><li><a href="global.html#tweet">tweet</a></li></ul>
+</nav>
 
-  <body>
+<div id="main">
+    
+    <h1 class="page-title">models/dogLocations</h1>
+    
 
-    <nav class="navbar" id="navbar">
-      <div class="navbar-heading" id="navbar-heading"><a href="index.html"><h2 class="navbar-heading-text">Home</h2></a></div><div class="search-box" id="search-box"><div class="search-box-input-container"><input class="search-box-input" type="text" placeholder="Search..." id="search-box-input" /><svg class="search-icon" alt="search-icon"><use xlink:href="#search-icon"></use></svg></div><div class="search-item-container" id="search-item-container"><ul class="search-item-ul" id="search-item-ul"></ul></div></div><div class="sidebar-main-content" id="sidebar-main-content"><div class="accordion collapsed" id="9530596" > <h3 class="accordion-heading">Classes<svg><use xlink:href="#down-icon"></use></svg></h3><ul class="accordion-content"><li class="accordion-list" id=""><a href="helpers_database.DatabaseException.html">DatabaseException</a></li></ul> </div><div class="accordion collapsed" id="1541634" > <h3 class="accordion-heading">Modules<svg><use xlink:href="#down-icon"></use></svg></h3><ul class="accordion-content"><li class="accordion-list" id=""><a href="module-controllers_authenticator.html">controllers/authenticator</a></li><li class="accordion collapsed child" id=4123820><div class="accordion-heading child"><a href="module-controllers_validator.html">controllers/validator</a><svg><use xlink:href="#down-icon"></use></svg></div><ul class='methods accordion-content'><li data-type='method'><a href="module-controllers_validator.html#.generate">generate</a></li><li data-type='method'><a href="module-controllers_validator.html#.verify">verify</a></li><li data-type='method'><a href="module-controllers_validator.html#~makeValidator">makeValidator</a></li></ul></li><li class="accordion collapsed child" id=5221687><div class="accordion-heading child"><a href="module-helpers_database.html">helpers/database</a><svg><use xlink:href="#down-icon"></use></svg></div><ul class='methods accordion-content'><li data-type='method'><a href="module-helpers_database.html#.run">run</a></li></ul></li><li class="accordion collapsed child" id=4945300><div class="accordion-heading child"><a href="module-models_breeds.html">models/breeds</a><svg><use xlink:href="#down-icon"></use></svg></div><ul class='methods accordion-content'><li data-type='method'><a href="module-models_breeds.html#.add">add</a></li><li data-type='method'><a href="module-models_breeds.html#.delete">delete</a></li><li data-type='method'><a href="module-models_breeds.html#.getAll">getAll</a></li><li data-type='method'><a href="module-models_breeds.html#.getById">getById</a></li><li data-type='method'><a href="module-models_breeds.html#.update">update</a></li></ul></li><li class="accordion collapsed child" id=5139349><div class="accordion-heading child"><a href="module-models_chatMessages.html">models/chatMessages</a><svg><use xlink:href="#down-icon"></use></svg></div><ul class='methods accordion-content'><li data-type='method'><a href="module-models_chatMessages.html#.add">add</a></li><li data-type='method'><a href="module-models_chatMessages.html#.delete">delete</a></li><li data-type='method'><a href="module-models_chatMessages.html#.getByChatId">getByChatId</a></li></ul></li><li class="accordion collapsed child" id=6766865><div class="accordion-heading child"><a href="module-models_dogBreeds.html">models/dogBreeds</a><svg><use xlink:href="#down-icon"></use></svg></div><ul class='methods accordion-content'><li data-type='method'><a href="module-models_dogBreeds.html#.add">add</a></li><li data-type='method'><a href="module-models_dogBreeds.html#.delete">delete</a></li><li data-type='method'><a href="module-models_dogBreeds.html#.getByBreedId">getByBreedId</a></li><li data-type='method'><a href="module-models_dogBreeds.html#.getByDogId">getByDogId</a></li><li data-type='method'><a href="module-models_dogBreeds.html#.update">update</a></li></ul></li><li class="accordion collapsed child" id=7808391><div class="accordion-heading child"><a href="module-models_dogLocations.html">models/dogLocations</a><svg><use xlink:href="#down-icon"></use></svg></div><ul class='methods accordion-content'><li data-type='method'><a href="module-models_dogLocations.html#.add">add</a></li><li data-type='method'><a href="module-models_dogLocations.html#.delete">delete</a></li><li data-type='method'><a href="module-models_dogLocations.html#.getByDogId">getByDogId</a></li><li data-type='method'><a href="module-models_dogLocations.html#.getByLocationId">getByLocationId</a></li><li data-type='method'><a href="module-models_dogLocations.html#.update">update</a></li></ul></li><li class="accordion collapsed child" id=3136923><div class="accordion-heading child"><a href="module-models_dogs.html">models/dogs</a><svg><use xlink:href="#down-icon"></use></svg></div><ul class='methods accordion-content'><li data-type='method'><a href="module-models_dogs.html#.add">add</a></li><li data-type='method'><a href="module-models_dogs.html#.delete">delete</a></li><li data-type='method'><a href="module-models_dogs.html#.getAll">getAll</a></li><li data-type='method'><a href="module-models_dogs.html#.getById">getById</a></li><li data-type='method'><a href="module-models_dogs.html#.update">update</a></li></ul></li><li class="accordion collapsed child" id=4527222><div class="accordion-heading child"><a href="module-models_favourites.html">models/favourites</a><svg><use xlink:href="#down-icon"></use></svg></div><ul class='methods accordion-content'><li data-type='method'><a href="module-models_favourites.html#.add">add</a></li><li data-type='method'><a href="module-models_favourites.html#.delete">delete</a></li><li data-type='method'><a href="module-models_favourites.html#.getByDogId">getByDogId</a></li><li data-type='method'><a href="module-models_favourites.html#.getByUserId">getByUserId</a></li><li data-type='method'><a href="module-models_favourites.html#.getFavCount">getFavCount</a></li><li data-type='method'><a href="module-models_favourites.html#.getSingleFav">getSingleFav</a></li></ul></li><li class="accordion collapsed child" id=7999221><div class="accordion-heading child"><a href="module-models_locations.html">models/locations</a><svg><use xlink:href="#down-icon"></use></svg></div><ul class='methods accordion-content'><li data-type='method'><a href="module-models_locations.html#.add">add</a></li><li data-type='method'><a href="module-models_locations.html#.delete">delete</a></li><li data-type='method'><a href="module-models_locations.html#.getAll">getAll</a></li><li data-type='method'><a href="module-models_locations.html#.getById">getById</a></li><li data-type='method'><a href="module-models_locations.html#.update">update</a></li></ul></li><li class="accordion collapsed child" id=9504827><div class="accordion-heading child"><a href="module-models_messages.html">models/messages</a><svg><use xlink:href="#down-icon"></use></svg></div><ul class='methods accordion-content'><li data-type='method'><a href="module-models_messages.html#.add">add</a></li><li data-type='method'><a href="module-models_messages.html#.delete">delete</a></li><li data-type='method'><a href="module-models_messages.html#.getById">getById</a></li></ul></li><li class="accordion collapsed child" id=2791053><div class="accordion-heading child"><a href="module-models_staff.html">models/staff</a><svg><use xlink:href="#down-icon"></use></svg></div><ul class='methods accordion-content'><li data-type='method'><a href="module-models_staff.html#.add">add</a></li><li data-type='method'><a href="module-models_staff.html#.delete">delete</a></li><li data-type='method'><a href="module-models_staff.html#.getAll">getAll</a></li><li data-type='method'><a href="module-models_staff.html#.getByStaffId">getByStaffId</a></li><li data-type='method'><a href="module-models_staff.html#.getByUserId">getByUserId</a></li><li data-type='method'><a href="module-models_staff.html#.update">update</a></li></ul></li><li class="accordion collapsed child" id=955221><div class="accordion-heading child"><a href="module-models_users.html">models/users</a><svg><use xlink:href="#down-icon"></use></svg></div><ul class='methods accordion-content'><li data-type='method'><a href="module-models_users.html#.add">add</a></li><li data-type='method'><a href="module-models_users.html#.delete">delete</a></li><li data-type='method'><a href="module-models_users.html#.findByUsername">findByUsername</a></li><li data-type='method'><a href="module-models_users.html#.getAll">getAll</a></li><li data-type='method'><a href="module-models_users.html#.getById">getById</a></li><li data-type='method'><a href="module-models_users.html#.update">update</a></li></ul></li><li class="accordion collapsed child" id=3623870><div class="accordion-heading child"><a href="module-modules_chats.html">modules/chats</a><svg><use xlink:href="#down-icon"></use></svg></div><ul class='methods accordion-content'><li data-type='method'><a href="module-modules_chats.html#.add">add</a></li><li data-type='method'><a href="module-modules_chats.html#.delete">delete</a></li><li data-type='method'><a href="module-modules_chats.html#.getAll">getAll</a></li><li data-type='method'><a href="module-modules_chats.html#.getById">getById</a></li></ul></li><li class="accordion collapsed child" id=2061545><div class="accordion-heading child"><a href="module-permissions_users.html">permissions/users</a><svg><use xlink:href="#down-icon"></use></svg></div><ul class='methods accordion-content'><li data-type='method'><a href="module-permissions_users.html#.get">get</a></li></ul></li><li class="accordion collapsed child" id=1584476><div class="accordion-heading child"><a href="module-routes_breeds.html">routes/breeds</a><svg><use xlink:href="#down-icon"></use></svg></div><ul class='methods accordion-content'><li data-type='method'><a href="module-routes_breeds.html#~addBreed">addBreed</a></li><li data-type='method'><a href="module-routes_breeds.html#~deleteBreed">deleteBreed</a></li><li data-type='method'><a href="module-routes_breeds.html#~getAll">getAll</a></li><li data-type='method'><a href="module-routes_breeds.html#~getBreed">getBreed</a></li><li data-type='method'><a href="module-routes_breeds.html#~updateBreed">updateBreed</a></li></ul></li><li class="accordion collapsed child" id=5500965><div class="accordion-heading child"><a href="module-routes_dogs.html">routes/dogs</a><svg><use xlink:href="#down-icon"></use></svg></div><ul class='methods accordion-content'><li data-type='method'><a href="module-routes_dogs.html#~addDog">addDog</a></li><li data-type='method'><a href="module-routes_dogs.html#~addDogBreed">addDogBreed</a></li><li data-type='method'><a href="module-routes_dogs.html#~addDogLocation">addDogLocation</a></li><li data-type='method'><a href="module-routes_dogs.html#~deleteDog">deleteDog</a></li><li data-type='method'><a href="module-routes_dogs.html#~deleteDogBreed">deleteDogBreed</a></li><li data-type='method'><a href="module-routes_dogs.html#~deleteDogLocation">deleteDogLocation</a></li><li data-type='method'><a href="module-routes_dogs.html#~getAll">getAll</a></li><li data-type='method'><a href="module-routes_dogs.html#~getDog">getDog</a></li><li data-type='method'><a href="module-routes_dogs.html#~getDogBreed">getDogBreed</a></li><li data-type='method'><a href="module-routes_dogs.html#~getDogLocation">getDogLocation</a></li><li data-type='method'><a href="module-routes_dogs.html#~getFavourites">getFavourites</a></li><li data-type='method'><a href="module-routes_dogs.html#~updateDog">updateDog</a></li><li data-type='method'><a href="module-routes_dogs.html#~updateDogBreed">updateDogBreed</a></li><li data-type='method'><a href="module-routes_dogs.html#~updateDogLocation">updateDogLocation</a></li></ul></li><li class="accordion collapsed child" id=7139437><div class="accordion-heading child"><a href="module-routes_locations.html">routes/locations</a><svg><use xlink:href="#down-icon"></use></svg></div><ul class='methods accordion-content'><li data-type='method'><a href="module-routes_locations.html#~addLocation">addLocation</a></li><li data-type='method'><a href="module-routes_locations.html#~deleteLocation">deleteLocation</a></li><li data-type='method'><a href="module-routes_locations.html#~getAll">getAll</a></li><li data-type='method'><a href="module-routes_locations.html#~getLocation">getLocation</a></li><li data-type='method'><a href="module-routes_locations.html#~getLocationDogs">getLocationDogs</a></li><li data-type='method'><a href="module-routes_locations.html#~updateLocation">updateLocation</a></li></ul></li><li class="accordion collapsed child" id=3097078><div class="accordion-heading child"><a href="module-routes_login.html">routes/login</a><svg><use xlink:href="#down-icon"></use></svg></div><ul class='methods accordion-content'><li data-type='method'><a href="module-routes_login.html#~getJWT">getJWT</a></li><li data-type='method'><a href="module-routes_login.html#~refresh">refresh</a></li></ul></li><li class="accordion-list" id=""><a href="module-routes_special.html">routes/special</a></li><li class="accordion-list" id=""><a href="module-routes_staff.html">routes/staff</a></li><li class="accordion collapsed child" id=2126364><div class="accordion-heading child"><a href="module-routes_users.html">routes/users</a><svg><use xlink:href="#down-icon"></use></svg></div><ul class='methods accordion-content'><li data-type='method'><a href="module-routes_users.html#~addUserFav">addUserFav</a></li><li data-type='method'><a href="module-routes_users.html#~createUser">createUser</a></li><li data-type='method'><a href="module-routes_users.html#~deleteUser">deleteUser</a></li><li data-type='method'><a href="module-routes_users.html#~deleteUserFav">deleteUserFav</a></li><li data-type='method'><a href="module-routes_users.html#~getAll">getAll</a></li><li data-type='method'><a href="module-routes_users.html#~getUser">getUser</a></li><li data-type='method'><a href="module-routes_users.html#~getUserFav">getUserFav</a></li><li data-type='method'><a href="module-routes_users.html#~getUserFavs">getUserFavs</a></li><li data-type='method'><a href="module-routes_users.html#~updateUser">updateUser</a></li></ul></li><li class="accordion collapsed child" id=1605214><div class="accordion-heading child"><a href="module-strategies_basic.html">strategies/basic</a><svg><use xlink:href="#down-icon"></use></svg></div><ul class='methods accordion-content'><li data-type='method'><a href="module-strategies_basic.html#~checkUser">checkUser</a></li><li data-type='method'><a href="module-strategies_basic.html#~verifyPassword">verifyPassword</a></li></ul></li><li class="accordion collapsed child" id=8819849><div class="accordion-heading child"><a href="module-strategies_jwt.html">strategies/jwt</a><svg><use xlink:href="#down-icon"></use></svg></div><ul class='methods accordion-content'><li data-type='method'><a href="module-strategies_jwt.html#~checkUser">checkUser</a></li></ul></li></ul> </div><div class="accordion collapsed" id="1341730" > <h3 class="accordion-heading">Global<svg><use xlink:href="#down-icon"></use></svg></h3><ul class="accordion-content"><li class="accordion-list" id=""><a href="global.html#tweet">tweet</a></li></ul> </div></div>
-    </nav>
-    <div class="navbar-ham" id="navbar-ham">
-      <div>
-        <div class="first"></div>
-        <div class="second"></div>
-        <div class="third"></div>
-      </div>
-    </div>
-
-    <div id="main" class="main-content">
-      
-      <h1 id='page-title' class="page-title">
-        models/dogLocations
-      </h1>
-      
-
-      
+    
 
 
 
 
 <section>
-
 
 <header>
     
@@ -114,29 +50,16 @@
     
 </header>
 
-
 <article>
-    <div class="container-overview">
     
-        
-            <div class="description">Dog locations model to manage interactions with the database.</div>
-        
-
+        <div class="container-overview">
         
             
+                <div class="description usertext">Dog locations model to manage interactions with the database.</div>
+            
 
-
-
-
-
-
-
-
-
-
-
-
-
+            
+                
 
 
 
@@ -144,7 +67,10 @@
 <dl class="details">
 
     
-
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="models_dogLocations.js.html">models/dogLocations.js</a>, <a href="models_dogLocations.js.html#line3">line 3</a>
+    </li></ul></dd>
     
 
     
@@ -160,29 +86,22 @@
     
 
     
-        <div class="details-item-container">
-            <dt class="tag-author">Author:</dt>
-            <dd class="tag-author">
-                <ul>
-                    <li>Bartlomiej Wlodarski</li>
-                </ul>
-            </dd>
-        </div>
+
+    
+
+    
+    <dt class="tag-author">Author:</dt>
+    <dd class="tag-author">
+        <ul>
+            <li>Bartlomiej Wlodarski</li>
+        </ul>
+    </dd>
     
 
     
 
     
 
-    
-
-    
-        <div class="details-item-container">
-            <dt class="tag-source">Source:</dt>
-            <dd class="tag-source"><ul class="dummy"><li>
-                <a href="models_dogLocations.js.html">models/dogLocations.js</a>, <a href="models_dogLocations.js.html#line1">line 1</a>
-            </li></ul></dd>
-        </div>
     
 
     
@@ -209,14 +128,31 @@
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            
         
-    
-    </div>
-
+        </div>
     
 
     
 
+    
+
+    
+    
     
 
      
@@ -233,18 +169,60 @@
 
     
 
-    <h4 class="name" id=".add">
-        <a href="#.add">#</a>
-        <span class="type-signature">(async, static) </span>add<span class="signature">(dogId, locationId)</span><span class="type-signature"> &rarr; {Promise.&lt;true>}</span>
-    </h4>
+    <h4 class="name" id=".add"><span class="type-signature">(async, static) </span>add<span class="signature">(dogId, locationId)</span><span class="type-signature"> &rarr; {Promise.&lt;true>}</span></h4>
 
     
 
 
 
-    <div class="description">
-        Creates a new location entry in the DB.
-    </div>
+
+<dl class="details">
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="models_dogLocations.js.html">models/dogLocations.js</a>, <a href="models_dogLocations.js.html#line47">line 47</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+<div class="description usertext">
+    Creates a new location entry in the DB.
+</div>
 
 
 
@@ -254,9 +232,10 @@
 
 
 
-    <div class="method-member-container flex flex-col w-100 overflow-auto mt-20">
-        <strong>Parameters:</strong>
-        
+
+
+    <h5>Parameters:</h5>
+    
 
 <table class="params">
     <thead>
@@ -286,7 +265,7 @@
             <td class="type">
             
                 
-<span class="param-type">Number</span>
+<span class="param-type">number</span>
 
 
             
@@ -309,7 +288,7 @@
             <td class="type">
             
                 
-<span class="param-type">Number</span>
+<span class="param-type">number</span>
 
 
             
@@ -326,7 +305,6 @@
     </tbody>
 </table>
 
-    </div>
 
 
 
@@ -342,15 +320,9 @@
 
 
 
+<h5>Returns:</h5>
 
-
-
-
-
-    <div class="method-member-container mt-20">
-    <strong>Returns:</strong>
         
-            
 <div class="param-desc">
     confirmation of insertion.
 </div>
@@ -369,9 +341,7 @@
     </dd>
 </dl>
 
-            
-    </div>
-
+    
 
 
 
@@ -380,18 +350,60 @@
 
     
 
-    <h4 class="name" id=".delete">
-        <a href="#.delete">#</a>
-        <span class="type-signature">(async, static) </span>delete<span class="signature">(dogId)</span><span class="type-signature"> &rarr; {Promise.&lt;Number>}</span>
-    </h4>
+    <h4 class="name" id=".delete"><span class="type-signature">(async, static) </span>delete<span class="signature">(dogId)</span><span class="type-signature"> &rarr; {Promise.&lt;number>}</span></h4>
 
     
 
 
 
-    <div class="description">
-        Deletes a dog location entry from the DB.
-    </div>
+
+<dl class="details">
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="models_dogLocations.js.html">models/dogLocations.js</a>, <a href="models_dogLocations.js.html#line72">line 72</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+<div class="description usertext">
+    Deletes a dog location entry from the DB.
+</div>
 
 
 
@@ -401,9 +413,10 @@
 
 
 
-    <div class="method-member-container flex flex-col w-100 overflow-auto mt-20">
-        <strong>Parameters:</strong>
-        
+
+
+    <h5>Parameters:</h5>
+    
 
 <table class="params">
     <thead>
@@ -433,7 +446,7 @@
             <td class="type">
             
                 
-<span class="param-type">Number</span>
+<span class="param-type">number</span>
 
 
             
@@ -450,7 +463,6 @@
     </tbody>
 </table>
 
-    </div>
 
 
 
@@ -466,17 +478,11 @@
 
 
 
+<h5>Returns:</h5>
 
-
-
-
-
-    <div class="method-member-container mt-20">
-    <strong>Returns:</strong>
         
-            
 <div class="param-desc">
-    Number of affected rows (should be 1).
+    number of affected rows (should be 1).
 </div>
 
 
@@ -487,15 +493,13 @@
     </dt>
     <dd>
         
-<span class="param-type">Promise.&lt;Number></span>
+<span class="param-type">Promise.&lt;number></span>
 
 
     </dd>
 </dl>
 
-            
-    </div>
-
+    
 
 
 
@@ -504,18 +508,60 @@
 
     
 
-    <h4 class="name" id=".getByDogId">
-        <a href="#.getByDogId">#</a>
-        <span class="type-signature">(async, static) </span>getByDogId<span class="signature">(dogId)</span><span class="type-signature"> &rarr; {Promise.&lt;Object>}</span>
-    </h4>
+    <h4 class="name" id=".getByDogId"><span class="type-signature">(async, static) </span>getByDogId<span class="signature">(dogId)</span><span class="type-signature"> &rarr; {Promise.&lt;object>}</span></h4>
 
     
 
 
 
-    <div class="description">
-        Gets a dog's location by their ID.
-    </div>
+
+<dl class="details">
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="models_dogLocations.js.html">models/dogLocations.js</a>, <a href="models_dogLocations.js.html#line24">line 24</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+<div class="description usertext">
+    Gets a dog's location by their ID.
+</div>
 
 
 
@@ -525,9 +571,10 @@
 
 
 
-    <div class="method-member-container flex flex-col w-100 overflow-auto mt-20">
-        <strong>Parameters:</strong>
-        
+
+
+    <h5>Parameters:</h5>
+    
 
 <table class="params">
     <thead>
@@ -557,7 +604,7 @@
             <td class="type">
             
                 
-<span class="param-type">Number</span>
+<span class="param-type">number</span>
 
 
             
@@ -574,7 +621,6 @@
     </tbody>
 </table>
 
-    </div>
 
 
 
@@ -590,15 +636,9 @@
 
 
 
+<h5>Returns:</h5>
 
-
-
-
-
-    <div class="method-member-container mt-20">
-    <strong>Returns:</strong>
         
-            
 <div class="param-desc">
     record of dog's location.
 </div>
@@ -611,15 +651,13 @@
     </dt>
     <dd>
         
-<span class="param-type">Promise.&lt;Object></span>
+<span class="param-type">Promise.&lt;object></span>
 
 
     </dd>
 </dl>
 
-            
-    </div>
-
+    
 
 
 
@@ -628,18 +666,60 @@
 
     
 
-    <h4 class="name" id=".getByLocationId">
-        <a href="#.getByLocationId">#</a>
-        <span class="type-signature">(async, static) </span>getByLocationId<span class="signature">(locationId)</span><span class="type-signature"> &rarr; {Promise.&lt;Array.&lt;Object>>}</span>
-    </h4>
+    <h4 class="name" id=".getByLocationId"><span class="type-signature">(async, static) </span>getByLocationId<span class="signature">(locationId)</span><span class="type-signature"> &rarr; {Promise.&lt;Array.&lt;object>>}</span></h4>
 
     
 
 
 
-    <div class="description">
-        Gets all the dogs with a location ID.
-    </div>
+
+<dl class="details">
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="models_dogLocations.js.html">models/dogLocations.js</a>, <a href="models_dogLocations.js.html#line35">line 35</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+<div class="description usertext">
+    Gets all the dogs with a location ID.
+</div>
 
 
 
@@ -649,9 +729,10 @@
 
 
 
-    <div class="method-member-container flex flex-col w-100 overflow-auto mt-20">
-        <strong>Parameters:</strong>
-        
+
+
+    <h5>Parameters:</h5>
+    
 
 <table class="params">
     <thead>
@@ -681,7 +762,7 @@
             <td class="type">
             
                 
-<span class="param-type">Number</span>
+<span class="param-type">number</span>
 
 
             
@@ -698,7 +779,6 @@
     </tbody>
 </table>
 
-    </div>
 
 
 
@@ -714,15 +794,9 @@
 
 
 
+<h5>Returns:</h5>
 
-
-
-
-
-    <div class="method-member-container mt-20">
-    <strong>Returns:</strong>
         
-            
 <div class="param-desc">
     list of dogs at the given location.
 </div>
@@ -735,15 +809,13 @@
     </dt>
     <dd>
         
-<span class="param-type">Promise.&lt;Array.&lt;Object>></span>
+<span class="param-type">Promise.&lt;Array.&lt;object>></span>
 
 
     </dd>
 </dl>
 
-            
-    </div>
-
+    
 
 
 
@@ -752,18 +824,60 @@
 
     
 
-    <h4 class="name" id=".update">
-        <a href="#.update">#</a>
-        <span class="type-signature">(async, static) </span>update<span class="signature">(dogId, locationId)</span><span class="type-signature"> &rarr; {Promise.&lt;Number>}</span>
-    </h4>
+    <h4 class="name" id=".update"><span class="type-signature">(async, static) </span>update<span class="signature">(dogId, locationId)</span><span class="type-signature"> &rarr; {Promise.&lt;number>}</span></h4>
 
     
 
 
 
-    <div class="description">
-        Updates a location entry in the DB.
-    </div>
+
+<dl class="details">
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="models_dogLocations.js.html">models/dogLocations.js</a>, <a href="models_dogLocations.js.html#line59">line 59</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+<div class="description usertext">
+    Updates a location entry in the DB.
+</div>
 
 
 
@@ -773,9 +887,10 @@
 
 
 
-    <div class="method-member-container flex flex-col w-100 overflow-auto mt-20">
-        <strong>Parameters:</strong>
-        
+
+
+    <h5>Parameters:</h5>
+    
 
 <table class="params">
     <thead>
@@ -805,7 +920,7 @@
             <td class="type">
             
                 
-<span class="param-type">Number</span>
+<span class="param-type">number</span>
 
 
             
@@ -828,7 +943,7 @@
             <td class="type">
             
                 
-<span class="param-type">Number</span>
+<span class="param-type">number</span>
 
 
             
@@ -845,7 +960,6 @@
     </tbody>
 </table>
 
-    </div>
 
 
 
@@ -861,17 +975,11 @@
 
 
 
+<h5>Returns:</h5>
 
-
-
-
-
-    <div class="method-member-container mt-20">
-    <strong>Returns:</strong>
         
-            
 <div class="param-desc">
-    Number of updated rows (should be 1).
+    number of updated rows (should be 1).
 </div>
 
 
@@ -882,15 +990,13 @@
     </dt>
     <dd>
         
-<span class="param-type">Promise.&lt;Number></span>
+<span class="param-type">Promise.&lt;number></span>
 
 
     </dd>
 </dl>
 
-            
-    </div>
-
+    
 
 
 
@@ -902,41 +1008,58 @@
 
         
                 
-<h4 class="name" id="~DogLocation">
-    <a href="#~DogLocation">#</a>
-    DogLocation
-</h4>
-
-
-
-
-<div class="description">
-    Dog location Object returned from the DB.
-</div>
-
-
-
-    <div class="member-item-container flex">
-        <strong>Type: </strong>
-        <ul>
-            <li>
-                
-<span class="param-type">Object</span>
-
-
-            </li>
-        </ul>
-    </div>
+<h4 class="name" id="~DogLocation">DogLocation</h4>
 
 
 
 
 
-
-    <h5 class="subsection-title">Properties</h5>
+<dl class="details">
 
     
-<div class="allow-overflow">
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="models_dogLocations.js.html">models/dogLocations.js</a>, <a href="models_dogLocations.js.html#line11">line 11</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+    <h5 class="subsection-title">Properties:</h5>
+
+    
+
 <table class="props">
     <thead>
     <tr>
@@ -965,7 +1088,7 @@
             <td class="type">
             
                 
-<span class="param-type">Number</span>
+<span class="param-type">number</span>
 
 
             
@@ -988,7 +1111,7 @@
             <td class="type">
             
                 
-<span class="param-type">Number</span>
+<span class="param-type">number</span>
 
 
             
@@ -1004,12 +1127,27 @@
     
     </tbody>
 </table>
+
+
+
+
+
+
+<div class="description usertext">
+    Dog location object returned from the DB.
 </div>
 
 
 
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">object</span>
 
 
+        </li>
+    </ul>
 
 
 
@@ -1027,35 +1165,21 @@
 
 
 
-    </div>
-
-    <footer class="footer" id="footer">
-      
-    </footer>
-
-    <script src="scripts/third-party/prettify.js"></script>
-    <script src="scripts/third-party/lang-css.js"></script>
-    <script src="scripts/search.js"></script>
-    <script src="scripts/third-party/fuse.js"></script>
-    <script type="text/javascript" src="scripts/misc.js"></script>
-
-    <script>prettyPrint();</script>
-    <script src="scripts/linenumber.js"></script>
-    <script src="scripts/fix-code-block.js"></script>
-    <script src="scripts/fix-navbar.js"></script>
-    <script>
-      var list = [{"title":"DatabaseException","link":"<a href=\"helpers_database.DatabaseException.html\">DatabaseException</a>"},{"title":"controllers/authenticator","link":"<a href=\"module-controllers_authenticator.html\">controllers/authenticator</a>"},{"title":"controllers/validator","link":"<a href=\"module-controllers_validator.html\">controllers/validator</a>"},{"title":"module:controllers/validator.generate","link":"<a href=\"module-controllers_validator.html#.generate\">module:controllers/validator.generate &rtrif; undefined</a>"},{"title":"module:controllers/validator.verify","link":"<a href=\"module-controllers_validator.html#.verify\">module:controllers/validator.verify &rtrif; undefined</a>"},{"title":"module:controllers/validator~makeValidator","link":"<a href=\"module-controllers_validator.html#~makeValidator\">module:controllers/validator~makeValidator &rtrif; undefined</a>"},{"title":"helpers/database","link":"<a href=\"module-helpers_database.html\">helpers/database</a>"},{"title":"module:helpers/database.run","link":"<a href=\"module-helpers_database.html#.run\">module:helpers/database.run &rtrif; undefined</a>"},{"title":"models/breeds","link":"<a href=\"module-models_breeds.html\">models/breeds</a>"},{"title":"module:models/breeds.add","link":"<a href=\"module-models_breeds.html#.add\">module:models/breeds.add &rtrif; undefined</a>"},{"title":"module:models/breeds.delete","link":"<a href=\"module-models_breeds.html#.delete\">module:models/breeds.delete &rtrif; undefined</a>"},{"title":"module:models/breeds.getAll","link":"<a href=\"module-models_breeds.html#.getAll\">module:models/breeds.getAll &rtrif; undefined</a>"},{"title":"module:models/breeds.getById","link":"<a href=\"module-models_breeds.html#.getById\">module:models/breeds.getById &rtrif; undefined</a>"},{"title":"module:models/breeds.update","link":"<a href=\"module-models_breeds.html#.update\">module:models/breeds.update &rtrif; undefined</a>"},{"title":"models/chatMessages","link":"<a href=\"module-models_chatMessages.html\">models/chatMessages</a>"},{"title":"module:models/chatMessages.add","link":"<a href=\"module-models_chatMessages.html#.add\">module:models/chatMessages.add &rtrif; undefined</a>"},{"title":"module:models/chatMessages.delete","link":"<a href=\"module-models_chatMessages.html#.delete\">module:models/chatMessages.delete &rtrif; undefined</a>"},{"title":"module:models/chatMessages.getByChatId","link":"<a href=\"module-models_chatMessages.html#.getByChatId\">module:models/chatMessages.getByChatId &rtrif; undefined</a>"},{"title":"models/dogBreeds","link":"<a href=\"module-models_dogBreeds.html\">models/dogBreeds</a>"},{"title":"module:models/dogBreeds.add","link":"<a href=\"module-models_dogBreeds.html#.add\">module:models/dogBreeds.add &rtrif; undefined</a>"},{"title":"module:models/dogBreeds.delete","link":"<a href=\"module-models_dogBreeds.html#.delete\">module:models/dogBreeds.delete &rtrif; undefined</a>"},{"title":"module:models/dogBreeds.getByBreedId","link":"<a href=\"module-models_dogBreeds.html#.getByBreedId\">module:models/dogBreeds.getByBreedId &rtrif; undefined</a>"},{"title":"module:models/dogBreeds.getByDogId","link":"<a href=\"module-models_dogBreeds.html#.getByDogId\">module:models/dogBreeds.getByDogId &rtrif; undefined</a>"},{"title":"module:models/dogBreeds.update","link":"<a href=\"module-models_dogBreeds.html#.update\">module:models/dogBreeds.update &rtrif; undefined</a>"},{"title":"models/dogLocations","link":"<a href=\"module-models_dogLocations.html\">models/dogLocations</a>"},{"title":"module:models/dogLocations.add","link":"<a href=\"module-models_dogLocations.html#.add\">module:models/dogLocations.add &rtrif; undefined</a>"},{"title":"module:models/dogLocations.delete","link":"<a href=\"module-models_dogLocations.html#.delete\">module:models/dogLocations.delete &rtrif; undefined</a>"},{"title":"module:models/dogLocations.getByDogId","link":"<a href=\"module-models_dogLocations.html#.getByDogId\">module:models/dogLocations.getByDogId &rtrif; undefined</a>"},{"title":"module:models/dogLocations.getByLocationId","link":"<a href=\"module-models_dogLocations.html#.getByLocationId\">module:models/dogLocations.getByLocationId &rtrif; undefined</a>"},{"title":"module:models/dogLocations.update","link":"<a href=\"module-models_dogLocations.html#.update\">module:models/dogLocations.update &rtrif; undefined</a>"},{"title":"models/dogs","link":"<a href=\"module-models_dogs.html\">models/dogs</a>"},{"title":"module:models/dogs.add","link":"<a href=\"module-models_dogs.html#.add\">module:models/dogs.add &rtrif; undefined</a>"},{"title":"module:models/dogs.delete","link":"<a href=\"module-models_dogs.html#.delete\">module:models/dogs.delete &rtrif; undefined</a>"},{"title":"module:models/dogs.getAll","link":"<a href=\"module-models_dogs.html#.getAll\">module:models/dogs.getAll &rtrif; undefined</a>"},{"title":"module:models/dogs.getById","link":"<a href=\"module-models_dogs.html#.getById\">module:models/dogs.getById &rtrif; undefined</a>"},{"title":"module:models/dogs.update","link":"<a href=\"module-models_dogs.html#.update\">module:models/dogs.update &rtrif; undefined</a>"},{"title":"models/favourites","link":"<a href=\"module-models_favourites.html\">models/favourites</a>"},{"title":"module:models/favourites.add","link":"<a href=\"module-models_favourites.html#.add\">module:models/favourites.add &rtrif; undefined</a>"},{"title":"module:models/favourites.delete","link":"<a href=\"module-models_favourites.html#.delete\">module:models/favourites.delete &rtrif; undefined</a>"},{"title":"module:models/favourites.getByDogId","link":"<a href=\"module-models_favourites.html#.getByDogId\">module:models/favourites.getByDogId &rtrif; undefined</a>"},{"title":"module:models/favourites.getByUserId","link":"<a href=\"module-models_favourites.html#.getByUserId\">module:models/favourites.getByUserId &rtrif; undefined</a>"},{"title":"module:models/favourites.getFavCount","link":"<a href=\"module-models_favourites.html#.getFavCount\">module:models/favourites.getFavCount &rtrif; undefined</a>"},{"title":"module:models/favourites.getSingleFav","link":"<a href=\"module-models_favourites.html#.getSingleFav\">module:models/favourites.getSingleFav &rtrif; undefined</a>"},{"title":"models/locations","link":"<a href=\"module-models_locations.html\">models/locations</a>"},{"title":"module:models/locations.add","link":"<a href=\"module-models_locations.html#.add\">module:models/locations.add &rtrif; undefined</a>"},{"title":"module:models/locations.delete","link":"<a href=\"module-models_locations.html#.delete\">module:models/locations.delete &rtrif; undefined</a>"},{"title":"module:models/locations.getAll","link":"<a href=\"module-models_locations.html#.getAll\">module:models/locations.getAll &rtrif; undefined</a>"},{"title":"module:models/locations.getById","link":"<a href=\"module-models_locations.html#.getById\">module:models/locations.getById &rtrif; undefined</a>"},{"title":"module:models/locations.update","link":"<a href=\"module-models_locations.html#.update\">module:models/locations.update &rtrif; undefined</a>"},{"title":"models/messages","link":"<a href=\"module-models_messages.html\">models/messages</a>"},{"title":"module:models/messages.add","link":"<a href=\"module-models_messages.html#.add\">module:models/messages.add &rtrif; undefined</a>"},{"title":"module:models/messages.delete","link":"<a href=\"module-models_messages.html#.delete\">module:models/messages.delete &rtrif; undefined</a>"},{"title":"module:models/messages.getById","link":"<a href=\"module-models_messages.html#.getById\">module:models/messages.getById &rtrif; undefined</a>"},{"title":"models/staff","link":"<a href=\"module-models_staff.html\">models/staff</a>"},{"title":"module:models/staff.add","link":"<a href=\"module-models_staff.html#.add\">module:models/staff.add &rtrif; undefined</a>"},{"title":"module:models/staff.delete","link":"<a href=\"module-models_staff.html#.delete\">module:models/staff.delete &rtrif; undefined</a>"},{"title":"module:models/staff.getAll","link":"<a href=\"module-models_staff.html#.getAll\">module:models/staff.getAll &rtrif; undefined</a>"},{"title":"module:models/staff.getByStaffId","link":"<a href=\"module-models_staff.html#.getByStaffId\">module:models/staff.getByStaffId &rtrif; undefined</a>"},{"title":"module:models/staff.getByUserId","link":"<a href=\"module-models_staff.html#.getByUserId\">module:models/staff.getByUserId &rtrif; undefined</a>"},{"title":"module:models/staff.update","link":"<a href=\"module-models_staff.html#.update\">module:models/staff.update &rtrif; undefined</a>"},{"title":"models/users","link":"<a href=\"module-models_users.html\">models/users</a>"},{"title":"module:models/users.add","link":"<a href=\"module-models_users.html#.add\">module:models/users.add &rtrif; undefined</a>"},{"title":"module:models/users.delete","link":"<a href=\"module-models_users.html#.delete\">module:models/users.delete &rtrif; undefined</a>"},{"title":"module:models/users.findByUsername","link":"<a href=\"module-models_users.html#.findByUsername\">module:models/users.findByUsername &rtrif; undefined</a>"},{"title":"module:models/users.getAll","link":"<a href=\"module-models_users.html#.getAll\">module:models/users.getAll &rtrif; undefined</a>"},{"title":"module:models/users.getById","link":"<a href=\"module-models_users.html#.getById\">module:models/users.getById &rtrif; undefined</a>"},{"title":"module:models/users.update","link":"<a href=\"module-models_users.html#.update\">module:models/users.update &rtrif; undefined</a>"},{"title":"modules/chats","link":"<a href=\"module-modules_chats.html\">modules/chats</a>"},{"title":"module:modules/chats.add","link":"<a href=\"module-modules_chats.html#.add\">module:modules/chats.add &rtrif; undefined</a>"},{"title":"module:modules/chats.delete","link":"<a href=\"module-modules_chats.html#.delete\">module:modules/chats.delete &rtrif; undefined</a>"},{"title":"module:modules/chats.getAll","link":"<a href=\"module-modules_chats.html#.getAll\">module:modules/chats.getAll &rtrif; undefined</a>"},{"title":"module:modules/chats.getById","link":"<a href=\"module-modules_chats.html#.getById\">module:modules/chats.getById &rtrif; undefined</a>"},{"title":"permissions/users","link":"<a href=\"module-permissions_users.html\">permissions/users</a>"},{"title":"module:permissions/users.get","link":"<a href=\"module-permissions_users.html#.get\">module:permissions/users.get &rtrif; undefined</a>"},{"title":"routes/breeds","link":"<a href=\"module-routes_breeds.html\">routes/breeds</a>"},{"title":"module:routes/breeds~addBreed","link":"<a href=\"module-routes_breeds.html#~addBreed\">module:routes/breeds~addBreed &rtrif; undefined</a>"},{"title":"module:routes/breeds~deleteBreed","link":"<a href=\"module-routes_breeds.html#~deleteBreed\">module:routes/breeds~deleteBreed &rtrif; undefined</a>"},{"title":"module:routes/breeds~getAll","link":"<a href=\"module-routes_breeds.html#~getAll\">module:routes/breeds~getAll &rtrif; undefined</a>"},{"title":"module:routes/breeds~getBreed","link":"<a href=\"module-routes_breeds.html#~getBreed\">module:routes/breeds~getBreed &rtrif; undefined</a>"},{"title":"module:routes/breeds~updateBreed","link":"<a href=\"module-routes_breeds.html#~updateBreed\">module:routes/breeds~updateBreed &rtrif; undefined</a>"},{"title":"routes/dogs","link":"<a href=\"module-routes_dogs.html\">routes/dogs</a>"},{"title":"module:routes/dogs~addDog","link":"<a href=\"module-routes_dogs.html#~addDog\">module:routes/dogs~addDog &rtrif; undefined</a>"},{"title":"module:routes/dogs~addDogBreed","link":"<a href=\"module-routes_dogs.html#~addDogBreed\">module:routes/dogs~addDogBreed &rtrif; undefined</a>"},{"title":"module:routes/dogs~addDogLocation","link":"<a href=\"module-routes_dogs.html#~addDogLocation\">module:routes/dogs~addDogLocation &rtrif; undefined</a>"},{"title":"module:routes/dogs~deleteDog","link":"<a href=\"module-routes_dogs.html#~deleteDog\">module:routes/dogs~deleteDog &rtrif; undefined</a>"},{"title":"module:routes/dogs~deleteDogBreed","link":"<a href=\"module-routes_dogs.html#~deleteDogBreed\">module:routes/dogs~deleteDogBreed &rtrif; undefined</a>"},{"title":"module:routes/dogs~deleteDogLocation","link":"<a href=\"module-routes_dogs.html#~deleteDogLocation\">module:routes/dogs~deleteDogLocation &rtrif; undefined</a>"},{"title":"module:routes/dogs~getAll","link":"<a href=\"module-routes_dogs.html#~getAll\">module:routes/dogs~getAll &rtrif; undefined</a>"},{"title":"module:routes/dogs~getDog","link":"<a href=\"module-routes_dogs.html#~getDog\">module:routes/dogs~getDog &rtrif; undefined</a>"},{"title":"module:routes/dogs~getDogBreed","link":"<a href=\"module-routes_dogs.html#~getDogBreed\">module:routes/dogs~getDogBreed &rtrif; undefined</a>"},{"title":"module:routes/dogs~getDogLocation","link":"<a href=\"module-routes_dogs.html#~getDogLocation\">module:routes/dogs~getDogLocation &rtrif; undefined</a>"},{"title":"module:routes/dogs~getFavourites","link":"<a href=\"module-routes_dogs.html#~getFavourites\">module:routes/dogs~getFavourites &rtrif; undefined</a>"},{"title":"module:routes/dogs~updateDog","link":"<a href=\"module-routes_dogs.html#~updateDog\">module:routes/dogs~updateDog &rtrif; undefined</a>"},{"title":"module:routes/dogs~updateDogBreed","link":"<a href=\"module-routes_dogs.html#~updateDogBreed\">module:routes/dogs~updateDogBreed &rtrif; undefined</a>"},{"title":"module:routes/dogs~updateDogLocation","link":"<a href=\"module-routes_dogs.html#~updateDogLocation\">module:routes/dogs~updateDogLocation &rtrif; undefined</a>"},{"title":"routes/locations","link":"<a href=\"module-routes_locations.html\">routes/locations</a>"},{"title":"module:routes/locations~addLocation","link":"<a href=\"module-routes_locations.html#~addLocation\">module:routes/locations~addLocation &rtrif; undefined</a>"},{"title":"module:routes/locations~deleteLocation","link":"<a href=\"module-routes_locations.html#~deleteLocation\">module:routes/locations~deleteLocation &rtrif; undefined</a>"},{"title":"module:routes/locations~getAll","link":"<a href=\"module-routes_locations.html#~getAll\">module:routes/locations~getAll &rtrif; undefined</a>"},{"title":"module:routes/locations~getLocation","link":"<a href=\"module-routes_locations.html#~getLocation\">module:routes/locations~getLocation &rtrif; undefined</a>"},{"title":"module:routes/locations~getLocationDogs","link":"<a href=\"module-routes_locations.html#~getLocationDogs\">module:routes/locations~getLocationDogs &rtrif; undefined</a>"},{"title":"module:routes/locations~updateLocation","link":"<a href=\"module-routes_locations.html#~updateLocation\">module:routes/locations~updateLocation &rtrif; undefined</a>"},{"title":"routes/login","link":"<a href=\"module-routes_login.html\">routes/login</a>"},{"title":"module:routes/login~getJWT","link":"<a href=\"module-routes_login.html#~getJWT\">module:routes/login~getJWT &rtrif; undefined</a>"},{"title":"module:routes/login~refresh","link":"<a href=\"module-routes_login.html#~refresh\">module:routes/login~refresh &rtrif; undefined</a>"},{"title":"routes/special","link":"<a href=\"module-routes_special.html\">routes/special</a>"},{"title":"routes/staff","link":"<a href=\"module-routes_staff.html\">routes/staff</a>"},{"title":"routes/users","link":"<a href=\"module-routes_users.html\">routes/users</a>"},{"title":"module:routes/users~addUserFav","link":"<a href=\"module-routes_users.html#~addUserFav\">module:routes/users~addUserFav &rtrif; undefined</a>"},{"title":"module:routes/users~createUser","link":"<a href=\"module-routes_users.html#~createUser\">module:routes/users~createUser &rtrif; undefined</a>"},{"title":"module:routes/users~deleteUser","link":"<a href=\"module-routes_users.html#~deleteUser\">module:routes/users~deleteUser &rtrif; undefined</a>"},{"title":"module:routes/users~deleteUserFav","link":"<a href=\"module-routes_users.html#~deleteUserFav\">module:routes/users~deleteUserFav &rtrif; undefined</a>"},{"title":"module:routes/users~getAll","link":"<a href=\"module-routes_users.html#~getAll\">module:routes/users~getAll &rtrif; undefined</a>"},{"title":"module:routes/users~getUser","link":"<a href=\"module-routes_users.html#~getUser\">module:routes/users~getUser &rtrif; undefined</a>"},{"title":"module:routes/users~getUserFav","link":"<a href=\"module-routes_users.html#~getUserFav\">module:routes/users~getUserFav &rtrif; undefined</a>"},{"title":"module:routes/users~getUserFavs","link":"<a href=\"module-routes_users.html#~getUserFavs\">module:routes/users~getUserFavs &rtrif; undefined</a>"},{"title":"module:routes/users~updateUser","link":"<a href=\"module-routes_users.html#~updateUser\">module:routes/users~updateUser &rtrif; undefined</a>"},{"title":"strategies/basic","link":"<a href=\"module-strategies_basic.html\">strategies/basic</a>"},{"title":"module:strategies/basic~checkUser","link":"<a href=\"module-strategies_basic.html#~checkUser\">module:strategies/basic~checkUser &rtrif; undefined</a>"},{"title":"module:strategies/basic~verifyPassword","link":"<a href=\"module-strategies_basic.html#~verifyPassword\">module:strategies/basic~verifyPassword &rtrif; undefined</a>"},{"title":"strategies/jwt","link":"<a href=\"module-strategies_jwt.html\">strategies/jwt</a>"},{"title":"module:strategies/jwt~checkUser","link":"<a href=\"module-strategies_jwt.html#~checkUser\">module:strategies/jwt~checkUser &rtrif; undefined</a>"},{"title":"tweet","link":"<a href=\"global.html#tweet\">tweet</a>"}];
-      var options = 
-        setupSearch(list, options)
-    </script>
-
     
-
     
+</div>
 
-    
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.6</a> on Thu Apr 01 2021 12:15:03 GMT+0000 (Coordinated Universal Time) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/polyfill.js"></script>
+<script src="scripts/linenumber.js"></script>
 
 
-  </body>
 
+</body>
 </html>

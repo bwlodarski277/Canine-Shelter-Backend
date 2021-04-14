@@ -1,3 +1,5 @@
+'use strict';
+
 /**
  * @file Breeds model to manage interactions with the database.
  * @module models/breeds
@@ -11,18 +13,35 @@ const { db, run } = require('../helpers/database');
  * @typedef {object} Breed
  * @property {number} id Breed ID
  * @property {string} name Name of the breed
- * @property {string} description Breed description 
+ * @property {string} description Breed description
  */
 
 /**
  * Gets all breed entries from the DB.
+ * Allows for searching, filtering and sorting.
+ * @param {string} query search for breeds by name and description.
+ * @param {Array<string>} select list of columns to select.
+ * @param {number} page which page to get data from.
+ * @param {number} limit number of items on a page.
+ * @param {string} order what parameter to order by.
+ * @param {'asc'|'desc'} direction direction to sort (asc. or desc.).
  * @returns {Promise<Array<Breed>>} array of all breed records.
  * @async
  */
-exports.getAll = async () => {
-    const data = await run(async () => await db('breeds'));
-    return data;
-}
+exports.getAll = async (query, select, page, limit, order, direction) => {
+	const offset = (page - 1) * limit;
+	const data = await run(
+		async () =>
+			await db('breeds')
+				.select(...select)
+				.where('name', 'like', `%${query}%`)
+				.orWhere('description', 'like', `%${query}%`)
+				.orderBy(order, direction)
+				.limit(limit)
+				.offset(offset)
+	);
+	return data;
+};
 
 /**
  * Gets a single breed entry from the DB by its ID.
@@ -31,10 +50,9 @@ exports.getAll = async () => {
  * @async
  */
 exports.getById = async id => {
-    const [data] = await run(async () =>
-        await db('breeds').where({ id }));
-    return data;
-}
+	const [data] = await run(async () => await db('breeds').where({ id }));
+	return data;
+};
 
 /**
  * Creates a new breed entry in the DB.
@@ -43,10 +61,9 @@ exports.getById = async id => {
  * @async
  */
 exports.add = async breed => {
-    const [data] = await run(async () =>
-        await db('breeds').insert(breed));
-    return data;
-}
+	const [data] = await run(async () => await db('breeds').insert(breed));
+	return data;
+};
 
 /**
  * Updates a breed entry in the DB.
@@ -56,10 +73,9 @@ exports.add = async breed => {
  * @async
  */
 exports.update = async (id, breed) => {
-    const data = await run(async () =>
-        await db('breeds').where({ id }).update(breed));
-    return data;
-}
+	const data = await run(async () => await db('breeds').where({ id }).update(breed));
+	return data;
+};
 
 /**
  * Deletes a breed entry from the DB.
@@ -68,7 +84,6 @@ exports.update = async (id, breed) => {
  * @async
  */
 exports.delete = async id => {
-    const data = await run(async () =>
-        await db('breeds').where({ id }).delete());
-    return data;
-}
+	const data = await run(async () => await db('breeds').where({ id }).delete());
+	return data;
+};

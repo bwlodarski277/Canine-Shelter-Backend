@@ -1,3 +1,5 @@
+'use strict';
+
 /**
  * @file Users model to manage interactions with the database.
  * @module models/users
@@ -6,18 +8,6 @@
 
 const { db, run } = require('../helpers/database');
 const bcrypt = require('bcrypt');
-
-/** List of columns to return from the DB (excludes password). */
-const cols = [
-	'id',
-	'username',
-	'email',
-	'firstName',
-	'lastName',
-	'dateCreated',
-	'dateModified',
-	'imageUrl'
-];
 
 /**
  * User object returned from the DB.
@@ -42,22 +32,31 @@ const cols = [
  * @async
  */
 exports.findByUsername = async (username, provider = 'local') => {
-	const [data] = await run(
-		async () => await db('users').where({ username, provider })
-	);
+	const [data] = await run(async () => await db('users').where({ username, provider }));
 	return data;
 };
 
 /**
  * Gets all users from the DB.
+ * @param {string} query search for users by username.
+ * @param {Array<string>} select list of columns to select.
+ * @param {number} page which page to get data from.
+ * @param {number} limit number of items on a page.
+ * @param {string} order what parameter to order by.
+ * @param {'asc'|'desc'} direction direction to sort (asc. or desc.).
  * @returns {Promise<Array<User>>} list of users in the DB.
  * @async
  */
-exports.getAll = async () => {
+exports.getAll = async (query, select, page, limit, order, direction) => {
+	const offset = (page - 1) * limit;
 	const data = await run(
 		async () =>
-			// ...cols is to make sure password is not returned.
-			await db('users').select(...cols)
+			await db('users')
+				.select(...select)
+				.where('username', 'like', `%${query}%`)
+				.orderBy(order, direction)
+				.limit(limit)
+				.offset(offset)
 	);
 	return data;
 };
@@ -65,15 +64,16 @@ exports.getAll = async () => {
 /**
  * Gets a single user from the DB by their ID.
  * @param {number} id ID of user to fetch.
+ * @param {Array<string>} select list of columns to select.
  * @returns {Promise<User>} object containing the user's record.
  * @async
  */
-exports.getById = async id => {
+exports.getById = async (id, select) => {
 	const [data] = await run(
 		async () =>
 			await db('users')
 				.where({ id })
-				.select(...cols)
+				.select(...select)
 	);
 	return data;
 };
@@ -110,9 +110,7 @@ exports.update = async (id, user) => {
 		const hash = bcrypt.hashSync(password, 10);
 		user.password = hash;
 	}
-	const data = await run(
-		async () => await db('users').where({ id }).update(user)
-	);
+	const data = await run(async () => await db('users').where({ id }).update(user));
 	return data;
 };
 
@@ -123,8 +121,6 @@ exports.update = async (id, user) => {
  * @async
  */
 exports.delete = async id => {
-	const data = await run(
-		async () => await db('users').where({ id }).delete()
-	);
+	const data = await run(async () => await db('users').where({ id }).delete());
 	return data;
 };

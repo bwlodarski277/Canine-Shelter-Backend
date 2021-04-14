@@ -1,3 +1,5 @@
+'use strict';
+
 /**
  * @file Locations model to manage interactions with the database.
  * @module models/locations
@@ -20,9 +22,9 @@ const { db, run } = require('../helpers/database');
  * @async
  */
 exports.getAll = async () => {
-    const data = await run(async () => await db('locations'));
-    return data;
-}
+	const data = await run(async () => await db('locations'));
+	return data;
+};
 
 /**
  * Gets a single location entry from the DB by its ID.
@@ -31,10 +33,9 @@ exports.getAll = async () => {
  * @async
  */
 exports.getById = async id => {
-    const [data] = await run(async () =>
-        await db('locations').where({ id }));
-    return data;
-}
+	const [data] = await run(async () => await db('locations').where({ id }));
+	return data;
+};
 
 /**
  * Creates a new location entry in the DB.
@@ -43,10 +44,9 @@ exports.getById = async id => {
  * @async
  */
 exports.add = async location => {
-    const [data] = await run(async () =>
-        await db('locations').insert(location));
-    return data;
-}
+	const [data] = await run(async () => await db('locations').insert(location));
+	return data;
+};
 
 /**
  * Updates a location entry in the DB.
@@ -56,10 +56,9 @@ exports.add = async location => {
  * @async
  */
 exports.update = async (id, location) => {
-    const data = await run(async () =>
-        await db('locations').where({ id }).update(location));
-    return data;
-}
+	const data = await run(async () => await db('locations').where({ id }).update(location));
+	return data;
+};
 
 /**
  * Deletes a location entry from the DB.
@@ -68,7 +67,6 @@ exports.update = async (id, location) => {
  * @async
  */
 exports.delete = async id => {
-    const data = await run(async () =>
-        await db('locations').where({ id }).delete());
-    return data;
-}
+	const data = await run(async () => await db('locations').where({ id }).delete());
+	return data;
+};

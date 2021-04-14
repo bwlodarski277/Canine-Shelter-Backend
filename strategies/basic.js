@@ -1,3 +1,5 @@
+'use strict';
+
 /**
  * @file Basic authentication strategy.
  * @module strategies/basic
@@ -15,9 +17,7 @@ const bcrypt = require('bcrypt');
  * @returns {boolean} stating whether password is valid or not.
  * @async
  */
-const verifyPassword = async (user, password) => {
-	return await bcrypt.compare(password, user.password);
-};
+const verifyPassword = async (user, password) => await bcrypt.compare(password, user.password);
 
 /**
  * User authenticator for basic strategy authentication.
@@ -42,15 +42,14 @@ const checkUser = async (username, password, done) => {
 		if (verified) {
 			console.log(`Successfully authenticated user ${username}.`);
 			// Overwriting the user variable to make sure password is not returned.
-			user = await users.getById(user.id);
+			user = await users.getById(user.id, []);
 			return done(null, user);
-		} else {
-			console.log(`Incorrect password for user ${username}.`);
-			return done(null, false);
 		}
-	} else {
-		console.log(`No user found with username ${username}.`);
+		console.log(`Incorrect password for user ${username}.`);
+		return done(null, false);
 	}
+	console.log(`No user found with username ${username}.`);
+
 	return done(null, false);
 	// return done(null, { role: 'guest' });
 };

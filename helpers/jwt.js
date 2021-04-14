@@ -1,4 +1,20 @@
+'use strict';
+
+/**
+ * @file JSON Web Token helper. Used for generating and validating JWT.
+ * @module helpers/jwt
+ * @author Bartlomiej Wlodarski
+ */
+
 const jwt = require('jsonwebtoken');
+
+/**
+ * Payload object. Gets encoded to make a JWT.
+ * @typedef Payload
+ * @type {object}
+ * @property {string} token a JWT or refresh token.
+ * @property {string} expiresIn how long the token expires in.
+ */
 
 /**
  * Verifies whether a JWT token is valid.
@@ -20,11 +36,13 @@ exports.verify = (token, secret) => {
  * @param {object} payload the data to use to generate a token.
  * @param {string} secret the key to use to generate a token.
  * @param {string} expiresIn how long the token should be valid for.
- * @returns {object} a JWT token with its expiration date.
+ * @returns {Payload} a JWT token with its expiration date
+ * @see modules:helpers/jwt.Payload
  */
 exports.generate = (payload, secret, expiresIn) => {
 	// Need to remove the 'Issued at' property for new tokens to be generated.
-	delete payload.exp, payload.iat;
+	delete payload.exp;
+	delete payload.iat;
 	const token = jwt.sign(payload, secret, { expiresIn });
 	return { token, expiresIn };
 };

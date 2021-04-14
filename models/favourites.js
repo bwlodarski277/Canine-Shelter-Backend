@@ -1,3 +1,5 @@
+'use strict';
+
 /**
  * @file Favourites model to manage interactions with the database.
  * @module models/favourites
@@ -20,10 +22,9 @@ const { db, run } = require('../helpers/database');
  * @async
  */
 exports.getByUserId = async userId => {
-    const data = await run(async () =>
-        await db('favourites').where({ userId }));
-    return data;
-}
+	const data = await run(async () => await db('favourites').where({ userId }));
+	return data;
+};
 
 /**
  * Gets a single favourite by user ID and dog ID.
@@ -32,10 +33,9 @@ exports.getByUserId = async userId => {
  * @async
  */
 exports.getSingleFav = async id => {
-    const [data] = await run(async () =>
-        await db('favourites').where({ id }));
-    return data;
-}
+	const [data] = await run(async () => await db('favourites').where({ id }));
+	return data;
+};
 
 /**
  * Gets a list of users that favourited a dog.
@@ -44,10 +44,9 @@ exports.getSingleFav = async id => {
  * @async
  */
 exports.getByDogId = async dogId => {
-    const data = await run(async () =>
-        await db('favourites').where({ dogId }));
-    return data;
-}
+	const data = await run(async () => await db('favourites').where({ dogId }));
+	return data;
+};
 
 /**
  * Gets a count of users that favourited a dog.
@@ -56,10 +55,11 @@ exports.getByDogId = async dogId => {
  * @async
  */
 exports.getFavCount = async dogId => {
-    const [data] = await run(async () =>
-        await db('favourites').where({ dogId }).count('dogId', { as: 'count' }));
-    return data;
-}
+	const [data] = await run(
+		async () => await db('favourites').where({ dogId }).count('dogId', { as: 'count' })
+	);
+	return data;
+};
 
 /**
  * Creates a new favourite entry in the DB.
@@ -69,10 +69,9 @@ exports.getFavCount = async dogId => {
  * @async
  */
 exports.add = async (userId, dogId) => {
-    const data = await run(async () =>
-        await db('favourites').insert({ userId, dogId }));
-    return data;
-}
+	const data = await run(async () => await db('favourites').insert({ userId, dogId }));
+	return data;
+};
 
 /**
  * Deletes a favourite entry from the DB.
@@ -81,7 +80,6 @@ exports.add = async (userId, dogId) => {
  * @async
  */
 exports.delete = async id => {
-    const data = await run(async () =>
-        await db('favourites').where({ id }).delete());
-    return data;
-}
+	const data = await run(async () => await db('favourites').where({ id }).delete());
+	return data;
+};
