@@ -13,6 +13,7 @@ const dogModel = require('../models/dogs');
 const dogBreedModel = require('../models/dogBreeds');
 const dogLocationModel = require('../models/dogLocations');
 const favouritesModel = require('../models/favourites');
+const staffModel = require('../models/staff');
 
 const { validateDog, validateDogBreed, validateDogLocation } = require('../controllers/validation');
 const can = require('../permissions/dogs');
@@ -54,8 +55,10 @@ const getAll = async ctx => {
  */
 const getDog = async ctx => {
 	const id = ctx.params.id;
+	let { select = [] } = ctx.request.query;
+	if (!Array.isArray(select)) select = Array(select);
 	try {
-		const dog = await dogModel.getById(id);
+		const dog = await dogModel.getById(id, select);
 		if (dog) ctx.body = dog;
 	} catch (err) {
 		ctx.status = 500;
@@ -94,14 +97,20 @@ const addDog = async ctx => {
 const updateDog = async ctx => {
 	const dogId = ctx.params.id;
 	try {
-		const dog = await dogModel.getById(dogId);
+		const dog = await dogModel.getById(dogId, []);
 		if (dog) {
-			const location = await dogLocationModel.getByDogId(dogId);
-			const permission = await can.
+			const { id: userId, role } = ctx.state.user;
+			const { locationId: userLoc } = (await staffModel.getByUserId(userId)) || {};
+			const { locationId: dogLoc } = (await dogLocationModel.getByDogId(dogId)) || {};
+			// If a user is a staff member
+			const permission = await can.dog.modify(role, userLoc, dogLoc);
+			if (!permission.granted) {
+				ctx.status = 403;
+				return;
+			}
 			// Excluding fields that must not be updated
 			const { id, dateCreated, dateModified, ...body } = ctx.request.body;
 			const result = await dogModel.update(dogId, body);
-			// Knex returns amount of affected rows.
 			if (result) {
 				ctx.status = 201;
 				ctx.body = { id: dogId, updated: true, link: ctx.request.path };
@@ -118,12 +127,21 @@ const updateDog = async ctx => {
  * @param {object} ctx context passed from Koa.
  */
 const deleteDog = async ctx => {
-	const id = ctx.params.id;
+	const dogId = ctx.params.id;
 	try {
-		const dog = await dogModel.getById(id);
+		const dog = await dogModel.getById(dogId);
 		if (dog) {
-			const result = await dogModel.delete(id);
-			if (result) ctx.stbody = { id, deleted: true };
+			const { id: userId, role } = ctx.state.user;
+			const { locationId: userLoc } = (await staffModel.getByUserId(userId)) || {};
+			const { locationId: dogLoc } = (await dogLocationModel.getByDogId(dogId)) || {};
+
+			const permission = await can.dog.delete(role, userLoc, dogLoc);
+			if (!permission.granted) {
+				ctx.status = 403;
+				return;
+			}
+			const result = await dogModel.delete(dogId);
+			if (result) ctx.stbody = { id: dogId, deleted: true };
 		}
 	} catch (err) {
 		ctx.status = 500;
@@ -154,10 +172,20 @@ const addDogBreed = async ctx => {
 	const dogId = ctx.params.id;
 	const { breedId } = ctx.request.body;
 	try {
-		const result = await dogBreedModel.add(dogId, breedId);
-		if (result) {
-			ctx.status = 201;
-			ctx.body = { id: dogId, created: true, link: ctx.request.path };
+		const dog = await dogModel.getById(dogId);
+		if (dog) {
+			const { role } = ctx.state.user;
+
+			const permission = await can.dogBreed.set(role);
+			if (!permission.granted) {
+				ctx.status = 403;
+				return;
+			}
+			const result = await dogBreedModel.add(dogId, breedId);
+			if (result) {
+				ctx.status = 201;
+				ctx.body = { id: dogId, created: true, link: ctx.request.path };
+			}
 		}
 	} catch (err) {
 		ctx.status = 500;
@@ -173,8 +201,20 @@ const updateDogBreed = async ctx => {
 	const dogId = ctx.params.id;
 	const { breedId } = ctx.request.body;
 	try {
-		const result = await dogBreedModel.update(dogId, breedId);
-		if (result) ctx.body = { id: dogId, updated: true, link: ctx.request.path };
+		const dog = await dogModel.getById(dogId);
+		if (dog) {
+			const { id: userId, role } = ctx.state.user;
+			const { locationId: userLoc } = (await staffModel.getByUserId(userId)) || {};
+			const { locationId: dogLoc } = (await dogLocationModel.getByDogId(dogId)) || {};
+
+			const permission = await can.dogBreed.modify(role, userLoc, dogLoc);
+			if (!permission.granted) {
+				ctx.status = 403;
+				return;
+			}
+			const result = await dogBreedModel.update(dogId, breedId);
+			if (result) ctx.body = { id: dogId, updated: true, link: ctx.request.path };
+		}
 	} catch (err) {
 		ctx.status = 500;
 		ctx.body = err;
@@ -188,8 +228,20 @@ const updateDogBreed = async ctx => {
 const deleteDogBreed = async ctx => {
 	const dogId = ctx.params.id;
 	try {
-		const result = await dogBreedModel.delete(dogId);
-		if (result) ctx.body = { id: dogId, deleted: true };
+		const dog = await dogModel.getById(dogId);
+		if (dog) {
+			const { id: userId, role } = ctx.state.user;
+			const { locationId: userLoc } = (await staffModel.getByUserId(userId)) || {};
+			const { locationId: dogLoc } = (await dogLocationModel.getByDogId(dogId)) || {};
+
+			const permission = await can.dog.delete(role, userLoc, dogLoc);
+			if (!permission.granted) {
+				ctx.status = 403;
+				return;
+			}
+			const result = await dogBreedModel.delete(dogId);
+			if (result) ctx.body = { id: dogId, deleted: true };
+		}
 	} catch (err) {
 		ctx.status = 500;
 		ctx.body = err;
@@ -201,9 +253,9 @@ const deleteDogBreed = async ctx => {
  * @param {object} ctx context passed from Koa.
  */
 const getDogLocation = async ctx => {
-	const id = ctx.params.id;
+	const dogId = ctx.params.id;
 	try {
-		const dogLocation = await dogLocationModel.getByDogId(id);
+		const dogLocation = await dogLocationModel.getByDogId(dogId);
 		if (dogLocation) ctx.body = dogLocation;
 	} catch (err) {
 		ctx.status = 500;
@@ -219,10 +271,22 @@ const addDogLocation = async ctx => {
 	const dogId = ctx.params.id;
 	const { locationId } = ctx.request.body;
 	try {
-		const result = await dogLocationModel.add(dogId, locationId);
-		if (result) {
-			ctx.status = 201;
-			ctx.body = { id: dogId, created: true, link: ctx.request.path };
+		const dog = await dogModel.getById(dogId);
+		if (dog) {
+			const { id: userId, role } = ctx.state.user;
+			const { locationId: userLoc } = (await staffModel.getByUserId(userId)) || {};
+			const { locationId: dogLoc } = (await dogLocationModel.getByDogId(dogId)) || {};
+
+			const permission = await can.dog.delete(role, userLoc, dogLoc);
+			if (!permission.granted) {
+				ctx.status = 403;
+				return;
+			}
+			const result = await dogLocationModel.add(dogId, locationId);
+			if (result) {
+				ctx.status = 201;
+				ctx.body = { id: dogId, created: true, link: ctx.request.path };
+			}
 		}
 	} catch (err) {
 		ctx.status = 500;
@@ -238,8 +302,20 @@ const updateDogLocation = async ctx => {
 	const dogId = ctx.params.id;
 	const { locationId } = ctx.request.body;
 	try {
-		const result = await dogLocationModel.update(dogId, locationId);
-		if (result) ctx.body = { id: dogId, updated: true, link: ctx.request.path };
+		const dog = await dogModel.getById(dogId);
+		if (dog) {
+			const { id: userId, role } = ctx.state.user;
+			const { locationId: userLoc } = (await staffModel.getByUserId(userId)) || {};
+			const { locationId: dogLoc } = (await dogLocationModel.getByDogId(dogId)) || {};
+
+			const permission = await can.dog.delete(role, userLoc, dogLoc);
+			if (!permission.granted) {
+				ctx.status = 403;
+				return;
+			}
+			const result = await dogLocationModel.update(dogId, locationId);
+			if (result) ctx.body = { id: dogId, updated: true, link: ctx.request.path };
+		}
 	} catch (err) {
 		ctx.status = 500;
 		ctx.body = err;
@@ -253,8 +329,20 @@ const updateDogLocation = async ctx => {
 const deleteDogLocation = async ctx => {
 	const dogId = ctx.params.id;
 	try {
-		const result = await dogLocationModel.delete(dogId);
-		if (result) ctx.body = { id: dogId, deleted: true };
+		const dog = await dogModel.getById(dogId);
+		if (dog) {
+			const { id: userId, role } = ctx.state.user;
+			const { locationId: userLoc } = (await staffModel.getByUserId(userId)) || {};
+			const { locationId: dogLoc } = (await dogLocationModel.getByDogId(dogId)) || {};
+
+			const permission = await can.dog.delete(role, userLoc, dogLoc);
+			if (!permission.granted) {
+				ctx.status = 403;
+				return;
+			}
+			const result = await dogLocationModel.delete(dogId);
+			if (result) ctx.body = { id: dogId, deleted: true };
+		}
 	} catch (err) {
 		ctx.status = 500;
 		ctx.body = err;

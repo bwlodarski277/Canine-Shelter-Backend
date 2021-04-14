@@ -11,6 +11,7 @@ const bodyParser = require('koa-bodyparser');
 
 const userModel = require('../models/users');
 const favsModel = require('../models/favourites');
+const chatModel = require('../models/chats');
 
 const { auth } = require('../controllers/auth');
 const { config } = require('../config');
@@ -18,6 +19,7 @@ const { config } = require('../config');
 const { validateUser, validateFavourite } = require('../controllers/validation');
 
 const can = require('../permissions/users');
+const { clamp } = require('../helpers/utils');
 
 const router = new Router({ prefix: '/api/v1/users' });
 router.use(bodyParser());
@@ -27,15 +29,30 @@ router.use(bodyParser());
  * @param {object} ctx context passed from Koa.
  */
 const getAll = async ctx => {
-	const perm = await can.getAll(ctx.state.user);
-	if (perm.granted)
-		try {
-			ctx.body = await userModel.getAll();
-		} catch (err) {
-			ctx.status = 500;
-			ctx.body = err;
-		}
-	else ctx.status = 403;
+	const permission = await can.getAll(ctx.state.user);
+	if (!permission.granted) {
+		ctx.status = 403;
+		return;
+	}
+	let {
+		query = '',
+		select = [],
+		page = 1,
+		limit = 10,
+		order = 'id',
+		direction
+	} = ctx.request.query;
+	limit = clamp(limit, 1, 20); // Clamping the limit to be between 1 and 20.
+	direction = direction === 'desc' ? 'desc' : 'asc';
+	if (!Array.isArray(select)) select = Array(select);
+	try {
+		let users = await userModel.getAll(query, select, page, limit, order, direction);
+		users = users.map(user => permission.filter(user));
+		ctx.body = users;
+	} catch (err) {
+		ctx.status = 500;
+		ctx.body = err;
+	}
 };
 
 /**
@@ -44,9 +61,20 @@ const getAll = async ctx => {
  */
 const getUser = async ctx => {
 	const id = ctx.params.id;
+	let { select = [] } = ctx.request.query;
+	if (!Array.isArray(select)) select = Array(select);
 	try {
-		const user = await userModel.getById(id);
-		if (user) ctx.body = user;
+		let user = await userModel.getById(id, select);
+		if (user) {
+			const { id: userId, role } = ctx.state.user;
+			const permission = await can.get(role, userId, id);
+			if (!permission.granted) {
+				ctx.status = 403;
+				return;
+			}
+			user = permission.filter(user);
+			ctx.body = user;
+		}
 	} catch (err) {
 		ctx.status = 500;
 		ctx.body = err;
@@ -180,6 +208,21 @@ const deleteUserFav = async ctx => {
 	}
 };
 
+/**
+ * Gets a user's chats by their ID.
+ * @param {object} ctx context passed from koa.
+ */
+const getUserChats = async ctx => {
+	const userId = ctx.params.id;
+	try {
+		const chats = await chatModel.getByUserId(userId);
+		if (chats) ctx.body = chats;
+	} catch (err) {
+		ctx.status = 500;
+		ctx.body = err;
+	}
+};
+
 router.get('/', auth, getAll);
 router.post('/', validateUser, createUser);
 
@@ -192,5 +235,7 @@ router.post('/:id([0-9]+)/favourites', auth, validateFavourite, addUserFav);
 
 router.get('/:id([0-9]+)/favourites/:favId([0-9]+)', auth, getUserFav);
 router.del('/:id([0-9]+)/favourites/:favId([0-9]+)', auth, deleteUserFav);
+
+router.get('/:id([0-9]+)/chats', auth, getUserChats);
 
 module.exports = router;
