@@ -1,5 +1,8 @@
 'use strict';
 
+// eslint-disable-next-line no-unused-vars
+const { AccessControl, Permission } = require('role-acl');
+
 /**
  * @file Permission helper. Used for generating a permission generator.
  * @module helpers/permissions
@@ -14,7 +17,7 @@
 /**
  * Generates a perms generator using an AccessControl object.
  * Used to avoid duplicate code in permissions files.
- * @param {object} ac AccessControl object from role-acl.
+ * @param {AccessControl} ac AccessControl object from role-acl.
  * @param {string} current context value to check.
  * @param {string} expected expected context value.
  * @returns {function(string, string): function} generatePerms function generator.
@@ -30,7 +33,7 @@ const permGenerator = (ac, current, expected) => {
 	 * @type {function}
 	 * @param {string} action action to perform on resource.
 	 * @param {string} onResource resource to perform action on.
-	 * @returns {function(string, simple, simple): function} AccessControl perm. checker generator.
+	 * @returns {function(string, simple, simple)} AccessControl perm. checker generator.
 	 * @see module:helpers/permissions~checker
 	 * @see module:helpers/permissions~simple
 	 * @function
@@ -43,7 +46,7 @@ const permGenerator = (ac, current, expected) => {
 		 * @param {string} role role to check.
 		 * @param {simple} value data to validate.
 		 * @param {simple} toCheck data to validate against.
-		 * @returns {Promise<function>} AccessControl validator.
+		 * @returns {Promise<Permission>} AccessControl validator.
 		 * @see module:models/users~User
 		 * @see module:helpers/permissions~simple
 		 * @function
