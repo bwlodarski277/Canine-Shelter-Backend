@@ -52,11 +52,17 @@ exports.getAll = async (query, select, page, limit, order, direction) => {
 /**
  * Gets a single dog entry from the DB by their ID.
  * @param {number} id ID of the dog to fetch.
+ * @param {Array<string>} select list of columns to select.
  * @returns {Promise<Dog>} object containing the dog's record.
  * @async
  */
-exports.getById = async id => {
-	const [data] = await run(async () => await db('dogs').where({ id }));
+exports.getById = async (id, select) => {
+	const [data] = await run(
+		async () =>
+			await db('dogs')
+				.where({ id })
+				.select(...select)
+	);
 	return data;
 };
 

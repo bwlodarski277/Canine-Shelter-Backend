@@ -18,7 +18,7 @@ const { db, run } = require('../helpers/database');
 /**
  * Gets a dog's location by their ID.
  * @param {number} dogId ID of the dog to fetch.
- * @returns {Promise<object>} record of dog's location.
+ * @returns {Promise<DogLocation>} record of dog's location.
  * @async
  */
 exports.getByDogId = async dogId => {
@@ -29,7 +29,7 @@ exports.getByDogId = async dogId => {
 /**
  * Gets all the dogs with a location ID.
  * @param {number} locationId ID of the location to fetch.
- * @returns {Promise<Array<object>>} list of dogs at the given location.
+ * @returns {Promise<Array<DogLocation>>} list of dogs at the given location.
  * @async
  */
 exports.getByLocationId = async locationId => {
