@@ -53,7 +53,7 @@ const makeValidator = schema => {
 	return handler;
 };
 
-exports.validateDreed = makeValidator(breed);
+exports.validateBreed = makeValidator(breed);
 exports.validateDog = makeValidator(dog);
 exports.validateDogBreed = makeValidator(dogBreed);
 exports.validateDogLocation = makeValidator(dogLocation);

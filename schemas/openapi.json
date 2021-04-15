@@ -75,6 +75,13 @@
 			}
 		},
 		"parameters": {
+			"breedId": {
+				"name": "id",
+				"in": "path",
+				"description": "Breed ID",
+				"required": true,
+				"schema": { "type": "integer" }
+			},
 			"userId": {
 				"name": "id",
 				"in": "path",
@@ -138,6 +145,154 @@
 		}
 	},
 	"paths": {
+		"/breeds": {
+			"description": "Represents dog breeds",
+			"get": {
+				"tags": ["Breeds"],
+				"summary": "Gets all the breeds on the website",
+				"responses": {
+					"200": {
+						"description": "A list of breeds",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "./breeds.json#/definitions/breeds"
+								}
+							}
+						}
+					}
+				}
+			},
+			"post": {
+				"tags": ["Breeds"],
+				"summary": "Adds a new breed to the website",
+				"responses": {
+					"201": {
+						"description": "Breed successfully added",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "./breeds.json#/definitions/breedCreated"
+								}
+							}
+						}
+					},
+					"400": {
+						"$ref": "#/components/responses/validationError"
+					},
+					"401": {
+						"$ref": "#/components/responses/authenticationError"
+					},
+					"403": {
+						"description": "Only staff may add breeds"
+					}
+				}
+			}
+		},
+		"/breeds/{id}": {
+			"summary": "A single breed",
+			"parameters": [{ "$ref": "#/components/parameters/breedId" }],
+			"get": {
+				"tags": ["Breeds"],
+				"summary": "Get a single breed entry",
+				"security": [],
+				"responses": {
+					"200": {
+						"description": "Breed entry successfully retrieved",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "./breeds.json#/definitions/breedData"
+								}
+							}
+						}
+					},
+					"404": {
+						"$ref": "#/components/responses/notFoundError"
+					}
+				}
+			},
+			"put": {
+				"tags": ["Breeds"],
+				"summary": "Update a breed entry",
+				"description": "Updates a breed's entry by breed ID and data provided",
+				"requestBody": {
+					"description": "Data to update a breed",
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "./breeds.json#/definitions/breed"
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "Breed was successfully updated",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "./breeds.json#/definitions/breedUpdated"
+								}
+							}
+						}
+					},
+					"400": { "$ref": "#/components/responses/validationError" },
+					"401": {
+						"$ref": "#/components/responses/authenticationError"
+					},
+					"403": {
+						"description": "Only staff may alter breed entries"
+					},
+					"404": { "$ref": "#/components/responses/notFoundError" }
+				}
+			},
+			"delete": {
+				"tags": ["Breeds"],
+				"summary": "Delete a breed from the database",
+				"description": "Deletes a breed from the database by breed ID",
+				"responses": {
+					"200": {
+						"description": "Breed was successfully deleted",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "./breeds.json#/definitions/breedDeleted"
+								}
+							}
+						}
+					},
+					"401": {
+						"$ref": "#/components/responses/authenticationError"
+					},
+					"403": {
+						"description": "Only staff may delete breed entries"
+					},
+					"404": { "$ref": "#/components/responses/notFoundError" }
+				}
+			}
+		},
+		"/breed/{id}/dogs": {
+			"summary": "Dogs associated with breed",
+			"get": {
+				"tags": ["Breeds"],
+				"summary": "Get a list of dogs associated with breed",
+				"responses": {
+					"200": {
+						"description": "A list of dogs",
+						"content": {
+							"application/json": {
+								"schema": { "$ref": "./breeds.json#/definitions/breedDogs" }
+							}
+						}
+					},
+					"404": {
+						"$ref": "#/components/responses/notFoundError"
+					}
+				}
+			}
+		},
 		"/": {
 			"description": "API root",
 			"get": {
@@ -468,13 +623,7 @@
 						"required": false,
 						"schema": {
 							"type": "string",
-							"enum": [
-								"id",
-								"name",
-								"description",
-								"age",
-								"gender"
-							]
+							"enum": ["id", "name", "description", "age", "gender"]
 						},
 						"example": "age"
 					},
