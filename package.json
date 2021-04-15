@@ -6,6 +6,7 @@
 	"scripts": {
 		"test": "jest",
 		"test:watch": "jest --watch",
+		"test:coverage": "jest --coverage",
 		"start": "node index.js",
 		"debug": "nodemon --inspect index.js",
 		"docs": "jsdoc -c jsdoc.conf.json",
