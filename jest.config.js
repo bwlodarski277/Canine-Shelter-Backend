@@ -1,6 +1,6 @@
 'use strict';
 
 module.exports = {
-	globalSetup: './tests/jestSetup.js',
-	globalTeardown: './tests/jestTeardown.js'
+	globalSetup: './tests/_jestSetup.js',
+	globalTeardown: './tests/_jestTeardown.js'
 };
