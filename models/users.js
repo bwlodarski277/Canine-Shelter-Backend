@@ -79,6 +79,29 @@ exports.getById = async (id, select) => {
 };
 
 /**
+ * Gets a single user from the DB by their username.
+ * @param {string} username username of user to fetch.
+ * @param {string} provider provider to check for username.
+ * @returns {Promise<User>} object containing the user's record.
+ * @async
+ */
+exports.getByUsername = async (username, provider = 'local') => {
+	const [data] = await run(async () => await db('users').where({ username, provider }));
+	return data;
+};
+
+/**
+ * Get a single user from the DB by their email address.
+ * @param {string} email email address to search by.
+ * @returns {Promise<User>} object containing the user's record.
+ * @async
+ */
+exports.getByEmail = async email => {
+	const [data] = await run(async () => await db('users').where({ email }));
+	return data;
+};
+
+/**
  * Creates a new user entry in the DB.
  * @param {User} user user data to pass to the DB.
  * @returns {Promise<number>} ID of the newly inserted row.

@@ -10,11 +10,20 @@ const Router = require('koa-router');
 const bodyParser = require('koa-bodyparser');
 const jwtHelper = require('../helpers/jwt');
 
-const { basic, google } = require('../controllers/auth');
+const { auth, basic, google } = require('../controllers/auth');
 const { config } = require('../config');
 
 const router = new Router({ prefix: '/api/v1/auth' });
 router.use(bodyParser());
+
+/**
+ * Gets the current user's ID.
+ * @param {object} ctx context passed from Koa.
+ */
+const login = async ctx => {
+	const { id } = ctx.state.user;
+	ctx.body = { id };
+};
 
 /**
  * Login route which generates a JWT token. Requires authentication.
@@ -55,6 +64,7 @@ const googleCallback = async ctx => {
 	ctx.body = { access, refresh };
 };
 
+router.get('/login', auth, login);
 router.get('/jwt', basic, getJWT);
 router.post('/jwt/refresh', refresh);
 router.get('/google', google);

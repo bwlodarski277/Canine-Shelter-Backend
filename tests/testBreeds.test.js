@@ -4,8 +4,8 @@ const request = require('supertest');
 const app = require('../app').callback();
 
 beforeAll(() => {
-	// jest.spyOn(console, 'log').mockImplementation(() => {});
-	// jest.spyOn(console, 'error').mockImplementation(() => {});
+	jest.spyOn(console, 'log').mockImplementation(() => {});
+	jest.spyOn(console, 'error').mockImplementation(() => {});
 });
 
 afterAll(() => {

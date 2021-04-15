@@ -15,7 +15,7 @@ const { dog, dogBreed, dogLocation } = require('../schemas/dogs.json').definitio
 const { location, chat, message } = require('../schemas/locations.json').definitions;
 
 const { staff } = require('../schemas/staff.json').definitions;
-const { user, favourite } = require('../schemas/users.json').definitions;
+const { user, favourite, userUpdate } = require('../schemas/users.json').definitions;
 
 /**
  * Creates a validator middleware for Koa.
@@ -62,4 +62,5 @@ exports.validateChat = makeValidator(chat);
 exports.validateMessage = makeValidator(message);
 exports.validateStaff = makeValidator(staff);
 exports.validateUser = makeValidator(user);
+exports.validateUserUpdate = makeValidator(userUpdate);
 exports.validateFavourite = makeValidator(favourite);

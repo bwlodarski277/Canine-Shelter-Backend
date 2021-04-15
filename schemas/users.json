@@ -7,6 +7,12 @@
 			"description": "Data to register a new user",
 			"type": "object",
 			"properties": {
+				"staffKey": {
+					"description": "Key for signing up staff",
+					"type": "string",
+					"minLength": 32,
+					"maxLength": 32
+				},
 				"username": {
 					"description": "Unique username",
 					"type": "string",
@@ -45,7 +51,54 @@
 					"examples": ["https://picsum.photos/200"]
 				}
 			},
-			"required": ["username", "email", "password"]
+			"required": ["username", "email", "password"],
+			"additionalProperties": false
+		},
+		"userUpdate": {
+			"$id": "#userUpdate",
+			"title": "User",
+			"description": "Data to update a user",
+			"type": "object",
+			"properties": {
+				"username": {
+					"description": "Unique username",
+					"type": "string",
+					"minLength": 4,
+					"maxLength": 32,
+					"examples": ["userName"]
+				},
+				"email": {
+					"description": "User email address",
+					"type": "string",
+					"format": "email"
+				},
+				"password": {
+					"description": "User's password of choice",
+					"type": "string",
+					"minLength": 8,
+					"maxLength": 72,
+					"examples": ["password"]
+				},
+				"firstName": {
+					"description": "User's first name",
+					"type": "string",
+					"maxLength": 32,
+					"examples": ["John"]
+				},
+				"lastName": {
+					"description": "User's last name",
+					"type": "string",
+					"maxLength": 32,
+					"examples": ["Doe"]
+				},
+				"imageUrl": {
+					"description": "Link to the user's profile picture",
+					"type": "string",
+					"pattern": "uri",
+					"examples": ["https://picsum.photos/200"]
+				}
+			},
+			"additionalProperties": false
 		},
 		"userData": {
 			"$id": "#userData",
@@ -174,12 +227,6 @@
 			"description": "Data to register a new favourite",
 			"type": "object",
 			"properties": {
-				"userId": {
-					"description": "ID of the user favouriting a dog",
-					"type": "integer",
-					"minimum": 1,
-					"examples": [4]
-				},
 				"dogId": {
 					"description": "ID of the dog the user is favouriting",
 					"type": "integer",
@@ -187,7 +234,7 @@
 					"examples": [2]
 				}
 			},
-			"required": ["userId", "dogId"]
+			"required": ["dogId"]
 		},
 		"favouriteData": {
 			"$id": "#favouriteData",
