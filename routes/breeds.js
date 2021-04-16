@@ -18,7 +18,9 @@ const can = require('../permissions/breeds');
 
 const { validateBreed } = require('../controllers/validation');
 
-const router = new Router({ prefix: '/api/v1/breeds' });
+const prefix = '/api/v1/breeds';
+const router = new Router({ prefix });
+
 router.use(bodyParser());
 
 /**
@@ -28,7 +30,7 @@ router.use(bodyParser());
 const getAll = async ctx => {
 	let {
 		query = '',
-		select = ['*'],
+		select = [],
 		page = 1,
 		limit = 10,
 		order = 'id',
@@ -37,18 +39,31 @@ const getAll = async ctx => {
 	limit = clamp(limit, 1, 20); // Clamping the limit to be between 1 and 20.
 	direction = direction === 'desc' ? 'desc' : 'asc';
 	if (!Array.isArray(select)) select = Array(select);
-	try {
-		ctx.body = await breedModel.getAll(query, select, page, limit, order, direction);
-	} catch (err) {
-		ctx.status = 400;
-		ctx.body = err;
-	}
+	let breeds = await breedModel.getAll(query, page, limit, order, direction);
+	breeds = breeds.map(breed => {
+		// Selecting fields the user wants
+		const partial = { id: breed.id };
+		select.map(field => (partial[field] = breed[field]));
+		const self = `${ctx.protocol}://${ctx.host}${prefix}/${partial.id}`;
+		partial.links = {
+			self: self,
+			dogs: `${self}/dogs`
+		};
+		return partial;
+	});
+	ctx.body = breeds;
 };
 
 const getDogs = async ctx => {
 	const breedId = ctx.params.id;
-	const dogs = await dogBreedModel.getByBreedId(breedId);
-	if (dogs.length) ctx.body = dogs;
+	let dogs = await dogBreedModel.getByBreedId(breedId);
+	const breed = await breedModel.getById(breedId);
+	if (breed) {
+		dogs = dogs.map(
+			dog => (dog.links = { dog: `${ctx.protocol}://${ctx.host}/dogs/${dog.id}` })
+		);
+		ctx.body = dogs;
+	}
 };
 
 /**
@@ -57,8 +72,24 @@ const getDogs = async ctx => {
  */
 const getBreed = async ctx => {
 	const breedId = ctx.params.id;
+	let { select = [] } = ctx.request.query;
+	if (!Array.isArray(select)) select = Array(select);
 	const breed = await breedModel.getById(breedId);
-	if (breed) ctx.body = breed;
+	if (breed) {
+		// Selecting fields the user wants
+		let partial;
+		// If nothing is selected, return everything
+		if (select.length === 0) partial = breed;
+		else {
+			partial = { id: breed.id };
+			select.map(field => (partial[field] = breed[field]));
+		}
+		const self = `${ctx.protocol}://${ctx.host}${prefix}/${partial.id}`;
+		partial.links = {
+			dogs: `${self}/dogs`
+		};
+		ctx.body = partial;
+	}
 };
 
 /**

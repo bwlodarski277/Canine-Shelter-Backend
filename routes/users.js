@@ -26,7 +26,9 @@ const {
 const can = require('../permissions/users');
 const { clamp } = require('../helpers/utils');
 
-const router = new Router({ prefix: '/api/v1/users' });
+const prefix = '/api/v1/users';
+const router = new Router({ prefix });
+
 router.use(bodyParser());
 
 /**
@@ -50,14 +52,22 @@ const getAll = async ctx => {
 	limit = clamp(limit, 1, 20); // Clamping the limit to be between 1 and 20.
 	direction = direction === 'desc' ? 'desc' : 'asc';
 	if (!Array.isArray(select)) select = Array(select);
-	try {
-		let users = await userModel.getAll(query, select, page, limit, order, direction);
-		users = users.map(user => permission.filter(user));
-		ctx.body = users;
-	} catch (err) {
-		ctx.status = 400;
-		ctx.body = err;
-	}
+	let users = await userModel.getAll(query, page, limit, order, direction);
+	users = users.map(user => {
+		// filtering out fields the user can't see
+		user = permission.filter(user);
+		// Selecting fields the user wants]
+		const partial = { id: user.id };
+		select.map(field => (partial[field] = user[field]));
+		const self = `${ctx.protocol}://${ctx.host}${prefix}/${partial.id}`;
+		partial.links = {
+			self: self,
+			favourites: `${self}/favourites`,
+			chats: `${self}/chats`
+		};
+		return partial;
+	});
+	ctx.body = users;
 };
 
 /**
@@ -68,21 +78,30 @@ const getUser = async ctx => {
 	const id = parseInt(ctx.params.id);
 	let { select = [] } = ctx.request.query;
 	if (!Array.isArray(select)) select = Array(select);
-	try {
-		let user = await userModel.getById(id, select);
-		if (user) {
-			const { id: userId, role } = ctx.state.user;
-			const permission = await can.user.get(role, userId, id);
-			if (!permission.granted) {
-				ctx.status = 403;
-				return;
-			}
-			user = permission.filter(user);
-			ctx.body = user;
+	let user = await userModel.getById(id);
+	if (user) {
+		const { id: userId, role } = ctx.state.user;
+		const permission = await can.user.get(role, userId, id);
+		if (!permission.granted) {
+			ctx.status = 403;
+			return;
 		}
-	} catch (err) {
-		ctx.status = 400;
-		ctx.body = err;
+		// filtering out fields the user can't see
+		user = permission.filter(user);
+		// Selecting fields the user wants
+		let partial;
+		// If nothing is selected, return everything
+		if (select.length === 0) partial = user;
+		else {
+			partial = { id: user.id };
+			select.map(field => (partial[field] = user[field]));
+		}
+		const self = `${ctx.protocol}://${ctx.host}${prefix}/${partial.id}`;
+		partial.links = {
+			favourites: `${self}/favourites`,
+			chats: `${self}/chats`
+		};
+		ctx.body = partial;
 	}
 };
 
@@ -121,7 +140,7 @@ const createUser = async ctx => {
 const updateUser = async ctx => {
 	const { id: userId, role } = ctx.state.user;
 	const id = parseInt(ctx.params.id);
-	const user = await userModel.getById(id, []);
+	const user = await userModel.getById(id);
 	if (user) {
 		const permission = await can.user.modify(role, userId, id);
 		if (!permission.granted) {
@@ -141,7 +160,7 @@ const updateUser = async ctx => {
 const deleteUser = async ctx => {
 	const id = parseInt(ctx.params.id);
 	const { id: userId, role } = ctx.state.user;
-	const user = await userModel.getById(id, []);
+	const user = await userModel.getById(id);
 	if (user) {
 		const permission = await can.user.delete(role, userId, id);
 		if (!permission.granted) {
@@ -160,7 +179,7 @@ const deleteUser = async ctx => {
 const getUserFavs = async ctx => {
 	const id = parseInt(ctx.params.id);
 	const { id: userId, role } = ctx.state.user;
-	const user = await userModel.getById(id, []);
+	const user = await userModel.getById(id);
 	if (user) {
 		const permission = await can.favourite.get(role, userId, id);
 		if (!permission.granted) {
@@ -180,14 +199,14 @@ const addUserFav = async ctx => {
 	const id = parseInt(ctx.params.id);
 	const { id: userId, role } = ctx.state.user;
 	const { dogId } = ctx.request.body;
-	const user = await userModel.getById(id, []);
+	const user = await userModel.getById(id);
 	if (user) {
 		const permission = await can.favourite.create(role, userId, id);
 		if (!permission.granted) {
 			ctx.status = 403;
 			return;
 		}
-		const dog = await dogModel.getById(dogId, []);
+		const dog = await dogModel.getById(dogId);
 		if (dog) {
 			let favs = await favsModel.getByUserId(id);
 			favs = favs.filter(fav => fav.dogId === dogId);
@@ -219,7 +238,7 @@ const getUserFav = async ctx => {
 	id = parseInt(id);
 	favId = parseInt(favId);
 	const { id: userId, role } = ctx.state.user;
-	const user = await userModel.getById(id, []);
+	const user = await userModel.getById(id);
 	if (user) {
 		const favourite = await favsModel.getSingleFav(favId);
 		if (favourite) {
@@ -242,7 +261,7 @@ const deleteUserFav = async ctx => {
 	id = parseInt(id);
 	favId = parseInt(favId);
 	const { id: userId, role } = ctx.state.user;
-	const user = await userModel.getById(id, []);
+	const user = await userModel.getById(id);
 	if (user) {
 		const favourite = await favsModel.getSingleFav(favId);
 		if (favourite) {
@@ -264,7 +283,7 @@ const deleteUserFav = async ctx => {
 const getUserChats = async ctx => {
 	const userId = parseInt(ctx.params.id);
 	const { id, role } = ctx.state.user;
-	const user = await userModel.getById(userId, []);
+	const user = await userModel.getById(userId);
 	if (user) {
 		const permission = await can.user.get(role, userId, id);
 		if (!permission.granted) {

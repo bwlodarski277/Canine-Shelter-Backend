@@ -40,6 +40,44 @@
 			"required": ["name"],
 			"additionalProperties": false
 		},
+		"dogUpdate": {
+			"$id": "#dogUpdate",
+			"title": "Dog Update",
+			"description": "Data to update a dog",
+			"type": "object",
+			"properties": {
+				"name": {
+					"description": "Dog name",
+					"type": "string",
+					"examples": ["Rex"],
+					"minLength": 3,
+					"maxLength": 32
+				},
+				"description": {
+					"description": "Description talking about the dog",
+					"type": "string",
+					"examples": ["A beautiful corgi"]
+				},
+				"age": {
+					"description": "Dog's age in years",
+					"type": "integer",
+					"examples": [5],
+					"minimum": 0
+				},
+				"gender": {
+					"description": "Dog's gender. 0 for female, 1 for male",
+					"type": "boolean",
+					"examples": [1]
+				},
+				"imageUrl": {
+					"description": "Path to a picture of the dog",
+					"type": "string",
+					"pattern": "uri",
+					"examples": ["https://picsum.photos/200"]
+				}
+			},
+			"additionalProperties": false
+		},
 		"dogData": {
 			"$id": "#dogData",
 			"title": "Dog data",
@@ -158,8 +196,7 @@
 					"description": "Indiactor of removal success",
 					"type": "boolean"
 				}
-			},
-			"additionalProperties": false
+			}
 		},
 		"dogBreed": {
 			"$id": "#dogBreed",
@@ -167,12 +204,6 @@
 			"description": "Data to assign a breed to a dog",
 			"type": "object",
 			"properties": {
-				"dogId": {
-					"description": "ID of dog linked to a breed",
-					"type": "integer",
-					"minimum": 1,
-					"examples": [2]
-				},
 				"breedId": {
 					"description": "Id of breed linked to a dog",
 					"type": "integer",
@@ -180,7 +211,8 @@
 					"examples": [1]
 				}
 			},
-			"required": ["dogId", "breedId"]
+			"required": ["breedId"],
+			"additionalProperties": false
 		},
 		"dogBreedData": {
 			"$id": "#dogBreedData",
@@ -269,20 +301,15 @@
 			"description": "Data to register a dog's location",
 			"type": "object",
 			"properties": {
-				"dogId": {
-					"description": "ID of dog to assign to a location",
-					"type": "integer",
-					"minimum": 1,
-					"examples": [2]
-				},
-				"breedId": {
+				"locationId": {
 					"description": "ID of location to assign to a dog",
 					"type": "integer",
 					"minimum": 1,
 					"examples": [5]
 				}
 			},
-			"required": ["dogId", "breedId"]
+			"required": ["locationId"],
+			"additionalProperties": false
 		},
 		"dogLocationData": {
 			"$id": "#dogLocationData",

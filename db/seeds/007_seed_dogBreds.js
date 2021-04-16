@@ -5,7 +5,8 @@ const Knex = require('knex');
 
 const dogBreeds = [
 	{ dogId: 1, breedId: 1 },
-	{ dogId: 2, breedId: 2 }
+	{ dogId: 2, breedId: 2 },
+	{ dogId: 9, breedId: 2 }
 ];
 
 /**

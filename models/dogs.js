@@ -21,11 +21,11 @@ const { db, run } = require('../helpers/database');
  * @property {string} imageUrl Dog image URL
  */
 
+//  * @param {Array<string>} select list of columns to select.
 /**
  * Get a list of dog entries from the DB.
  * Allows for searching, filtering and sorting.
  * @param {string} query search for dogs by name and description.
- * @param {Array<string>} select list of columns to select.
  * @param {number} page which page to get data from.
  * @param {number} limit number of items on a page.
  * @param {string} order what parameter to order by.
@@ -33,12 +33,12 @@ const { db, run } = require('../helpers/database');
  * @returns {Promise<Array<Dog>>} array of selected dog records.
  * @async
  */
-exports.getAll = async (query, select, page, limit, order, direction) => {
+exports.getAll = async (query, page, limit, order, direction) => {
 	const offset = (page - 1) * limit;
 	const data = await run(
 		async () =>
 			await db('dogs')
-				.select(...select)
+				// .select(...select)
 				// Safe as it is escaped by driver
 				.where('name', 'like', `%${query}%`)
 				.orWhere('description', 'like', `%${query}%`)
@@ -49,20 +49,15 @@ exports.getAll = async (query, select, page, limit, order, direction) => {
 	return data;
 };
 
+//  * @param {Array<string>} select list of columns to select.
 /**
  * Gets a single dog entry from the DB by their ID.
  * @param {number} id ID of the dog to fetch.
- * @param {Array<string>} select list of columns to select.
  * @returns {Promise<Dog>} object containing the dog's record.
  * @async
  */
-exports.getById = async (id, select) => {
-	const [data] = await run(
-		async () =>
-			await db('dogs')
-				.where({ id })
-				.select(...select)
-	);
+exports.getById = async id => {
+	const [data] = await run(async () => await db('dogs').where({ id }));
 	return data;
 };
 

@@ -16,12 +16,30 @@
 				"address": {
 					"description": "Location address",
 					"type": "string",
-					"examples": [
-						"Coventry Shelter\n,1 Sample Road,\nCoventry,\nCV1 5FB"
-					]
+					"examples": ["Coventry Shelter\n,1 Sample Road,\nCoventry,\nCV1 5FB"]
 				}
 			},
 			"required": ["name"],
+			"additionalProperties": false
+		},
+		"locationUpdate": {
+			"$id": "#locationUpdate",
+			"title": "Location Update",
+			"description": "Data to update a location",
+			"type": "object",
+			"properties": {
+				"name": {
+					"description": "Location name",
+					"type": "string",
+					"maxLength": 128,
+					"examples": ["Coventry Shelter"]
+				},
+				"address": {
+					"description": "Location address",
+					"type": "string",
+					"examples": ["Coventry Shelter\n,1 Sample Road,\nCoventry,\nCV1 5FB"]
+				}
+			},
 			"additionalProperties": false
 		},
 		"locationData": {
@@ -43,9 +61,7 @@
 				"address": {
 					"description": "Location address",
 					"type": "string",
-					"examples": [
-						"Coventry Shelter\n,1 Sample Road,\nCoventry,\nCV1 5FB"
-					]
+					"examples": ["Coventry Shelter\n,1 Sample Road,\nCoventry,\nCV1 5FB"]
 				}
 			}
 		},

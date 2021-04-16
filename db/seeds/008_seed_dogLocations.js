@@ -5,7 +5,10 @@ const Knex = require('knex');
 
 const dogLocations = [
 	{ dogId: 1, locationId: 1 },
-	{ dogId: 2, locationId: 3 }
+	{ dogId: 2, locationId: 3 },
+	{ dogId: 5, locationId: 1 },
+	{ dogId: 6, locationId: 2 },
+	{ dogId: 9, locationId: 1 }
 ];
 
 /**

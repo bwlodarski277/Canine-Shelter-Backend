@@ -234,7 +234,8 @@
 					"examples": [2]
 				}
 			},
-			"required": ["dogId"]
+			"required": ["dogId"],
+			"additionalProperties": false
 		},
 		"favouriteData": {
 			"$id": "#favouriteData",

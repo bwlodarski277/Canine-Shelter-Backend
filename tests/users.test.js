@@ -15,19 +15,19 @@ afterAll(() => {
 });
 
 describe('GET /users', () => {
-	it('Should not allow un-authenticated users', async () => {
+	it('should not allow un-authenticated users', async () => {
 		const res = await request(app).get('/api/v1/users');
 		expect(res.status).toBe(401);
 	});
 
-	it('Should not allow regular users', async () => {
+	it('should not allow regular users', async () => {
 		const res = await request(app)
 			.get('/api/v1/users')
 			.set({ Authorization: `Basic ${btoa('TestUser:userPass')}` });
 		expect(res.status).toBe(403);
 	});
 
-	it('Should allow staff to view users', async () => {
+	it('should allow staff to view users', async () => {
 		const res = await request(app)
 			.get('/api/v1/users')
 			.set({ Authorization: `Basic ${btoa('TestStaff:staffPass')}` });
@@ -37,7 +37,7 @@ describe('GET /users', () => {
 		res.body.map(user => expect(Object.keys(user)).not.toContain('password'));
 	});
 
-	it('Should choose sorting direction accordingly', async () => {
+	it('should choose sorting direction accordingly', async () => {
 		const res = await request(app)
 			.get('/api/v1/users')
 			.query({ direction: 'desc' })
@@ -47,64 +47,82 @@ describe('GET /users', () => {
 		expect(res.body[0]).toMatchObject({ id: 5 });
 	});
 
-	it('Should filter data correctly', async () => {
+	it('should filter data correctly', async () => {
 		const res = await request(app)
 			.get('/api/v1/users')
 			.query({ select: 'username' })
 			.set({ Authorization: `Basic ${btoa('TestStaff:staffPass')}` });
 		expect(res.status).toBe(200);
 		expect(res.body).toBeInstanceOf(Array);
-		// Making sure each item in users array only has username
-		res.body.map(user => expect(Object.keys(user)).toEqual(['username']));
+		res.body.map(user => expect(Object.keys(user)).toContain('username'));
+		res.body.map(user => expect(Object.keys(user)).not.toContain('email'));
 	});
 
-	it('Should handle invalid filters properly', async () => {
+	it('should handle invalid filters properly', async () => {
 		const res = await request(app)
 			.get('/api/v1/users')
 			.query({ select: 'invalid' })
 			.set({ Authorization: `Basic ${btoa('TestStaff:staffPass')}` });
-		expect(res.status).toEqual(400);
+		expect(res.status).toEqual(200);
+		res.body.map(user => expect(Object.keys(user)).not.toContain('invalid'));
 	});
 });
 
 describe('GET /users/{id}', () => {
-	it('Should not allow unauthorised users', async () => {
+	it('should not allow unauthorised users', async () => {
 		const res = await request(app).get('/api/v1/users/1');
 		expect(res.status).toEqual(401);
 	});
 
-	it('Should not allow users to view other user records', async () => {
+	it('should not allow users to view other user records', async () => {
 		const res = await request(app)
 			.get('/api/v1/users/2')
 			.set({ Authorization: `Basic ${btoa('TestUser:userPass')}` });
 		expect(res.status).toEqual(403);
 	});
 
-	it('Should allow users to view their own records', async () => {
+	it('should allow users to view their own records', async () => {
 		const res = await request(app)
 			.get('/api/v1/users/1')
 			.set({ Authorization: `Basic ${btoa('TestUser:userPass')}` });
 		expect(res.status).toEqual(200);
 		expect(res.body).toBeInstanceOf(Object);
-		expect(res.body).not.toContain('password');
+		expect(Object.keys(res.body)).not.toContain('password');
 	});
 
-	it('Should allow staff to access any records', async () => {
+	it('should allow staff to access any records', async () => {
 		const res = await request(app)
 			.get('/api/v1/users/1')
 			.set({ Authorization: `Basic ${btoa('TestStaff:staffPass')}` });
 		expect(res.status).toEqual(200);
 	});
 
-	it('Should handle filtering properly', async () => {
+	it('should handle no filters', async () => {
+		const res = await request(app)
+			.get('/api/v1/users/1')
+			.set({ Authorization: `Basic ${btoa('TestUser:userPass')}` });
+		expect(Object.keys(res.body)).toContain('username');
+	});
+
+	it('should handle valid filters', async () => {
+		const res = await request(app)
+			.get('/api/v1/users/1')
+			.query({ select: 'username' })
+			.set({ Authorization: `Basic ${btoa('TestUser:userPass')}` });
+		expect(Object.keys(res.body)).toContain('username');
+		expect(Object.keys(res.body)).not.toContain('email');
+	});
+
+	it('should handle invalid filters', async () => {
 		const res = await request(app)
 			.get('/api/v1/users/1')
 			.query({ select: 'invalid' })
 			.set({ Authorization: `Basic ${btoa('TestUser:userPass')}` });
-		expect(res.status).toEqual(400);
+		expect(res.status).toEqual(200);
+		expect(Object.keys(res.body)).not.toContain('invalid');
 	});
 
-	it('Should handle invalid users', async () => {
+	it('should handle invalid users', async () => {
 		const res = await request(app)
 			.get('/api/v1/users/100')
 			.set({ Authorization: `Basic ${btoa('TestStaff:staffPass')}` });
@@ -113,12 +131,12 @@ describe('GET /users/{id}', () => {
 });
 
 describe('GET /users/{id}/favourites', () => {
-	it('Should allow only authenticated users', async () => {
+	it('should allow only authenticated users', async () => {
 		const res = await request(app).get('/api/v1/users/1/favourites');
 		expect(res.status).toBe(401);
 	});
 
-	it('Should allow users to view their own', async () => {
+	it('should allow users to view their own', async () => {
 		const res = await request(app)
 			.get('/api/v1/users/1/favourites')
 			.set({ Authorization: `Basic ${btoa('TestUser:userPass')}` });
@@ -127,21 +145,21 @@ describe('GET /users/{id}/favourites', () => {
 		expect(res.body.length).toBe(1);
 	});
 
-	it('Should prevent users from viewing others', async () => {
+	it('should prevent users from viewing others', async () => {
 		const res = await request(app)
 			.get('/api/v1/users/2/favourites')
 			.set({ Authorization: `Basic ${btoa('TestUser:userPass')}` });
 		expect(res.status).toBe(403);
 	});
 
-	it('Should allow staff to view any record', async () => {
+	it('should allow staff to view any record', async () => {
 		const res = await request(app)
 			.get('/api/v1/users/1/favourites')
 			.set({ Authorization: `Basic ${btoa('TestStaff:staffPass')}` });
 		expect(res.status).toBe(200);
 	});
 
-	it('Should handle invalid user IDs', async () => {
+	it('should handle invalid user IDs', async () => {
 		const res = await request(app)
 			.get('/api/v1/users/100/favourites')
 			.set({ Authorization: `Basic ${btoa('TestStaff:staffPass')}` });
@@ -150,12 +168,12 @@ describe('GET /users/{id}/favourites', () => {
 });
 
 describe('GET /users/{id}/favourites/{favId}', () => {
-	it('Should allow only authenticated users', async () => {
+	it('should allow only authenticated users', async () => {
 		const res = await request(app).get('/api/v1/users/1/favourites/1');
 		expect(res.status).toBe(401);
 	});
 
-	it('Should allow users to view their own', async () => {
+	it('should allow users to view their own', async () => {
 		const res = await request(app)
 			.get('/api/v1/users/1/favourites/1')
 			.set({ Authorization: `Basic ${btoa('TestUser:userPass')}` });
@@ -163,21 +181,21 @@ describe('GET /users/{id}/favourites/{favId}', () => {
 		expect(res.body).toBeInstanceOf(Object);
 	});
 
-	it('Should prevent users from viewing others', async () => {
+	it('should prevent users from viewing others', async () => {
 		const res = await request(app)
 			.get('/api/v1/users/2/favourites/2')
 			.set({ Authorization: `Basic ${btoa('TestUser:userPass')}` });
 		expect(res.status).toBe(403);
 	});
 
-	it('Should allow staff to view any record', async () => {
+	it('should allow staff to view any record', async () => {
 		const res = await request(app)
 			.get('/api/v1/users/1/favourites/1')
 			.set({ Authorization: `Basic ${btoa('TestStaff:staffPass')}` });
 		expect(res.status).toBe(200);
 	});
 
-	it('Should handle invalid user IDs', async () => {
+	it('should handle invalid user IDs', async () => {
 		const res = await request(app)
 			.get('/api/v1/users/100/favourites/1')
 			.set({ Authorization: `Basic ${btoa('TestStaff:staffPass')}` });
@@ -190,12 +208,12 @@ describe('GET /users/{id}/favourites/{favId}', () => {
 });
 
 describe('GET /users/{id}/chats', () => {
-	it('Should allow only authenticated users', async () => {
+	it('should allow only authenticated users', async () => {
 		const res = await request(app).get('/api/v1/users/1/chats');
 		expect(res.status).toBe(401);
 	});
 
-	it('Should allow users to view their own', async () => {
+	it('should allow users to view their own', async () => {
 		const res = await request(app)
 			.get('/api/v1/users/1/chats')
 			.set({ Authorization: `Basic ${btoa('TestUser:userPass')}` });
@@ -203,14 +221,14 @@ describe('GET /users/{id}/chats', () => {
 		expect(res.body).toBeInstanceOf(Array);
 	});
 
-	it('Should prevent users from viewing others', async () => {
+	it('should prevent users from viewing others', async () => {
 		const res = await request(app)
 			.get('/api/v1/users/2/chats')
 			.set({ Authorization: `Basic ${btoa('TestUser:userPass')}` });
 		expect(res.status).toBe(403);
 	});
 
-	it('Should check if the user exists', async () => {
+	it('should check if the user exists', async () => {
 		const res = await request(app)
 			.get('/api/v1/users/100/chats')
 			.set({ Authorization: `Basic ${btoa('TestUser:userPass')}` });
@@ -219,7 +237,7 @@ describe('GET /users/{id}/chats', () => {
 });
 
 describe('POST /users', () => {
-	it('Should allow users to register', async () => {
+	it('should allow users to register', async () => {
 		const res = await request(app).post('/api/v1/users').send({
 			username: 'UnitTestUser',
 			email: 'unittest@email.com',
@@ -230,7 +248,7 @@ describe('POST /users', () => {
 		expect(res.status).toBe(201);
 	});
 
-	it('Should show an error if username is taken', async () => {
+	it('should show an error if username is taken', async () => {
 		const res = await request(app).post('/api/v1/users').send({
 			username: 'TestUser',
 			email: 'unittest1@email.com',
@@ -241,7 +259,7 @@ describe('POST /users', () => {
 		expect(res.status).toBe(400);
 	});
 
-	it('Should show an error if email is taken', async () => {
+	it('should show an error if email is taken', async () => {
 		const res = await request(app).post('/api/v1/users').send({
 			username: 'UnitTestUser2',
 			email: 'user1@example.com',
@@ -252,14 +270,14 @@ describe('POST /users', () => {
 		expect(res.status).toBe(400);
 	});
 
-	it('Should validate the schema properly', async () => {
+	it('should validate the schema properly', async () => {
 		const res = await request(app).post('/api/v1/users').send({
 			username: 'UnitTestUser'
 		});
 		expect(res.status).toBe(400);
 	});
 
-	it('Should allow users to register as staff', async () => {
+	it('should allow users to register as staff', async () => {
 		const res = await request(app).post('/api/v1/users').send({
 			username: 'UnitTestStaff',
 			email: 'staff22@test.com',
@@ -279,12 +297,12 @@ describe('POST /users', () => {
 });
 
 describe('POST /users/{id}/favourites', () => {
-	it('Should prevent unauthorised users from access', async () => {
+	it('should prevent unauthorised users from access', async () => {
 		const res = await request(app).post('/api/v1/users/1/favourites');
 		expect(res.status).toBe(401);
 	});
 
-	it('Should prevent users from adding favs to others', async () => {
+	it('should prevent users from adding favs to others', async () => {
 		const res = await request(app)
 			.post('/api/v1/users/2/favourites')
 			.set({ Authorization: `Basic ${btoa('TestUser:userPass')}` })
@@ -292,7 +310,7 @@ describe('POST /users/{id}/favourites', () => {
 		expect(res.status).toBe(403);
 	});
 
-	it('Should allow users to add their own favourites', async () => {
+	it('should allow users to add their own favourites', async () => {
 		const res = await request(app)
 			.post('/api/v1/users/1/favourites')
 			.set({ Authorization: `Basic ${btoa('TestUser:userPass')}` })
@@ -300,7 +318,7 @@ describe('POST /users/{id}/favourites', () => {
 		expect(res.status).toBe(201);
 	});
 
-	it('Should check if the user exists', async () => {
+	it('should check if the user exists', async () => {
 		const res = await request(app)
 			.post('/api/v1/users/100/favourites')
 			.set({ Authorization: `Basic ${btoa('TestUser:userPass')}` })
@@ -308,7 +326,7 @@ describe('POST /users/{id}/favourites', () => {
 		expect(res.status).toBe(404);
 	});
 
-	it('Should check if the dog exists', async () => {
+	it('should check if the dog exists', async () => {
 		const res = await request(app)
 			.post('/api/v1/users/1/favourites')
 			.set({ Authorization: `Basic ${btoa('TestUser:userPass')}` })
@@ -316,7 +334,7 @@ describe('POST /users/{id}/favourites', () => {
 		expect(res.status).toBe(400);
 	});
 
-	it('Should check if the dog is already a favourite', async () => {
+	it('should check if the dog is already a favourite', async () => {
 		const res = await request(app)
 			.post('/api/v1/users/1/favourites')
 			.set({ Authorization: `Basic ${btoa('TestUser:userPass')}` })
@@ -326,12 +344,12 @@ describe('POST /users/{id}/favourites', () => {
 });
 
 describe('PUT /users/{id}', () => {
-	it('Should prevent unauthorised users from access', async () => {
+	it('should prevent unauthorised users from access', async () => {
 		const res = await request(app).put('/api/v1/users/1');
 		expect(res.status).toBe(401);
 	});
 
-	it('Should allow users to only update their own profile', async () => {
+	it('should allow users to only update their own profile', async () => {
 		const res = await request(app)
 			.put('/api/v1/users/2')
 			.set({ Authorization: `Basic ${btoa('TestUser:userPass')}` })
@@ -339,7 +357,7 @@ describe('PUT /users/{id}', () => {
 		expect(res.status).toBe(403);
 	});
 
-	it('Should allow users to update their own record', async () => {
+	it('should allow users to update their own record', async () => {
 		const res = await request(app)
 			.put('/api/v1/users/1')
 			.set({ Authorization: `Basic ${btoa('TestUser:userPass')}` })
@@ -351,7 +369,7 @@ describe('PUT /users/{id}', () => {
 		expect(res2.body).toMatchObject({ firstName: 'Test2' });
 	});
 
-	it('Should allow users to only update themselves', async () => {
+	it('should allow users to only update themselves', async () => {
 		const res = await request(app)
 			.put('/api/v1/users/2')
 			.set({ Authorization: `Basic ${btoa('TestUser:userPass')}` })
@@ -359,7 +377,7 @@ describe('PUT /users/{id}', () => {
 		expect(res.status).toBe(403);
 	});
 
-	it('Should validate the data passed', async () => {
+	it('should validate the data passed', async () => {
 		const res = await request(app)
 			.put('/api/v1/users/1')
 			.set({ Authorization: `Basic ${btoa('TestUser:userPass')}` })
@@ -367,7 +385,7 @@ describe('PUT /users/{id}', () => {
 		expect(res.status).toBe(400);
 	});
 
-	it('Should check that the user exists', async () => {
+	it('should check that the user exists', async () => {
 		const res = await request(app)
 			.put('/api/v1/users/100')
 			.set({ Authorization: `Basic ${btoa('TestUser:userPass')}` })
@@ -377,19 +395,19 @@ describe('PUT /users/{id}', () => {
 });
 
 describe('DEL /users/{id}', () => {
-	it('Should prevent unauthorised users from access', async () => {
+	it('should prevent unauthorised users from access', async () => {
 		const res = await request(app).del('/api/v1/users/1');
 		expect(res.status).toBe(401);
 	});
 
-	it('Should prevent users from deleting other accounts', async () => {
+	it('should prevent users from deleting other accounts', async () => {
 		const res = await request(app)
 			.del('/api/v1/users/2')
 			.set({ Authorization: `Basic ${btoa('TestUser:userPass')}` });
 		expect(res.status).toBe(403);
 	});
 
-	it('Should delete the account properly', async () => {
+	it('should delete the account properly', async () => {
 		// Create account
 		const res = await request(app).post('/api/v1/users').send({
 			username: 'UserToDelete',
@@ -412,7 +430,7 @@ describe('DEL /users/{id}', () => {
 		expect(res3.status).toBe(404);
 	});
 
-	it('Should check if the user exists', async () => {
+	it('should check if the user exists', async () => {
 		const res = await request(app)
 			.del('/api/v1/users/100')
 			.set({ Authorization: `Basic ${btoa('TestStaff:staffPass')}` });
@@ -421,19 +439,19 @@ describe('DEL /users/{id}', () => {
 });
 
 describe('DEL /users/{id}/favourites/{favId}', () => {
-	it('Should prevent unauthorised users from deleting', async () => {
+	it('should prevent unauthorised users from deleting', async () => {
 		const res = await request(app).del('/api/v1/users/1/favourites/1');
 		expect(res.status).toBe(401);
 	});
 
-	it('Should prevent users from deleting other users favs', async () => {
+	it('should prevent users from deleting other users favs', async () => {
 		const res = await request(app)
 			.del('/api/v1/users/2/favourites/2')
 			.set({ Authorization: `Basic ${btoa('TestUser:userPass')}` });
 		expect(res.status).toBe(403);
 	});
 
-	it('Should delete the account properly', async () => {
+	it('should delete the account properly', async () => {
 		// Create favourite
 		const res = await request(app)
 			.post('/api/v1/users/1/favourites')
@@ -453,14 +471,14 @@ describe('DEL /users/{id}/favourites/{favId}', () => {
 		expect(res3.status).toBe(404);
 	});
 
-	it('Should check if the favourite exists', async () => {
+	it('should check if the favourite exists', async () => {
 		const res = await request(app)
 			.del('/api/v1/users/1/favourites/100')
 			.set({ Authorization: `Basic ${btoa('TestUser:userPass')}` });
 		expect(res.status).toBe(404);
 	});
 
-	it('Should check if the user exists', async () => {
+	it('should check if the user exists', async () => {
 		const res = await request(app)
 			.del('/api/v1/users/100/favourites/1')
 			.set({ Authorization: `Basic ${btoa('TestStaff:staffPass')}` });

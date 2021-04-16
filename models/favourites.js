@@ -58,7 +58,7 @@ exports.getFavCount = async dogId => {
 	const [data] = await run(
 		async () => await db('favourites').where({ dogId }).count('dogId', { as: 'count' })
 	);
-	return data;
+	return data.count;
 };
 
 /**

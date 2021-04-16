@@ -36,10 +36,10 @@ exports.findByUsername = async (username, provider = 'local') => {
 	return data;
 };
 
+//  * @param {Array<string>} select list of columns to select.
 /**
  * Gets all users from the DB.
  * @param {string} query search for users by username.
- * @param {Array<string>} select list of columns to select.
  * @param {number} page which page to get data from.
  * @param {number} limit number of items on a page.
  * @param {string} order what parameter to order by.
@@ -47,12 +47,12 @@ exports.findByUsername = async (username, provider = 'local') => {
  * @returns {Promise<Array<User>>} list of users in the DB.
  * @async
  */
-exports.getAll = async (query, select, page, limit, order, direction) => {
+exports.getAll = async (query, page, limit, order, direction) => {
 	const offset = (page - 1) * limit;
 	const data = await run(
 		async () =>
 			await db('users')
-				.select(...select)
+				// .select(...select)
 				.where('username', 'like', `%${query}%`)
 				.orderBy(order, direction)
 				.limit(limit)
@@ -61,20 +61,16 @@ exports.getAll = async (query, select, page, limit, order, direction) => {
 	return data;
 };
 
+// * @param {Array<string>} select list of columns to select.
 /**
  * Gets a single user from the DB by their ID.
  * @param {number} id ID of user to fetch.
- * @param {Array<string>} select list of columns to select.
  * @returns {Promise<User>} object containing the user's record.
  * @async
  */
-exports.getById = async (id, select) => {
-	const [data] = await run(
-		async () =>
-			await db('users')
-				.where({ id })
-				.select(...select)
-	);
+exports.getById = async id => {
+	const [data] = await run(async () => await db('users').where({ id }));
+	// .select(...select)
 	return data;
 };
 
