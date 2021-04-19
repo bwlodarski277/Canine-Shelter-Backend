@@ -11,10 +11,10 @@
 		"debug": "nodemon --inspect index.js",
 		"docs": "jsdoc -c jsdoc.conf.json",
 		"linter": "./node_modules/.bin/eslint --fix .",
-		"knex_migrate": "knex migrate:latest",
-		"knex_rollback": "knex migrate:rollback --all",
-		"knex_seed": "knex seed:run",
-		"refresh": "npm run knex_rollback && npm run knex_migrate && npm run knex_seed"
+		"db:migrate": "knex migrate:latest",
+		"db:rollback": "knex migrate:rollback --all",
+		"db:seed": "knex seed:run",
+		"db:refresh": "npm run db:rollback && npm run db:migrate && npm run db:seed"
 	},
 	"repository": {
 		"type": "git",
@@ -38,6 +38,7 @@
 		"ajv-formats": "^1.5.1",
 		"bcrypt": "^5.0.0",
 		"dotenv": "^8.2.0",
+		"etag": "^1.8.1",
 		"jsonwebtoken": "^8.5.1",
 		"knex": "^0.21.17",
 		"koa": "^2.13.1",
