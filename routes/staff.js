@@ -16,6 +16,7 @@ const { auth } = require('../controllers/auth');
 const can = require('../permissions/staff');
 
 const { validateStaff, validateStaffUpdate } = require('../controllers/validation');
+const { ifNoneMatch, ifModifiedSince } = require('../helpers/caching');
 
 const prefix = '/api/v1/staff';
 const router = new Router({ prefix });
@@ -25,7 +26,7 @@ router.use(bodyParser());
  * Gets all staff members from the database.
  * @param {object} ctx Koa context
  */
-const getAll = async ctx => {
+const getAll = async (ctx, next) => {
 	const { role } = ctx.state.user;
 	const permission = await can.read(role);
 	if (!permission.granted) {
@@ -42,6 +43,7 @@ const getAll = async ctx => {
 		return staff;
 	});
 	ctx.body = staffList;
+	return next();
 };
 
 /**
@@ -79,7 +81,7 @@ const createStaff = async ctx => {
  * @param {object} ctx Koa context
  * @returns
  */
-const getStaff = async ctx => {
+const getStaff = async (ctx, next) => {
 	const id = ctx.params.id;
 	const { role } = ctx.state.user;
 	const permission = await can.read(role);
@@ -95,6 +97,7 @@ const getStaff = async ctx => {
 			location: `${ctx.protocol}://${ctx.host}/api/v1/locations/${staff.locationId}`
 		};
 		ctx.body = staff;
+		return next();
 	}
 };
 
@@ -141,10 +144,10 @@ const deleteStaff = async ctx => {
 	}
 };
 
-router.get('/', auth, getAll);
+router.get('/', auth, getAll, ifNoneMatch);
 router.post('/', auth, validateStaff, createStaff);
 
-router.get('/:id([0-9]+)', auth, getStaff);
+router.get('/:id([0-9]+)', auth, getStaff, ifModifiedSince);
 router.put('/:id([0-9]+)', auth, validateStaffUpdate, updateStaff);
 router.del('/:id([0-9]+)', auth, deleteStaff);
 

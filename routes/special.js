@@ -7,11 +7,12 @@
  */
 
 const Router = require('koa-router');
+const { ifNoneMatch } = require('../helpers/caching');
 
 const prefix = '/api/v1';
 const router = new Router({ prefix });
 
-const welcome = async ctx => {
+const welcome = async (ctx, next) => {
 	const links = {
 		breeds: `${ctx.protocol}://${ctx.host}${prefix}/breeds`,
 		dogs: `${ctx.protocol}://${ctx.host}${prefix}/dogs`,
@@ -21,8 +22,9 @@ const welcome = async ctx => {
 	};
 	const data = { message: 'The Canine Shelter API', links };
 	ctx.body = data;
+	return next();
 };
 
-router.get('/', welcome);
+router.get('/', welcome, ifNoneMatch);
 
 module.exports = router;

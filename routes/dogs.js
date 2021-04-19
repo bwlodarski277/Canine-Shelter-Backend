@@ -25,6 +25,7 @@ const can = require('../permissions/dogs');
 
 const { auth } = require('../controllers/auth');
 const { clamp } = require('../helpers/utils');
+const { ifModifiedSince, ifNoneMatch } = require('../helpers/caching');
 
 const prefix = '/api/v1/dogs';
 const router = new Router({ prefix });
@@ -35,7 +36,7 @@ router.use(bodyParser());
  * Gets all the dogs from the database.
  * @param {object} ctx context passed from Koa.
  */
-const getAll = async ctx => {
+const getAll = async (ctx, next) => {
 	let {
 		query = '',
 		select = [],
@@ -62,13 +63,15 @@ const getAll = async ctx => {
 		return partial;
 	});
 	ctx.body = dogs;
+	return next();
 };
 
 /**
  * Gets a single dog from the database by ID.
- * @param {object} ctx context passed from Koa.
+ * @param {object} ctx Koa object passed by previous middleware
+ * @param {function} next next function to call in the middleware chain
  */
-const getDog = async ctx => {
+const getDog = async (ctx, next) => {
 	const id = ctx.params.id;
 	let { select = [] } = ctx.request.query;
 	if (!Array.isArray(select)) select = Array(select);
@@ -78,7 +81,7 @@ const getDog = async ctx => {
 		// If nothing is selected, return everything
 		if (select.length === 0) partial = dog;
 		else {
-			partial = { id: dog.id };
+			partial = { id: dog.id, modified: dog.modified };
 			select.map(field => (partial[field] = dog[field]));
 		}
 		const self = `${ctx.protocol}://${ctx.host}${prefix}/${id}`;
@@ -89,6 +92,7 @@ const getDog = async ctx => {
 			favourites: `${self}/favourites`
 		};
 		ctx.body = partial;
+		return next();
 	}
 };
 
@@ -165,15 +169,17 @@ const deleteDog = async ctx => {
 
 /**
  * Gets a dog's breed by the dog ID.
- * @param {object} ctx context passed from Koa.
+ * @param {object} ctx Koa object passed by previous middleware
+ * @param {function} next next function to call in the middleware chain
  */
-const getDogBreed = async ctx => {
+const getDogBreed = async (ctx, next) => {
 	const id = ctx.params.id;
 	const dogBreed = await dogBreedModel.getByDogId(id);
 	if (dogBreed) {
 		const breed = `${ctx.protocol}://${ctx.host}/api/v1/breeds/${dogBreed.breedId}`;
 		dogBreed.links = { breed };
 		ctx.body = dogBreed;
+		return next();
 	}
 };
 
@@ -239,7 +245,7 @@ const updateDogBreed = async ctx => {
  * Deletes a dog's breed from the database.
  * @param {object} ctx context passed from Koa.
  */
-const deleteDogBreed = async ctx => {
+const deleteDogBreed = async (ctx, next) => {
 	const dogId = parseInt(ctx.params.id);
 	const dog = await dogModel.getById(dogId);
 	if (dog) {
@@ -261,20 +267,23 @@ const deleteDogBreed = async ctx => {
 		}
 		await dogBreedModel.delete(dogId);
 		ctx.body = { id: dogId, deleted: true };
+		return next();
 	}
 };
 
 /**
  * Gets a dog's location by the dog's ID.
- * @param {object} ctx context passed from Koa.
+ * @param {object} ctx Koa object passed by previous middleware
+ * @param {function} next next function to call in the middleware chain
  */
-const getDogLocation = async ctx => {
+const getDogLocation = async (ctx, next) => {
 	const dogId = ctx.params.id;
 	const dogLocation = await dogLocationModel.getByDogId(dogId);
 	if (dogLocation) {
-		const location = `${ctx.protocol}://${ctx.host}/api/v1/breeds/${dogLocation.locationId}`;
+		const location = `${ctx.protocol}://${ctx.host}/api/v1/locations/${dogLocation.locationId}`;
 		dogLocation.links = { location };
 		ctx.body = dogLocation;
+		return next();
 	}
 };
 
@@ -372,32 +381,33 @@ const deleteDogLocation = async ctx => {
  * Gets the number of favourites a dog has.
  * @param {object} ctx context passed from Koa.
  */
-const getFavourites = async ctx => {
+const getFavourites = async (ctx, next) => {
 	const id = ctx.params.id;
 	const dog = await dogModel.getById(id);
 	if (dog) {
 		const count = await favouritesModel.getFavCount(id);
 		ctx.body = { count };
+		return next();
 	}
 };
 
-router.get('/', getAll);
+router.get('/', getAll, ifNoneMatch);
 router.post('/', auth, validateDog, addDog);
 
-router.get('/:id([0-9]+)', getDog);
+router.get('/:id([0-9]+)', getDog, ifModifiedSince);
 router.put('/:id([0-9]+)', auth, validateDogUpdate, updateDog);
 router.del('/:id([0-9]+)', auth, deleteDog);
 
-router.get('/:id([0-9]+)/breed', getDogBreed);
+router.get('/:id([0-9]+)/breed', getDogBreed, ifModifiedSince);
 router.post('/:id([0-9]+)/breed', auth, validateDogBreed, addDogBreed);
 router.put('/:id([0-9]+)/breed', auth, validateDogBreed, updateDogBreed);
 router.del('/:id([0-9]+)/breed', auth, deleteDogBreed);
 
-router.get('/:id([0-9]+)/location', getDogLocation);
+router.get('/:id([0-9]+)/location', getDogLocation, ifModifiedSince);
 router.post('/:id([0-9]+)/location', auth, validateDogLocation, addDogLocation);
 router.put('/:id([0-9]+)/location', auth, validateDogLocation, updateDogLocation);
 router.del('/:id([0-9]+)/location', auth, deleteDogLocation);
 
-router.get('/:id([0-9]+)/favourites', getFavourites);
+router.get('/:id([0-9]+)/favourites', getFavourites, ifNoneMatch);
 
 module.exports = router;

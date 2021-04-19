@@ -6,5 +6,6 @@ CREATE TABLE `dogs` (
     `gender` bool,
     `dateCreated` datetime DEFAULT CURRENT_TIMESTAMP,
     `dateModified` datetime ON UPDATE CURRENT_TIMESTAMP,
-    `imageUrl` varchar(2048)
+    `imageUrl` varchar(2048),
+    `modified` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );

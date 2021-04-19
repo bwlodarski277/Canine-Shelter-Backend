@@ -25,6 +25,7 @@ const {
 
 const can = require('../permissions/users');
 const { clamp } = require('../helpers/utils');
+const { ifNoneMatch, ifModifiedSince } = require('../helpers/caching');
 
 const prefix = '/api/v1/users';
 const router = new Router({ prefix });
@@ -35,7 +36,7 @@ router.use(bodyParser());
  * Gets all the users from the database.
  * @param {object} ctx context passed from Koa.
  */
-const getAll = async ctx => {
+const getAll = async (ctx, next) => {
 	const permission = await can.user.getAll(ctx.state.user);
 	if (!permission.granted) {
 		ctx.status = 403;
@@ -68,13 +69,14 @@ const getAll = async ctx => {
 		return partial;
 	});
 	ctx.body = users;
+	return next();
 };
 
 /**
  * Gets a single user from the database.
  * @param {object} ctx context passed from Koa.
  */
-const getUser = async ctx => {
+const getUser = async (ctx, next) => {
 	const id = parseInt(ctx.params.id);
 	let { select = [] } = ctx.request.query;
 	if (!Array.isArray(select)) select = Array(select);
@@ -102,6 +104,7 @@ const getUser = async ctx => {
 			chats: `${self}/chats`
 		};
 		ctx.body = partial;
+		return next();
 	}
 };
 
@@ -184,7 +187,7 @@ const deleteUser = async ctx => {
  * Gets a user's favourites.
  * @param {object} ctx context passed from Koa.
  */
-const getUserFavs = async ctx => {
+const getUserFavs = async (ctx, next) => {
 	const id = parseInt(ctx.params.id);
 	const { id: userId, role } = ctx.state.user;
 	const user = await userModel.getById(id);
@@ -194,8 +197,16 @@ const getUserFavs = async ctx => {
 			ctx.status = 403;
 			return;
 		}
-		const favourites = await favsModel.getByUserId(id);
+		let favourites = await favsModel.getByUserId(id);
+		favourites = favourites.map(favourite => {
+			favourite.links = {
+				self: `${ctx.protocol}://${ctx.host}${prefix}/${id}/favourites/${favourite.id}`,
+				dog: `${ctx.protocol}://${ctx.host}/api/v1/dogs/${favourite.dogId}`
+			};
+			return favourite;
+		});
 		ctx.body = favourites;
+		return next();
 	}
 };
 
@@ -241,7 +252,7 @@ const addUserFav = async ctx => {
  * Gets a user's favourite from the database by dog ID.
  * @param {object} ctx context passed from Koa.
  */
-const getUserFav = async ctx => {
+const getUserFav = async (ctx, next) => {
 	let { id, favId } = ctx.params;
 	id = parseInt(id);
 	favId = parseInt(favId);
@@ -255,7 +266,12 @@ const getUserFav = async ctx => {
 				ctx.status = 403;
 				return;
 			}
+			favourite.links = {
+				self: `${ctx.protocol}://${ctx.host}${prefix}/${id}/favourites/${favourite.id}`,
+				dog: `${ctx.protocol}://${ctx.host}/api/v1/dogs/${favourite.dogId}`
+			};
 			ctx.body = favourite;
+			return next();
 		}
 	}
 };
@@ -288,7 +304,7 @@ const deleteUserFav = async ctx => {
  * Gets a user's chats by their ID.
  * @param {object} ctx context passed from koa.
  */
-const getUserChats = async ctx => {
+const getUserChats = async (ctx, next) => {
 	const userId = parseInt(ctx.params.id);
 	const { id, role } = ctx.state.user;
 	const user = await userModel.getById(userId);
@@ -300,22 +316,23 @@ const getUserChats = async ctx => {
 		}
 		const chats = await chatModel.getByUserId(userId);
 		ctx.body = chats;
+		return next();
 	}
 };
 
-router.get('/', auth, getAll);
+router.get('/', auth, getAll, ifNoneMatch);
 router.post('/', validateUser, createUser);
 
-router.get('/:id([0-9]+)', auth, getUser);
+router.get('/:id([0-9]+)', auth, getUser, ifModifiedSince);
 router.put('/:id([0-9]+)', auth, validateUserUpdate, updateUser);
 router.del('/:id([0-9]+)', auth, deleteUser);
 
-router.get('/:id([0-9]+)/favourites', auth, getUserFavs);
+router.get('/:id([0-9]+)/favourites', auth, getUserFavs, ifNoneMatch);
 router.post('/:id([0-9]+)/favourites', auth, validateFavourite, addUserFav);
 
-router.get('/:id([0-9]+)/favourites/:favId([0-9]+)', auth, getUserFav);
+router.get('/:id([0-9]+)/favourites/:favId([0-9]+)', auth, getUserFav, ifNoneMatch);
 router.del('/:id([0-9]+)/favourites/:favId([0-9]+)', auth, deleteUserFav);
 
-router.get('/:id([0-9]+)/chats', auth, getUserChats);
+router.get('/:id([0-9]+)/chats', auth, getUserChats, ifNoneMatch);
 
 module.exports = router;

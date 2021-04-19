@@ -15,6 +15,7 @@ const dogBreedModel = require('../models/dogBreeds');
 const { auth } = require('../controllers/auth');
 const { clamp } = require('../helpers/utils');
 const can = require('../permissions/breeds');
+const { ifModifiedSince, ifNoneMatch } = require('../helpers/caching');
 
 const { validateBreed } = require('../controllers/validation');
 
@@ -27,7 +28,7 @@ router.use(bodyParser());
  * Gets all the breeds from the database.
  * @param {object} ctx context passed from Koa.
  */
-const getAll = async ctx => {
+const getAll = async (ctx, next) => {
 	let {
 		query = '',
 		select = [],
@@ -52,9 +53,10 @@ const getAll = async ctx => {
 		return partial;
 	});
 	ctx.body = breeds;
+	return next();
 };
 
-const getDogs = async ctx => {
+const getDogs = async (ctx, next) => {
 	const breedId = ctx.params.id;
 	const breed = await breedModel.getById(breedId);
 	if (breed) {
@@ -64,6 +66,7 @@ const getDogs = async ctx => {
 			return dog;
 		});
 		ctx.body = dogs;
+		return next();
 	}
 };
 
@@ -71,7 +74,7 @@ const getDogs = async ctx => {
  * Gets a single breed from the database by breed ID.
  * @param {object} ctx context passed from Koa.
  */
-const getBreed = async ctx => {
+const getBreed = async (ctx, next) => {
 	const breedId = ctx.params.id;
 	let { select = [] } = ctx.request.query;
 	if (!Array.isArray(select)) select = Array(select);
@@ -82,7 +85,7 @@ const getBreed = async ctx => {
 		// If nothing is selected, return everything
 		if (select.length === 0) partial = breed;
 		else {
-			partial = { id: breed.id };
+			partial = { id: breed.id, modified: breed.modified };
 			select.map(field => (partial[field] = breed[field]));
 		}
 		const self = `${ctx.protocol}://${ctx.host}${prefix}/${partial.id}`;
@@ -90,6 +93,7 @@ const getBreed = async ctx => {
 			dogs: `${self}/dogs`
 		};
 		ctx.body = partial;
+		return next();
 	}
 };
 
@@ -157,13 +161,13 @@ const deleteBreed = async ctx => {
 	}
 };
 
-router.get('/', getAll);
+router.get('/', getAll, ifNoneMatch);
 router.post('/', auth, validateBreed, addBreed);
 
-router.get('/:id([0-9]+)', getBreed);
+router.get('/:id([0-9]+)', getBreed, ifModifiedSince);
 router.put('/:id([0-9]+)', auth, validateBreed, updateBreed);
 router.del('/:id([0-9]+)', auth, deleteBreed);
 
-router.get('/:id([0-9]+)/dogs', getDogs);
+router.get('/:id([0-9]+)/dogs', getDogs, ifNoneMatch);
 
 module.exports = router;

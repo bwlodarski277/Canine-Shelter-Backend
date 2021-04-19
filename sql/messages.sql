@@ -3,5 +3,6 @@ CREATE TABLE `messages` (
     `sender` boolean NOT NULL,
     -- 0 for staff, 1 for user.
     `dateCreated` datetime DEFAULT CURRENT_TIMESTAMP,
-    `message` text NOT NULL
+    `message` text NOT NULL,
+    `modified` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
