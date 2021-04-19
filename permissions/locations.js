@@ -9,21 +9,21 @@
 const { AccessControl } = require('role-acl');
 const ac = new AccessControl();
 
-const checkMessage = ctx => {
-	// If is staff check location, else check user ID.
-	// TODO: check the role in this function? (not sure if this is needed, since we check the sender stuff.)
-	if (ctx.sender === 0) return ctx.staffLocation === ctx.chatLocation;
-	return ctx.userId === ctx.chatUser;
-};
+// const checkMessage = ctx => {
+// 	// If is staff check location, else check user ID.
+// 	// TODO: check the role in this function? (not sure if this is needed, since we check the sender stuff.)
+// 	if (ctx.sender === 0) return ctx.staffLocation === ctx.chatLocation;
+// 	return ctx.userId === ctx.chatUser;
+// };
 
 // Not used, but created so that the 'user' role is registered.
 // ac.grant('user').execute('none').on('none');
 
-// Letting staff modify details about a location, except address.
+// Letting staff modify details about a location.
 ac.grant('staff')
 	.condition({ Fn: 'EQUALS', args: { location: '$.owner' } })
 	.execute('modify')
-	.on('location', ['*', '!address']);
+	.on('location');
 
 // Only admins may create or delete locations
 ac.grant('admin').execute('create').on('location');
@@ -38,9 +38,21 @@ ac.grant('user')
 	.execute('read')
 	.on('chat');
 
+// Users may delete their own chats
+ac.grant('user')
+	.condition({ Fn: 'EQUALS', args: { userId: '$.chatUser' } })
+	.execute('delete')
+	.on('chat');
+
+// Staff may delete chats at their location
+ac.grant('staff')
+	.condition({ Fn: 'EQUALS', args: { staffLocation: '$.chatLocation' } })
+	.execute('delete')
+	.on('chat');
+
 // Staff may view a single chat at their location
 ac.grant('staff')
-	.condition({ Fn: 'EQUAlS', args: { staffLocation: '$.chatLocation' } })
+	.condition({ Fn: 'EQUALS', args: { staffLocation: '$.chatLocation' } })
 	.execute('read')
 	.on('chat');
 
@@ -62,8 +74,9 @@ ac.grant('user')
 	.execute('read')
 	.on('message');
 
+// { Fn: 'EQUALS', args: { userId: '$.chatUser' } }
 ac.grant('user')
-	.condition({ Fn: 'EQUALS', args: { userId: '$.chatUser' } })
+	.condition(ctx => ctx.userId === ctx.chatUser && ctx.sender === 1)
 	.execute('delete')
 	.on('message');
 
@@ -79,8 +92,9 @@ ac.grant('staff')
 	.execute('read')
 	.on('message');
 
+// { Fn: 'EQUALS', args: { staffLocation: '$.chatLocation' } }
 ac.grant('staff')
-	.condition({ Fn: 'EQUALS', args: { staffLocation: '$.chatLocation' } })
+	.condition(ctx => ctx.staffLocation === ctx.chatLocation && ctx.sender === 0)
 	.execute('delete')
 	.on('message');
 
@@ -138,6 +152,22 @@ exports.chat = {
 			.can(role)
 			.context({ userId, chatUser, staffLocation, chatLocation })
 			.execute('read')
+			.on('chat'),
+
+	/**
+	 * Checks if a user may delete a chat.
+	 * @param {string} role user's role
+	 * @param {number} userId user's ID
+	 * @param {number} chatUser ID of user associated with chat
+	 * @param {number} staffLocation staff ID (if staff)
+	 * @param {number} chatLocation chat location ID (if staff)
+	 * @returns permission object
+	 */
+	delete: async (role, userId, chatUser, staffLocation, chatLocation) =>
+		await ac
+			.can(role)
+			.context({ userId, chatUser, staffLocation, chatLocation })
+			.execute('delete')
 			.on('chat')
 };
 
@@ -175,16 +205,17 @@ exports.message = {
 	/**
 	 * Checks if a user may delete a chat message.
 	 * @param {string} role user's role
+	 * @param {boolean|number} sender1 message sender (0 for staff, 1 for user)
 	 * @param {number} userId user's ID
 	 * @param {number} chatUser ID of user associated with chat
 	 * @param {number} staffLocation staff ID (if staff)
 	 * @param {number} chatLocation chat location ID (if staff)
 	 * @returns permission object
 	 */
-	delete: async (role, userId, chatUser, staffLocation, chatLocation) =>
+	delete: async (role, sender, userId, chatUser, staffLocation, chatLocation) =>
 		await ac
 			.can(role)
-			.context({ userId, chatUser, staffLocation, chatLocation })
+			.context({ sender, userId, chatUser, staffLocation, chatLocation })
 			.execute('delete')
 			.on('message')
 };

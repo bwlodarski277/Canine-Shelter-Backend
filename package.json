@@ -4,15 +4,31 @@
 	"description": "The backend code for The Canine Shelter.",
 	"main": "index.js",
 	"scripts": {
-		"test": "echo \"Error: no test specified\" && exit 1",
+		"test": "jest",
+		"test:watch": "jest --watch",
+		"test:coverage": "jest --coverage",
 		"start": "node index.js",
 		"debug": "nodemon --inspect index.js",
 		"docs": "jsdoc -c jsdoc.conf.json",
-		"linter": "./node_modules/.bin/eslint --fix ."
+		"linter": "./node_modules/.bin/eslint --fix .",
+		"knex_migrate": "knex migrate:latest",
+		"knex_rollback": "knex migrate:rollback --all",
+		"knex_seed": "knex seed:run",
+		"refresh": "npm run knex_rollback && npm run knex_migrate && npm run knex_seed"
 	},
 	"repository": {
 		"type": "git",
 		"url": "https://github.coventry.ac.uk/6003CEM-2021JANMAY/6003CEM_backend.git"
+	},
+	"jest": {
+		"testEnvironment": "node",
+		"coveragePathIgnorePatterns": [
+			".vscode",
+			"db",
+			"docs",
+			"node_modules",
+			"openapi"
+		]
 	},
 	"author": "Bartlomiej Wlodarski",
 	"license": "ISC",
@@ -21,6 +37,7 @@
 		"ajv": "^7.1.1",
 		"ajv-formats": "^1.5.1",
 		"bcrypt": "^5.0.0",
+		"dotenv": "^8.2.0",
 		"jsonwebtoken": "^8.5.1",
 		"knex": "^0.21.17",
 		"koa": "^2.13.1",
@@ -36,14 +53,18 @@
 		"twit": "^2.2.11"
 	},
 	"devDependencies": {
+		"@types/jest": "^26.0.22",
 		"clean-jsdoc-theme": "^3.1.1",
 		"docdash": "^1.2.0",
 		"eslint": "^7.23.0",
 		"eslint-config-prettier": "^8.1.0",
 		"eslint-plugin-import": "^2.22.1",
+		"eslint-plugin-jest": "^24.3.5",
 		"eslint-plugin-prettier": "^3.3.1",
+		"jest": "^26.6.3",
 		"jsdoc": "^3.6.6",
 		"nodemon": "^2.0.7",
-		"prettier": "2.2.1"
+		"prettier": "2.2.1",
+		"supertest": "^6.1.3"
 	}
 }

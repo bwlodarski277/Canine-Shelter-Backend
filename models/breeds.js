@@ -16,11 +16,11 @@ const { db, run } = require('../helpers/database');
  * @property {string} description Breed description
  */
 
+//  * @param {Array<string>} select list of columns to select.
 /**
  * Gets all breed entries from the DB.
  * Allows for searching, filtering and sorting.
  * @param {string} query search for breeds by name and description.
- * @param {Array<string>} select list of columns to select.
  * @param {number} page which page to get data from.
  * @param {number} limit number of items on a page.
  * @param {string} order what parameter to order by.
@@ -28,12 +28,11 @@ const { db, run } = require('../helpers/database');
  * @returns {Promise<Array<Breed>>} array of all breed records.
  * @async
  */
-exports.getAll = async (query, select, page, limit, order, direction) => {
+exports.getAll = async (query, page, limit, order, direction) => {
 	const offset = (page - 1) * limit;
 	const data = await run(
 		async () =>
 			await db('breeds')
-				.select(...select)
 				.where('name', 'like', `%${query}%`)
 				.orWhere('description', 'like', `%${query}%`)
 				.orderBy(order, direction)

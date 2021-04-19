@@ -7,21 +7,17 @@
  */
 
 const knex = require('knex');
-const { config } = require('../config');
+// const { config } = require('../config');
+const knexfile = require('../knexfile');
+
+require('dotenv').config();
+
+const knexConfig = knexfile[process.env.NODE_ENV];
 
 /**
  * Knex database object. Used for interacting with the DB.
  */
-exports.db = knex({
-	client: 'mysql2',
-	connection: {
-		host: config.host,
-		port: config.port,
-		user: config.user,
-		password: config.password,
-		database: config.database
-	}
-});
+exports.db = knex(knexConfig);
 
 /**
  * Wrapper for DB queries.
@@ -51,12 +47,13 @@ exports.run = async dbQuery => {
  * Used to hide sensitive information when an error happens in the DB.
  * @memberof helpers/database
  */
-class DatabaseException {
+class DatabaseException extends Error {
 	/**
 	 * @param {string} message error message to provide
 	 * @param {number|string} code exception's error code
 	 */
 	constructor(message, code, errno) {
+		super(message);
 		this.message = message;
 		this.code = code;
 		this.errno = errno;

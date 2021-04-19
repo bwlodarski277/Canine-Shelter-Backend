@@ -16,7 +16,11 @@ const { auth } = require('../controllers/auth');
 const { clamp } = require('../helpers/utils');
 const can = require('../permissions/breeds');
 
-const router = new Router({ prefix: '/api/v1/breeds' });
+const { validateBreed } = require('../controllers/validation');
+
+const prefix = '/api/v1/breeds';
+const router = new Router({ prefix });
+
 router.use(bodyParser());
 
 /**
@@ -26,7 +30,7 @@ router.use(bodyParser());
 const getAll = async ctx => {
 	let {
 		query = '',
-		select = ['*'],
+		select = [],
 		page = 1,
 		limit = 10,
 		order = 'id',
@@ -35,24 +39,31 @@ const getAll = async ctx => {
 	limit = clamp(limit, 1, 20); // Clamping the limit to be between 1 and 20.
 	direction = direction === 'desc' ? 'desc' : 'asc';
 	if (!Array.isArray(select)) select = Array(select);
-	try {
-		ctx.body = await breedModel.getAll(query, select, page, limit, order, direction);
-	} catch (err) {
-		ctx.status = 500;
-		ctx.body = err;
-	}
+	let breeds = await breedModel.getAll(query, page, limit, order, direction);
+	breeds = breeds.map(breed => {
+		// Selecting fields the user wants
+		const partial = { id: breed.id };
+		select.map(field => (partial[field] = breed[field]));
+		const self = `${ctx.protocol}://${ctx.host}${prefix}/${partial.id}`;
+		partial.links = {
+			self: self,
+			dogs: `${self}/dogs`
+		};
+		return partial;
+	});
+	ctx.body = breeds;
 };
 
 const getDogs = async ctx => {
 	const breedId = ctx.params.id;
-	let { select = [] } = ctx.request.query;
-	if (!Array.isArray(select)) select = Array(select);
-	try {
-		const dogs = await dogBreedModel.getByBreedId(breedId, select);
-		if (dogs) ctx.body = dogs;
-	} catch (err) {
-		ctx.status = 500;
-		ctx.body = err;
+	const breed = await breedModel.getById(breedId);
+	if (breed) {
+		let dogs = await dogBreedModel.getByBreedId(breedId);
+		dogs = dogs.map(dog => {
+			dog.links = { dog: `${ctx.protocol}://${ctx.host}/api/v1/dogs/${dog.id}` };
+			return dog;
+		});
+		ctx.body = dogs;
 	}
 };
 
@@ -62,12 +73,23 @@ const getDogs = async ctx => {
  */
 const getBreed = async ctx => {
 	const breedId = ctx.params.id;
-	try {
-		const breed = await breedModel.getById(breedId);
-		if (breed) ctx.body = breed;
-	} catch (err) {
-		ctx.status = 500;
-		ctx.body = err;
+	let { select = [] } = ctx.request.query;
+	if (!Array.isArray(select)) select = Array(select);
+	const breed = await breedModel.getById(breedId);
+	if (breed) {
+		// Selecting fields the user wants
+		let partial;
+		// If nothing is selected, return everything
+		if (select.length === 0) partial = breed;
+		else {
+			partial = { id: breed.id };
+			select.map(field => (partial[field] = breed[field]));
+		}
+		const self = `${ctx.protocol}://${ctx.host}${prefix}/${partial.id}`;
+		partial.links = {
+			dogs: `${self}/dogs`
+		};
+		ctx.body = partial;
 	}
 };
 
@@ -82,17 +104,14 @@ const addBreed = async ctx => {
 		ctx.status = 403;
 		return;
 	}
-	try {
-		const body = ctx.request.body;
-		const breedId = await breedModel.add(body);
-		if (breedId) {
-			ctx.status = 201;
-			ctx.body = { ID: breedId, created: true, link: `${ctx.request.path}/${breedId}` };
-		}
-	} catch (err) {
-		ctx.status = 500;
-		ctx.body = err;
-	}
+	const body = ctx.request.body;
+	const breedId = await breedModel.add(body);
+	ctx.status = 201;
+	ctx.body = {
+		ID: breedId,
+		created: true,
+		link: `${ctx.protocol}://${ctx.host}${ctx.request.path}/${breedId}`
+	};
 };
 
 /**
@@ -106,17 +125,16 @@ const updateBreed = async ctx => {
 		ctx.status = 403;
 		return;
 	}
-	try {
-		const breedId = ctx.params.id;
-		const breed = await breedModel.getById(breedId);
-		if (breed) {
-			const data = ctx.request.body;
-			const result = await breedModel.update(breedId, data);
-			if (result) ctx.body = { id: breedId, updated: true, link: ctx.request.path };
-		}
-	} catch (err) {
-		ctx.status = 500;
-		ctx.body = err;
+	const breedId = ctx.params.id;
+	const breed = await breedModel.getById(breedId);
+	if (breed) {
+		const data = ctx.request.body;
+		await breedModel.update(breedId, data);
+		ctx.body = {
+			id: breedId,
+			updated: true,
+			link: `${ctx.protocol}://${ctx.host}${ctx.request.path}`
+		};
 	}
 };
 
@@ -126,29 +144,24 @@ const updateBreed = async ctx => {
  */
 const deleteBreed = async ctx => {
 	const { role } = ctx.state.user;
-	const permission = await can.modify(role);
+	const permission = await can.delete(role);
 	if (!permission.granted) {
 		ctx.status = 403;
 		return;
 	}
-	try {
-		const breedId = ctx.params.id;
-		const breed = await breedModel.getById(breedId);
-		if (breed) {
-			const result = await breedModel.delete(breedId);
-			if (result) ctx.body = { id: breedId, deleted: true };
-		}
-	} catch (err) {
-		ctx.status = 500;
-		ctx.body = err;
+	const breedId = ctx.params.id;
+	const breed = await breedModel.getById(breedId);
+	if (breed) {
+		await breedModel.delete(breedId);
+		ctx.body = { id: breedId, deleted: true };
 	}
 };
 
 router.get('/', getAll);
-router.post('/', auth, addBreed);
+router.post('/', auth, validateBreed, addBreed);
 
 router.get('/:id([0-9]+)', getBreed);
-router.put('/:id([0-9]+)', auth, updateBreed);
+router.put('/:id([0-9]+)', auth, validateBreed, updateBreed);
 router.del('/:id([0-9]+)', auth, deleteBreed);
 
 router.get('/:id([0-9]+)/dogs', getDogs);

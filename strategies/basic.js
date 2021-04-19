@@ -27,14 +27,7 @@ const verifyPassword = async (user, password) => await bcrypt.compare(password, 
  * @async
  */
 const checkUser = async (username, password, done) => {
-	let user;
-
-	try {
-		user = await users.findByUsername(username);
-	} catch (error) {
-		console.error(`Error during authentication for user ${username}.`);
-		return done(error);
-	}
+	let user = await users.findByUsername(username);
 
 	// If the user exists
 	if (user) {
@@ -51,7 +44,6 @@ const checkUser = async (username, password, done) => {
 	console.log(`No user found with username ${username}.`);
 
 	return done(null, false);
-	// return done(null, { role: 'guest' });
 };
 
 module.exports = new BasicStrategy(checkUser);

@@ -51,6 +51,18 @@ exports.getById = async id => {
 };
 
 /**
+ * Gets a chat where user ID and location ID match in a chat.
+ * @param {number} userId ID of a user.
+ * @param {number} locationId ID of a location.
+ * @returns {Promise<Chat>} object containing the chat record.
+ * @async
+ */
+exports.getMatching = async (userId, locationId) => {
+	const [data] = await run(async () => await db('chats').where({ userId, locationId }));
+	return data;
+};
+
+/**
  * Gets a list of a user's chats by ID.
  * @param {number} userId ID of a user.
  * @returns {Promise<Chat>} object containing the chat record.

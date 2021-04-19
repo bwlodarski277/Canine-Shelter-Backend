@@ -14,14 +14,19 @@ const dogLocationsModel = require('../models/dogLocations');
 const chatModel = require('../models/chats');
 const chatMessagesModel = require('../models/chatMessages');
 const messagesModel = require('../models/messages');
-const userModel = require('../models/users');
+// const userModel = require('../models/users');
 const staffModel = require('../models/staff');
 
+const { validateLocation, validateLocationUpdate } = require('../controllers/validation');
+
 const { auth } = require('../controllers/auth');
+const { clamp } = require('../helpers/utils');
 
 const can = require('../permissions/locations');
 
-const router = new Router({ prefix: '/api/v1/locations' });
+const prefix = '/api/v1/locations';
+const router = new Router({ prefix });
+
 router.use(bodyParser());
 
 /**
@@ -29,7 +34,30 @@ router.use(bodyParser());
  * @param {object} ctx context passed from Koa.
  */
 const getAll = async ctx => {
-	ctx.body = await locationsModel.getAll();
+	let {
+		query = '',
+		select = [],
+		page = 1,
+		limit = 10,
+		order = 'id',
+		direction
+	} = ctx.request.query;
+	limit = clamp(limit, 1, 20); // Clamping the limit to be between 1 and 20.
+	direction = direction === 'desc' ? 'desc' : 'asc';
+	if (!Array.isArray(select)) select = Array(select);
+	let locations = await locationsModel.getAll(query, page, limit, order, direction);
+	locations = locations.map(location => {
+		const partial = { id: location.id };
+		select.map(field => (partial[field] = location[field]));
+		const self = `${ctx.protocol}://${ctx.host}${prefix}/${partial.id}`;
+		partial.links = {
+			self: self,
+			dogs: `${self}/dogs`,
+			chats: `${self}/chats`
+		};
+		return partial;
+	});
+	ctx.body = locations;
 };
 
 /**
@@ -38,12 +66,25 @@ const getAll = async ctx => {
  */
 const getLocation = async ctx => {
 	const id = ctx.params.id;
-	try {
-		const location = await locationsModel.getById(id);
-		if (location) ctx.body = location;
-	} catch (err) {
-		ctx.status = 500;
-		ctx.body = err;
+	let { select = [] } = ctx.request.query;
+	if (!Array.isArray(select)) select = Array(select);
+	const location = await locationsModel.getById(id);
+	if (location) {
+		let partial;
+		// If nothing is selected, return everything
+		if (select.length === 0) partial = location;
+		else {
+			partial = { id: location.id };
+			select.map(field => (partial[field] = location[field]));
+		}
+		select.map(field => (partial[field] = location[field]));
+		const self = `${ctx.protocol}://${ctx.host}${prefix}/${partial.id}`;
+		partial.links = {
+			self: self,
+			dogs: `${self}/dogs`,
+			chats: `${self}/chats`
+		};
+		ctx.body = partial;
 	}
 };
 
@@ -59,16 +100,13 @@ const addLocation = async ctx => {
 		ctx.status = 403;
 		return;
 	}
-	try {
-		const id = await locationsModel.add(body);
-		if (id) {
-			ctx.status = 201;
-			ctx.body = { id, created: true, link: `${ctx.request.path}/${id}` };
-		}
-	} catch (err) {
-		ctx.status = 500;
-		ctx.body = err;
-	}
+	const id = await locationsModel.add(body);
+	ctx.status = 201;
+	ctx.body = {
+		id,
+		created: true,
+		link: `${ctx.protocol}://${ctx.host}${ctx.request.path}/${id}`
+	};
 };
 
 /**
@@ -76,31 +114,24 @@ const addLocation = async ctx => {
  * @param {object} ctx context passed from Koa.
  */
 const updateLocation = async ctx => {
-	const locationId = ctx.params.id;
-	try {
-		const location = await locationsModel.getById(locationId);
-		if (location) {
-			const { id: userId, role } = ctx.state.user;
-			const { locationId: userLoc } = (await staffModel.getByUserId(userId)) || {};
-			const permission = await can.location.modify(role, userLoc, locationId);
-			if (!permission.granted) {
-				ctx.status = 403;
-				return;
-			}
-			// Excluding fields that must not be updated
-			const body = permission.filter(ctx.request.body);
-			const result = await locationsModel.update(locationId, body);
-			// Knex returns amount of affected rows.
-			if (result)
-				ctx.body = {
-					id: locationId,
-					updated: true,
-					link: ctx.request.path
-				};
+	const locationId = parseInt(ctx.params.id);
+	const location = await locationsModel.getById(locationId);
+	if (location) {
+		const { id: userId, role } = ctx.state.user;
+		const { locationId: userLoc } = (await staffModel.getByUserId(userId)) || {};
+		const permission = await can.location.modify(role, userLoc, locationId);
+		if (!permission.granted) {
+			ctx.status = 403;
+			return;
 		}
-	} catch (err) {
-		ctx.status = 500;
-		ctx.body = err;
+		// Excluding fields that must not be updated
+		const body = permission.filter(ctx.request.body);
+		await locationsModel.update(locationId, body);
+		ctx.body = {
+			id: locationId,
+			updated: true,
+			link: `${ctx.protocol}://${ctx.host}${ctx.request.path}`
+		};
 	}
 };
 
@@ -109,22 +140,17 @@ const updateLocation = async ctx => {
  * @param {object} ctx context passed from Koa.
  */
 const deleteLocation = async ctx => {
-	const locationId = ctx.params.id;
-	try {
-		const location = await locationsModel.getById(locationId);
-		if (location) {
-			const { role } = ctx.state.user;
-			const permission = await can.location.delete(role);
-			if (!permission.granted) {
-				ctx.status = 403;
-				return;
-			}
-			const result = await locationsModel.delete(locationId);
-			if (result) ctx.body = { id: locationId, deleted: true };
+	const locationId = parseInt(ctx.params.id);
+	const location = await locationsModel.getById(locationId);
+	if (location) {
+		const { role } = ctx.state.user;
+		const permission = await can.location.delete(role);
+		if (!permission.granted) {
+			ctx.status = 403;
+			return;
 		}
-	} catch (err) {
-		ctx.status = 500;
-		ctx.body = err;
+		await locationsModel.delete(locationId);
+		ctx.body = { id: locationId, deleted: true };
 	}
 };
 
@@ -134,15 +160,15 @@ const deleteLocation = async ctx => {
  */
 const getLocationDogs = async ctx => {
 	const locationId = ctx.params.id;
-	try {
-		const location = await locationsModel.getById(locationId);
-		if (location) {
-			const locationDogs = await dogLocationsModel.getByLocationId(locationId);
-			if (locationDogs) ctx.body = locationDogs;
-		}
-	} catch (err) {
-		ctx.status = 500;
-		ctx.body = err;
+	const location = await locationsModel.getById(locationId);
+	if (location) {
+		let locationDogs = await dogLocationsModel.getByLocationId(locationId);
+		locationDogs = locationDogs.map(dog => {
+			dog.links = {
+				dog: `${ctx.protocol}://${ctx.host}/dogs/${dog.id}`
+			};
+		});
+		ctx.body = locationDogs;
 	}
 };
 
@@ -151,54 +177,87 @@ const getLocationDogs = async ctx => {
  * @param {object} ctx context passed from Koa.
  */
 const getAllChats = async ctx => {
-	const locationId = ctx.params.id;
-	try {
-		const { id: userId, role } = ctx.state.user;
-		const { locationId: staffLoc } = (await staffModel.getByUserId(userId)) || {};
-		const location = await locationsModel.getById(locationId);
-		if (location) {
-			const permission = await can.chat.readAll(role, staffLoc, locationId);
-			if (!permission.granted) {
-				ctx.status = 403;
-				return;
-			}
-			const chats = await chatModel.getAll(locationId);
-			if (chats) ctx.body = chats;
+	const locationId = parseInt(ctx.params.id);
+	const { id: userId, role } = ctx.state.user;
+	const { locationId: staffLoc } = (await staffModel.getByUserId(userId)) || {};
+	const location = await locationsModel.getById(locationId);
+	if (location) {
+		const permission = await can.chat.readAll(role, staffLoc, locationId);
+		if (!permission.granted) {
+			ctx.status = 403;
+			return;
 		}
-	} catch (err) {
-		ctx.status = 500;
-		ctx.body = err;
+		let chats = await chatModel.getAll(locationId);
+		chats = chats.map(chat => {
+			const self = `${ctx.protocol}://${ctx.host}${prefix}/${locationId}/chats/${chat.id}`;
+			chat.links = {
+				self: self,
+				messages: `${self}/messages`,
+				user: `${ctx.protocol}://${ctx.host}/api/v1/users/${chat.userId}`
+			};
+			return chat;
+		});
+		ctx.body = chats;
 	}
 };
 
 const createChat = async ctx => {
-	const locationId = ctx.params.id;
+	const locationId = parseInt(ctx.params.id);
 	const { id: userId, role } = ctx.state.user;
 	const permission = await can.chat.create(role);
 	if (!permission.granted) {
 		ctx.status = 403;
 		return;
 	}
-	try {
-		const user = await userModel.getById(userId);
-		if (user) {
-			const id = await chatModel.add(locationId, userId);
-			if (id) {
-				ctx.status = 201;
-				ctx.body = { id, created: true, link: `${ctx.request.path}/${id}` };
-			}
+	const location = await locationsModel.getById(locationId);
+	if (location) {
+		const chat = await chatModel.getMatching(userId, locationId);
+		if (chat) {
+			ctx.status = 400;
+			ctx.body = { message: 'Chat between user and location exists' };
+			return;
 		}
-	} catch (err) {
-		ctx.status = 500;
-		ctx.body = err;
+		const id = await chatModel.add(locationId, userId);
+		ctx.status = 201;
+		ctx.body = {
+			id,
+			created: true,
+			link: `${ctx.protocol}://${ctx.host}${ctx.request.path}/${id}`
+		};
+	}
+};
+
+const deleteChat = async ctx => {
+	const locationId = parseInt(ctx.params.id);
+	const chatId = parseInt(ctx.params.chatId);
+	const { id: userId, role } = ctx.state.user;
+	const { locationId: staffLoc } = (await staffModel.getByUserId(userId)) || {};
+	const location = await locationsModel.getById(locationId);
+	if (location) {
+		const chat = await chatModel.getById(chatId);
+		if (chat) {
+			const { userId: chatUser, locationId: chatLoc } = chat;
+			const permission = await can.chat.delete(role, userId, chatUser, staffLoc, chatLoc);
+			if (!permission.granted) {
+				ctx.status = 403;
+				return;
+			}
+			const messages = await chatMessagesModel.getByChatId(chatId);
+			for (const message of messages) await messagesModel.delete(message.id);
+			await chatModel.delete(chatId);
+			ctx.body = { id: chatId, deleted: true };
+		}
 	}
 };
 
 const getChat = async ctx => {
-	const { id: locationId, chatId } = ctx.params;
+	let { id: locationId, chatId } = ctx.params;
+	locationId = parseInt(locationId);
+	chatId = parseInt(chatId);
 	const { id: userId, role } = ctx.state.user;
-	try {
-		const { locationId: staffLoc } = (await staffModel.getByUserId(userId)) || {};
+	const { locationId: staffLoc } = (await staffModel.getByUserId(userId)) || {};
+	const location = await locationsModel.getById(locationId);
+	if (location) {
 		const chat = await chatModel.getById(chatId);
 		if (chat) {
 			const { userId: chatUser } = chat;
@@ -207,52 +266,57 @@ const getChat = async ctx => {
 				ctx.status = 403;
 				return;
 			}
+			const self = `${ctx.protocol}://${ctx.host}${prefix}/${locationId}/chats/${chat.id}`;
+			chat.links = {
+				self: self,
+				messages: `${self}/messages`,
+				user: `${ctx.protocol}://${ctx.host}/api/v1/users/${chat.userId}`
+			};
 			ctx.body = chat;
 		}
-	} catch (err) {
-		ctx.status = 500;
-		ctx.body = err;
 	}
 };
 
 const getMessages = async ctx => {
-	const { id: locationId, chatId } = ctx.params;
+	let { id: locationId, chatId } = ctx.params;
+	locationId = parseInt(locationId);
+	chatId = parseInt(chatId);
 	const { id: userId, role } = ctx.state.user;
-	try {
-		const { locationId: staffLoc } = (await staffModel.getByUserId(userId)) || {};
+	const { locationId: staffLoc } = (await staffModel.getByUserId(userId)) || {};
+	const location = await locationsModel.getById(locationId);
+	if (location) {
 		const chat = await chatModel.getById(chatId);
 		if (chat) {
 			const { userId: chatUser } = chat;
-			const chatMessages = await chatMessagesModel.getByChatId(chatId);
-			if (chatMessages) {
-				const permission = await can.message.read(
-					role,
-					userId,
-					chatUser,
-					staffLoc,
-					locationId
-				);
-				if (!permission.granted) {
-					ctx.status = 403;
-					return;
-				}
-				ctx.body = chatMessages;
+			const permission = await can.message.read(role, userId, chatUser, staffLoc, locationId);
+			if (!permission.granted) {
+				ctx.status = 403;
+				return;
 			}
+			let chatMessages = await chatMessagesModel.getByChatId(chatId);
+			chatMessages = chatMessages.map(chatMsg => {
+				const selfPrefix = `${ctx.protocol}://${ctx.host}${prefix}`;
+				chatMsg.links = {
+					self: `${selfPrefix}/${locationId}/chats/${chat.id}/messages/${chatMsg.messageId}`
+				};
+				return chatMsg;
+			});
+			ctx.body = chatMessages;
 		}
-	} catch (err) {
-		ctx.status = 500;
-		ctx.body = err;
 	}
 };
 
 const sendMessage = async ctx => {
-	const { id: locationId, chatId } = ctx.params;
+	let { id: locationId, chatId } = ctx.params;
+	locationId = parseInt(locationId);
+	chatId = parseInt(chatId);
 	const { id: userId, role } = ctx.state.user;
-	try {
-		const { locationId: staffLoc } = (await staffModel.getByUserId(userId)) || {};
+	const { locationId: staffLoc } = (await staffModel.getByUserId(userId)) || {};
+	const location = await locationsModel.getById(locationId);
+	if (location) {
 		const chat = await chatModel.getById(chatId);
 		if (chat) {
-			const { userId: chatUser } = await chatMessagesModel.getByChatId(chatId);
+			const { userId: chatUser } = chat;
 			const permission = await can.message.create(
 				role,
 				userId,
@@ -264,37 +328,34 @@ const sendMessage = async ctx => {
 				ctx.status = 403;
 				return;
 			}
-			const { body } = ctx.request.body;
+			const { body } = ctx.request;
 			const sender = ctx.state.user.role === 'staff' ? 0 : 1;
 			body.sender = sender;
 
 			const messageId = await messagesModel.add(body);
-			if (messageId) {
-				const result = await chatMessagesModel.add(chatId, messageId);
-				if (result) {
-					ctx.status = 201;
-					ctx.body = {
-						id: messageId,
-						created: true,
-						link: `${ctx.request.path}/${messageId}`
-					};
-				}
-			}
+			await chatMessagesModel.add(chatId, messageId);
+
+			ctx.status = 201;
+			ctx.body = {
+				id: messageId,
+				created: true,
+				link: `${ctx.protocol}://${ctx.host}${ctx.request.path}/${messageId}`
+			};
 		}
-	} catch (err) {
-		ctx.status = 500;
-		ctx.body = err;
 	}
 };
 
 const getMessage = async ctx => {
-	const { id: locationId, chatId, messageId } = ctx.params;
+	let { id: locationId, chatId, messageId } = ctx.params;
+	locationId = parseInt(locationId);
+	chatId = parseInt(chatId);
 	const { id: userId, role } = ctx.state.user;
-	try {
-		const { locationId: staffLoc } = (await staffModel.getByUserId(userId)) || {};
+	const { locationId: staffLoc } = (await staffModel.getByUserId(userId)) || {};
+	const location = await locationsModel.getById(locationId);
+	if (location) {
 		const chat = await chatModel.getById(chatId);
 		if (chat) {
-			const { userId: chatUser } = await chatMessagesModel.getByChatId(chatId);
+			const { userId: chatUser } = chat;
 			const permission = await can.message.create(
 				role,
 				userId,
@@ -309,48 +370,49 @@ const getMessage = async ctx => {
 			const message = await messagesModel.getById(messageId);
 			if (message) ctx.body = message;
 		}
-	} catch (err) {
-		ctx.status = 500;
-		ctx.body = err;
 	}
 };
 
 const deleteMessage = async ctx => {
-	const { id: locationId, chatId, messageId } = ctx.params;
+	// const { id: locationId, chatId, messageId } = ctx.params;
+	const locationId = parseInt(ctx.params.id);
+	const chatId = parseInt(ctx.params.chatId);
+	const messageId = parseInt(ctx.params.messageId);
 	const { id: userId, role } = ctx.state.user;
-	try {
-		const { locationId: staffLoc } = (await staffModel.getByUserId(userId)) || {};
+	const { locationId: staffLoc } = (await staffModel.getByUserId(userId)) || {};
+	const location = await locationsModel.getById(locationId);
+	if (location) {
 		const chat = await chatModel.getById(chatId);
 		if (chat) {
-			const { userId: chatUser } = await chatMessagesModel.getByChatId(chatId);
-			const permission = await can.message.create(
-				role,
-				userId,
-				chatUser,
-				staffLoc,
-				locationId
-			);
-			if (!permission.granted) {
-				ctx.status = 403;
-				return;
-			}
-			const chatMessageResult = await chatMessagesModel.delete(messageId);
-			if (chatMessageResult) {
-				const messageResult = await messagesModel.delete(messageId);
-				if (messageResult) ctx.body = { id: messageId, deleted: true };
+			const { userId: chatUser } = chat;
+			const message = await messagesModel.getById(messageId);
+			if (message) {
+				const { sender } = message;
+				const permission = await can.message.delete(
+					role,
+					sender,
+					userId,
+					chatUser,
+					staffLoc,
+					locationId
+				);
+				if (!permission.granted) {
+					ctx.status = 403;
+					return;
+				}
+				await chatMessagesModel.delete(messageId);
+				await messagesModel.delete(messageId);
+				ctx.body = { id: messageId, deleted: true };
 			}
 		}
-	} catch (err) {
-		ctx.status = 500;
-		ctx.body = err;
 	}
 };
 
 router.get('/', getAll);
-router.post('/', auth, addLocation);
+router.post('/', auth, validateLocation, addLocation);
 
 router.get('/:id([0-9]+)', getLocation);
-router.put('/:id([0-9]+)', auth, updateLocation);
+router.put('/:id([0-9]+)', auth, validateLocationUpdate, updateLocation);
 router.del('/:id([0-9]+)', auth, deleteLocation);
 
 router.get('/:id([0-9]+)/dogs', getLocationDogs);
@@ -359,6 +421,8 @@ router.get('/:id([0-9]+)/chats', auth, getAllChats);
 router.post('/:id([0-9]+)/chats', auth, createChat);
 
 router.get('/:id([0-9]+)/chats/:chatId', auth, getChat);
+router.del('/:id([0-9]+)/chats/:chatId', auth, deleteChat);
+
 router.get('/:id([0-9]+)/chats/:chatId/messages', auth, getMessages);
 router.post('/:id([0-9]+)/chats/:chatId/messages', auth, sendMessage);
 

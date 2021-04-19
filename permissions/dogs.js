@@ -13,7 +13,7 @@ const ac = new AccessControl();
  * Checks if the user works at the dog's location
  * or if the dog is not assigned to a location.
  */
-const ifOwnerOrNone = ctx => ctx.location === ctx.owner || ctx.owner === undefined;
+const ifOwnerOrNone = context => context.location === context.owner || context.owner === undefined;
 
 // Not used, but created so that the 'user' role is registered.
 ac.grant('user').execute('none').on('none');
@@ -24,7 +24,7 @@ ac.grant('user').execute('none').on('none');
 ac.grant('staff').execute('create').on('dog');
 
 // Staff may modify dogs at their location
-ac.grant('staff').condition().execute('modify').on('dog');
+ac.grant('staff').condition(ifOwnerOrNone).execute('modify').on('dog');
 
 // Staff may delete dogs at their location
 ac.grant('staff').condition(ifOwnerOrNone).execute('delete').on('dog');
@@ -39,7 +39,7 @@ ac.grant('admin').execute('delete').on('dog');
 //#region /dogs/{id}/breed
 
 // Staff may set the dog breed of dogs at their location.
-ac.grant('staff').condition(ifOwnerOrNone).execute('set').on('dogBreed');
+ac.grant('staff').execute('set').on('dogBreed');
 
 // Staff may modify the dog breed of dogs at their location.
 ac.grant('staff').condition(ifOwnerOrNone).execute('modify').on('dogBreed');
@@ -123,14 +123,16 @@ exports.dogLocation = {
 
 	/** Checks if a user may modify a dog's location. */
 	modify: async (role, userLoc, dogLoc) =>
-		await ac(role)
+		await ac
+			.can(role)
 			.context({ location: userLoc, owner: dogLoc })
 			.execute('modify')
 			.on('dogLocation'),
 
 	/** Checks if a user may delete a dog's location. */
 	delete: async (role, userLoc, dogLoc) =>
-		await ac(role)
+		await ac
+			.can(role)
 			.context({ location: userLoc, owner: dogLoc })
 			.execute('delete')
 			.on('dogLocation')

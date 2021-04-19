@@ -1,5 +1,7 @@
 'use strict';
 
+/* istanbul ignore file */
+
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const { googleOauth } = require('../config').config;
 const userModel = require('../models/users');

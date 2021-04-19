@@ -10,13 +10,15 @@ const Router = require('koa-router');
 const bodyParser = require('koa-bodyparser');
 
 const staffModel = require('../models/staff');
+const locationModel = require('../models/locations');
 
-const auth = require('../controllers/auth');
+const { auth } = require('../controllers/auth');
 const can = require('../permissions/staff');
 
-const { validateStaff } = require('../controllers/validation');
+const { validateStaff, validateStaffUpdate } = require('../controllers/validation');
 
-const router = new Router({ prefix: '/api/v1/staff' });
+const prefix = '/api/v1/staff';
+const router = new Router({ prefix });
 router.use(bodyParser());
 
 /**
@@ -30,7 +32,16 @@ const getAll = async ctx => {
 		ctx.status = 403;
 		return;
 	}
-	ctx.body = await staffModel.getAll();
+	let staffList = await staffModel.getAll();
+	staffList = staffList.map(staff => {
+		staff.links = {
+			self: `${ctx.protocol}://${ctx.host}${prefix}/${staff.id}`,
+			user: `${ctx.protocol}://${ctx.host}/api/v1/users/${staff.userId}`,
+			location: `${ctx.protocol}://${ctx.host}/api/v1/locations/${staff.locationId}`
+		};
+		return staff;
+	});
+	ctx.body = staffList;
 };
 
 /**
@@ -38,22 +49,28 @@ const getAll = async ctx => {
  * @param {object} ctx Koa context
  */
 const createStaff = async ctx => {
-	const { staffKey, userId, locationId } = ctx.request.body;
-	const { role } = ctx.state.user;
+	const { staffKey, locationId } = ctx.request.body;
+	const { id: userId, role } = ctx.state.user;
 	const permission = await can.create(role, staffKey);
 	if (!permission.granted) {
 		ctx.status = 403;
 		return;
 	}
-	try {
-		const id = await staffModel.add(userId, locationId);
-		if (id) {
-			ctx.status = 201;
-			ctx.body = { id, created: true, link: `${ctx.request.path}/${id}` };
+	const location = await locationModel.getById(locationId);
+	if (location) {
+		const staff = await staffModel.getByLocationId(locationId);
+		if (staff) {
+			ctx.status = 400;
+			ctx.message = 'Staff already exists for this location.';
+			return;
 		}
-	} catch (err) {
-		ctx.status = 500;
-		ctx.body = err;
+		const id = await staffModel.add(userId, locationId);
+		ctx.status = 201;
+		ctx.body = {
+			id,
+			created: true,
+			link: `${ctx.protocol}://${ctx.host}${ctx.request.path}/${id}`
+		};
 	}
 };
 
@@ -70,50 +87,57 @@ const getStaff = async ctx => {
 		ctx.status = 403;
 		return;
 	}
-	try {
-		const staff = await staffModel.getByStaffId(id);
-		if (staff) ctx.body = staff;
-	} catch (err) {
-		ctx.status = 500;
-		ctx.body = err;
+	const staff = await staffModel.getByStaffId(id);
+	if (staff) {
+		staff.links = {
+			self: `${ctx.protocol}://${ctx.host}${prefix}/${staff.id}`,
+			user: `${ctx.protocol}://${ctx.host}/api/v1/users/${staff.userId}`,
+			location: `${ctx.protocol}://${ctx.host}/api/v1/locations/${staff.locationId}`
+		};
+		ctx.body = staff;
 	}
 };
 
 const updateStaff = async ctx => {
-	const id = ctx.params.id;
+	const id = parseInt(ctx.params.id);
 	const { locationId } = ctx.request.body;
 	const { id: userId, role } = ctx.state.user;
-	try {
-		const staff = await staffModel.getByStaffId(id);
-		if (staff) {
-			const permission = await can.modify(role, userId, staff.userId);
-			if (!permission.granted) {
-				ctx.status = 403;
-				return;
-			}
-			const result = await staffModel.update(id, locationId);
-			if (result) ctx.body = { id, updated: true, link: `${ctx.request.path}/${id}` };
+	const staff = await staffModel.getByStaffId(id);
+	if (staff) {
+		const { userId: staffUser } = staff;
+		const permission = await can.modify(role, userId, staffUser);
+		if (!permission.granted) {
+			ctx.status = 403;
+			return;
 		}
-	} catch (err) {
-		ctx.status = 500;
-		ctx.body = err;
+		const locationStaff = await staffModel.getByLocationId(locationId);
+		if (locationStaff) {
+			ctx.status = 400;
+			ctx.body = { message: 'Location has a staff member assigned.' };
+			return;
+		}
+		await staffModel.update(id, locationId);
+		ctx.body = {
+			id,
+			updated: true,
+			link: `${ctx.protocol}://${ctx.host}${ctx.request.path}`
+		};
 	}
 };
 
 const deleteStaff = async ctx => {
-	const id = ctx.params.id;
-	const { role } = ctx.state.user;
-	const permission = await can.delete(role);
-	if (!permission.granted) {
-		ctx.status = 403;
-		return;
-	}
-	try {
-		const result = await staffModel.delete(id);
-		if (result) ctx.body = { id, deleted: true };
-	} catch (err) {
-		ctx.status = 500;
-		ctx.body = err;
+	const id = parseInt(ctx.params.id);
+	const { id: userId, role } = ctx.state.user;
+	const staff = await staffModel.getByStaffId(id);
+	if (staff) {
+		const { userId: staffUser } = staff;
+		const permission = await can.delete(role, userId, staffUser);
+		if (!permission.granted) {
+			ctx.status = 403;
+			return;
+		}
+		await staffModel.delete(id);
+		ctx.body = { id, deleted: true };
 	}
 };
 
@@ -121,7 +145,7 @@ router.get('/', auth, getAll);
 router.post('/', auth, validateStaff, createStaff);
 
 router.get('/:id([0-9]+)', auth, getStaff);
-router.put('/:id([0-9]+)', auth, validateStaff, updateStaff);
+router.put('/:id([0-9]+)', auth, validateStaffUpdate, updateStaff);
 router.del('/:id([0-9]+)', auth, deleteStaff);
 
 module.exports = router;

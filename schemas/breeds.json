@@ -96,6 +96,24 @@
 				}
 			}
 		},
+		"breedDeleted": {
+			"$id": "#breedDeleted",
+			"title": "Breed deleted",
+			"description": "Confirmation of breed removal",
+			"type": "object",
+			"properties": {
+				"id": {
+					"description": "ID of the deleted breed",
+					"type": "integer",
+					"examples": [2]
+				},
+				"deleted": {
+					"description": "Indiactor of removal success",
+					"type": "boolean"
+				}
+			},
+			"additionalProperties": false
+		},
 		"breedDogs": {
 			"$id": "#breedDogs",
 			"title": "Breed dogs",

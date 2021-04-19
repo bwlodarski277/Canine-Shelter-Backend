@@ -12,16 +12,23 @@ const bodyParser = require('koa-bodyparser');
 const userModel = require('../models/users');
 const favsModel = require('../models/favourites');
 const chatModel = require('../models/chats');
+const dogModel = require('../models/dogs');
 
 const { auth } = require('../controllers/auth');
 const { config } = require('../config');
 
-const { validateUser, validateFavourite } = require('../controllers/validation');
+const {
+	validateUser,
+	validateUserUpdate,
+	validateFavourite
+} = require('../controllers/validation');
 
 const can = require('../permissions/users');
 const { clamp } = require('../helpers/utils');
 
-const router = new Router({ prefix: '/api/v1/users' });
+const prefix = '/api/v1/users';
+const router = new Router({ prefix });
+
 router.use(bodyParser());
 
 /**
@@ -29,7 +36,7 @@ router.use(bodyParser());
  * @param {object} ctx context passed from Koa.
  */
 const getAll = async ctx => {
-	const permission = await can.getAll(ctx.state.user);
+	const permission = await can.user.getAll(ctx.state.user);
 	if (!permission.granted) {
 		ctx.status = 403;
 		return;
@@ -45,14 +52,22 @@ const getAll = async ctx => {
 	limit = clamp(limit, 1, 20); // Clamping the limit to be between 1 and 20.
 	direction = direction === 'desc' ? 'desc' : 'asc';
 	if (!Array.isArray(select)) select = Array(select);
-	try {
-		let users = await userModel.getAll(query, select, page, limit, order, direction);
-		users = users.map(user => permission.filter(user));
-		ctx.body = users;
-	} catch (err) {
-		ctx.status = 500;
-		ctx.body = err;
-	}
+	let users = await userModel.getAll(query, page, limit, order, direction);
+	users = users.map(user => {
+		// filtering out fields the user can't see
+		user = permission.filter(user);
+		// Selecting fields the user wants]
+		const partial = { id: user.id };
+		select.map(field => (partial[field] = user[field]));
+		const self = `${ctx.protocol}://${ctx.host}${prefix}/${partial.id}`;
+		partial.links = {
+			self: self,
+			favourites: `${self}/favourites`,
+			chats: `${self}/chats`
+		};
+		return partial;
+	});
+	ctx.body = users;
 };
 
 /**
@@ -60,24 +75,33 @@ const getAll = async ctx => {
  * @param {object} ctx context passed from Koa.
  */
 const getUser = async ctx => {
-	const id = ctx.params.id;
+	const id = parseInt(ctx.params.id);
 	let { select = [] } = ctx.request.query;
 	if (!Array.isArray(select)) select = Array(select);
-	try {
-		let user = await userModel.getById(id, select);
-		if (user) {
-			const { id: userId, role } = ctx.state.user;
-			const permission = await can.get(role, userId, id);
-			if (!permission.granted) {
-				ctx.status = 403;
-				return;
-			}
-			user = permission.filter(user);
-			ctx.body = user;
+	let user = await userModel.getById(id);
+	if (user) {
+		const { id: userId, role } = ctx.state.user;
+		const permission = await can.user.get(role, userId, id);
+		if (!permission.granted) {
+			ctx.status = 403;
+			return;
 		}
-	} catch (err) {
-		ctx.status = 500;
-		ctx.body = err;
+		// filtering out fields the user can't see
+		user = permission.filter(user);
+		// Selecting fields the user wants
+		let partial;
+		// If nothing is selected, return everything
+		if (select.length === 0) partial = user;
+		else {
+			partial = { id: user.id };
+			select.map(field => (partial[field] = user[field]));
+		}
+		const self = `${ctx.protocol}://${ctx.host}${prefix}/${partial.id}`;
+		partial.links = {
+			favourites: `${self}/favourites`,
+			chats: `${self}/chats`
+		};
+		ctx.body = partial;
 	}
 };
 
@@ -86,19 +110,31 @@ const getUser = async ctx => {
  * @param {object} ctx context passed from Koa.
  */
 const createUser = async ctx => {
-	const { staffKey, role, ...body } = ctx.request.body;
+	const { staffKey, ...body } = ctx.request.body;
+	const { username, email } = body;
 	// Giving the user the role 'staff' if they provide right key.
 	body.role = staffKey === config.staffKey ? 'staff' : 'user';
-	try {
-		const id = await userModel.add(body);
-		if (id) {
-			ctx.status = 201;
-			ctx.body = { ID: id, created: true, link: `${ctx.request.path}/${id}` };
-		}
-	} catch (err) {
-		ctx.status = 500;
-		ctx.body = err;
+	// Making sure username isn't taken
+	let user = await userModel.getByUsername(username);
+	if (user) {
+		ctx.status = 400;
+		ctx.body = { message: 'Username is taken.' };
+		return;
 	}
+	// Making sure email isn't taken
+	user = await userModel.getByEmail(email);
+	if (user) {
+		ctx.status = 400;
+		ctx.body = { message: 'Email is taken.' };
+		return;
+	}
+	const id = await userModel.add(body);
+	ctx.status = 201;
+	ctx.body = {
+		id,
+		created: true,
+		link: `${ctx.protocol}://${ctx.host}${ctx.request.path}/${id}`
+	};
 };
 
 /**
@@ -106,19 +142,22 @@ const createUser = async ctx => {
  * @param {object} ctx context passed from Koa.
  */
 const updateUser = async ctx => {
-	const userId = ctx.params.id;
-	const user = await userModel.getById(userId);
+	const { id: userId, role } = ctx.state.user;
+	const id = parseInt(ctx.params.id);
+	const user = await userModel.getById(id);
 	if (user) {
-		// Excluding fields that must not be updated
-		const { id, dateCreated, ...body } = ctx.request.body;
-		try {
-			const result = await userModel.update(userId, body);
-			// Knex returns amount of affected rows.
-			if (result) ctx.body = { id: userId, updated: true, link: ctx.request.path };
-		} catch (err) {
-			ctx.status = 500;
-			ctx.body = err;
+		const permission = await can.user.modify(role, userId, id);
+		if (!permission.granted) {
+			ctx.status = 403;
+			return;
 		}
+		const { body } = ctx.request;
+		await userModel.update(id, body);
+		ctx.body = {
+			id: id,
+			updated: true,
+			link: `${ctx.protocol}://${ctx.host}${ctx.request.path}`
+		};
 	}
 };
 
@@ -127,16 +166,17 @@ const updateUser = async ctx => {
  * @param {object} ctx context passed from Koa.
  */
 const deleteUser = async ctx => {
-	const id = ctx.params.id;
-	try {
-		const user = await userModel.getById(id);
-		if (user) {
-			const result = await userModel.delete(id);
-			if (result) ctx.body = { id, deleted: true };
+	const id = parseInt(ctx.params.id);
+	const { id: userId, role } = ctx.state.user;
+	const user = await userModel.getById(id);
+	if (user) {
+		const permission = await can.user.delete(role, userId, id);
+		if (!permission.granted) {
+			ctx.status = 403;
+			return;
 		}
-	} catch (err) {
-		ctx.status = 500;
-		ctx.body = err;
+		await userModel.delete(id);
+		ctx.body = { id, deleted: true };
 	}
 };
 
@@ -145,13 +185,17 @@ const deleteUser = async ctx => {
  * @param {object} ctx context passed from Koa.
  */
 const getUserFavs = async ctx => {
-	const id = ctx.params.id;
-	try {
+	const id = parseInt(ctx.params.id);
+	const { id: userId, role } = ctx.state.user;
+	const user = await userModel.getById(id);
+	if (user) {
+		const permission = await can.favourite.get(role, userId, id);
+		if (!permission.granted) {
+			ctx.status = 403;
+			return;
+		}
 		const favourites = await favsModel.getByUserId(id);
-		if (favourites) ctx.body = favourites;
-	} catch (err) {
-		ctx.status = 500;
-		ctx.body = err;
+		ctx.body = favourites;
 	}
 };
 
@@ -160,21 +204,36 @@ const getUserFavs = async ctx => {
  * @param {object} ctx context passed from Koa.
  */
 const addUserFav = async ctx => {
-	const userId = ctx.params.id;
+	const id = parseInt(ctx.params.id);
+	const { id: userId, role } = ctx.state.user;
 	const { dogId } = ctx.request.body;
-	try {
-		const result = await favsModel.add(userId, dogId);
-		if (result) {
+	const user = await userModel.getById(id);
+	if (user) {
+		const permission = await can.favourite.create(role, userId, id);
+		if (!permission.granted) {
+			ctx.status = 403;
+			return;
+		}
+		const dog = await dogModel.getById(dogId);
+		if (dog) {
+			let favs = await favsModel.getByUserId(id);
+			favs = favs.filter(fav => fav.dogId === dogId);
+			if (favs.length) {
+				ctx.status = 400;
+				ctx.body = { message: 'Dog is already a favourite.' };
+				return;
+			}
+			const favId = await favsModel.add(userId, dogId);
 			ctx.status = 201;
 			ctx.body = {
-				id: userId,
+				id: favId,
 				created: true,
-				link: `${ctx.request.path}/${dogId}`
+				link: `${ctx.protocol}://${ctx.host}${ctx.request.path}/${favId}`
 			};
+		} else {
+			ctx.status = 400;
+			ctx.body = { message: 'Dog does not exist.' };
 		}
-	} catch (err) {
-		ctx.status = 500;
-		ctx.body = err;
 	}
 };
 
@@ -183,13 +242,21 @@ const addUserFav = async ctx => {
  * @param {object} ctx context passed from Koa.
  */
 const getUserFav = async ctx => {
-	const favId = ctx.params.favId;
-	try {
-		const result = await favsModel.getSingleFav(favId);
-		if (result) ctx.body = result;
-	} catch (err) {
-		ctx.status = 500;
-		ctx.body = err;
+	let { id, favId } = ctx.params;
+	id = parseInt(id);
+	favId = parseInt(favId);
+	const { id: userId, role } = ctx.state.user;
+	const user = await userModel.getById(id);
+	if (user) {
+		const favourite = await favsModel.getSingleFav(favId);
+		if (favourite) {
+			const permission = await can.favourite.get(role, userId, id);
+			if (!permission.granted) {
+				ctx.status = 403;
+				return;
+			}
+			ctx.body = favourite;
+		}
 	}
 };
 
@@ -198,13 +265,22 @@ const getUserFav = async ctx => {
  * @param {object} ctx context passed from Koa.
  */
 const deleteUserFav = async ctx => {
-	const favId = ctx.params.favId;
-	try {
-		const result = await favsModel.delete(favId);
-		if (result) ctx.body = { id: favId, deleted: true };
-	} catch (err) {
-		ctx.status = 500;
-		ctx.body = err;
+	let { id, favId } = ctx.params;
+	id = parseInt(id);
+	favId = parseInt(favId);
+	const { id: userId, role } = ctx.state.user;
+	const user = await userModel.getById(id);
+	if (user) {
+		const favourite = await favsModel.getSingleFav(favId);
+		if (favourite) {
+			const permission = await can.favourite.delete(role, userId, id);
+			if (!permission.granted) {
+				ctx.status = 403;
+				return;
+			}
+			await favsModel.delete(favId);
+			ctx.body = { id: favId, deleted: true };
+		}
 	}
 };
 
@@ -213,13 +289,17 @@ const deleteUserFav = async ctx => {
  * @param {object} ctx context passed from koa.
  */
 const getUserChats = async ctx => {
-	const userId = ctx.params.id;
-	try {
+	const userId = parseInt(ctx.params.id);
+	const { id, role } = ctx.state.user;
+	const user = await userModel.getById(userId);
+	if (user) {
+		const permission = await can.user.get(role, userId, id);
+		if (!permission.granted) {
+			ctx.status = 403;
+			return;
+		}
 		const chats = await chatModel.getByUserId(userId);
-		if (chats) ctx.body = chats;
-	} catch (err) {
-		ctx.status = 500;
-		ctx.body = err;
+		ctx.body = chats;
 	}
 };
 
@@ -227,7 +307,7 @@ router.get('/', auth, getAll);
 router.post('/', validateUser, createUser);
 
 router.get('/:id([0-9]+)', auth, getUser);
-router.put('/:id([0-9]+)', auth, validateUser, updateUser);
+router.put('/:id([0-9]+)', auth, validateUserUpdate, updateUser);
 router.del('/:id([0-9]+)', auth, deleteUser);
 
 router.get('/:id([0-9]+)/favourites', auth, getUserFavs);
