@@ -21,6 +21,7 @@ const { validateLocation, validateLocationUpdate } = require('../controllers/val
 
 const { auth } = require('../controllers/auth');
 const { clamp } = require('../helpers/utils');
+const { ifModifiedSince, ifNoneMatch } = require('../helpers/caching');
 
 const can = require('../permissions/locations');
 
@@ -33,7 +34,7 @@ router.use(bodyParser());
  * Gets all the locations from the database.
  * @param {object} ctx context passed from Koa.
  */
-const getAll = async ctx => {
+const getAll = async (ctx, next) => {
 	let {
 		query = '',
 		select = [],
@@ -58,13 +59,14 @@ const getAll = async ctx => {
 		return partial;
 	});
 	ctx.body = locations;
+	return next();
 };
 
 /**
  * Gets a single location from the database by ID.
  * @param {object} ctx context passed from Koa.
  */
-const getLocation = async ctx => {
+const getLocation = async (ctx, next) => {
 	const id = ctx.params.id;
 	let { select = [] } = ctx.request.query;
 	if (!Array.isArray(select)) select = Array(select);
@@ -85,6 +87,7 @@ const getLocation = async ctx => {
 			chats: `${self}/chats`
 		};
 		ctx.body = partial;
+		return next();
 	}
 };
 
@@ -158,7 +161,7 @@ const deleteLocation = async ctx => {
  * Gets all the dogs at a location by ID.
  * @param {object} ctx context passed from Koa.
  */
-const getLocationDogs = async ctx => {
+const getLocationDogs = async (ctx, next) => {
 	const locationId = ctx.params.id;
 	const location = await locationsModel.getById(locationId);
 	if (location) {
@@ -169,6 +172,7 @@ const getLocationDogs = async ctx => {
 			};
 		});
 		ctx.body = locationDogs;
+		return next();
 	}
 };
 
@@ -176,7 +180,7 @@ const getLocationDogs = async ctx => {
  * Gets all chats at a location by ID.
  * @param {object} ctx context passed from Koa.
  */
-const getAllChats = async ctx => {
+const getAllChats = async (ctx, next) => {
 	const locationId = parseInt(ctx.params.id);
 	const { id: userId, role } = ctx.state.user;
 	const { locationId: staffLoc } = (await staffModel.getByUserId(userId)) || {};
@@ -198,6 +202,7 @@ const getAllChats = async ctx => {
 			return chat;
 		});
 		ctx.body = chats;
+		return next();
 	}
 };
 
@@ -250,7 +255,7 @@ const deleteChat = async ctx => {
 	}
 };
 
-const getChat = async ctx => {
+const getChat = async (ctx, next) => {
 	let { id: locationId, chatId } = ctx.params;
 	locationId = parseInt(locationId);
 	chatId = parseInt(chatId);
@@ -273,11 +278,12 @@ const getChat = async ctx => {
 				user: `${ctx.protocol}://${ctx.host}/api/v1/users/${chat.userId}`
 			};
 			ctx.body = chat;
+			return next();
 		}
 	}
 };
 
-const getMessages = async ctx => {
+const getMessages = async (ctx, next) => {
 	let { id: locationId, chatId } = ctx.params;
 	locationId = parseInt(locationId);
 	chatId = parseInt(chatId);
@@ -302,6 +308,7 @@ const getMessages = async ctx => {
 				return chatMsg;
 			});
 			ctx.body = chatMessages;
+			return next();
 		}
 	}
 };
@@ -345,7 +352,7 @@ const sendMessage = async ctx => {
 	}
 };
 
-const getMessage = async ctx => {
+const getMessage = async (ctx, next) => {
 	let { id: locationId, chatId, messageId } = ctx.params;
 	locationId = parseInt(locationId);
 	chatId = parseInt(chatId);
@@ -368,13 +375,15 @@ const getMessage = async ctx => {
 				return;
 			}
 			const message = await messagesModel.getById(messageId);
-			if (message) ctx.body = message;
+			if (message) {
+				ctx.body = message;
+				return next();
+			}
 		}
 	}
 };
 
 const deleteMessage = async ctx => {
-	// const { id: locationId, chatId, messageId } = ctx.params;
 	const locationId = parseInt(ctx.params.id);
 	const chatId = parseInt(ctx.params.chatId);
 	const messageId = parseInt(ctx.params.messageId);
@@ -408,25 +417,25 @@ const deleteMessage = async ctx => {
 	}
 };
 
-router.get('/', getAll);
+router.get('/', getAll, ifNoneMatch);
 router.post('/', auth, validateLocation, addLocation);
 
-router.get('/:id([0-9]+)', getLocation);
+router.get('/:id([0-9]+)', getLocation, ifModifiedSince);
 router.put('/:id([0-9]+)', auth, validateLocationUpdate, updateLocation);
 router.del('/:id([0-9]+)', auth, deleteLocation);
 
-router.get('/:id([0-9]+)/dogs', getLocationDogs);
+router.get('/:id([0-9]+)/dogs', getLocationDogs, ifNoneMatch);
 
-router.get('/:id([0-9]+)/chats', auth, getAllChats);
+router.get('/:id([0-9]+)/chats', auth, getAllChats, ifNoneMatch);
 router.post('/:id([0-9]+)/chats', auth, createChat);
 
-router.get('/:id([0-9]+)/chats/:chatId', auth, getChat);
+router.get('/:id([0-9]+)/chats/:chatId', auth, getChat, ifNoneMatch);
 router.del('/:id([0-9]+)/chats/:chatId', auth, deleteChat);
 
-router.get('/:id([0-9]+)/chats/:chatId/messages', auth, getMessages);
+router.get('/:id([0-9]+)/chats/:chatId/messages', auth, getMessages, ifNoneMatch);
 router.post('/:id([0-9]+)/chats/:chatId/messages', auth, sendMessage);
 
-router.get('/:id([0-9]+)/chats/:chatId/messages/:messageId', auth, getMessage);
+router.get('/:id([0-9]+)/chats/:chatId/messages/:messageId', auth, getMessage, ifModifiedSince);
 router.del('/:id([0-9]+)/chats/:chatId/messages/:messageId', auth, deleteMessage);
 
 module.exports = router;
