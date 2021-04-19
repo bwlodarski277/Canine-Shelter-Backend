@@ -1,5 +1,6 @@
 CREATE TABLE `locations` (
     `id` int PRIMARY KEY NOT NULL AUTO_INCREMENT,
     `name` varchar(128) NOT NULL,
-    `address` text
+    `address` text,
+    `modified` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;
 );
