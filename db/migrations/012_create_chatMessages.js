@@ -2,7 +2,7 @@
 
 // eslint-disable-next-line no-unused-vars
 const Knex = require('knex');
-const { stringFromFile } = require('../../helpers/utils');
+const stringFromFile = require('../stringFromFile');
 
 /**
  * Creates the chatMessages table.

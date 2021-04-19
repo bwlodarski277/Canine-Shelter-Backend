@@ -130,7 +130,11 @@ const createUser = async ctx => {
 	}
 	const id = await userModel.add(body);
 	ctx.status = 201;
-	ctx.body = { id, created: true, link: `${ctx.request.path}/${id}` };
+	ctx.body = {
+		id,
+		created: true,
+		link: `${ctx.protocol}://${ctx.host}${ctx.request.path}/${id}`
+	};
 };
 
 /**
@@ -149,7 +153,11 @@ const updateUser = async ctx => {
 		}
 		const { body } = ctx.request;
 		await userModel.update(id, body);
-		ctx.body = { id: id, updated: true, link: ctx.request.path };
+		ctx.body = {
+			id: id,
+			updated: true,
+			link: `${ctx.protocol}://${ctx.host}${ctx.request.path}`
+		};
 	}
 };
 
@@ -220,7 +228,7 @@ const addUserFav = async ctx => {
 			ctx.body = {
 				id: favId,
 				created: true,
-				link: `${ctx.request.path}/${favId}`
+				link: `${ctx.protocol}://${ctx.host}${ctx.request.path}/${favId}`
 			};
 		} else {
 			ctx.status = 400;

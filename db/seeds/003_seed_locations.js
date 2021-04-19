@@ -4,9 +4,12 @@
 const Knex = require('knex');
 
 const locations = [
-	{ name: 'Coventry shelter', address: 'Sample Address, Sample Place, UK' },
-	{ name: 'Birmingham Shelter', address: 'Another Address, Another Place' },
-	{ name: 'Brighton Shelter', address: 'Another place etc' }
+	{ name: 'Coventry shelter', address: 'Sample Address, Sample Place, UK' }, //1
+	{ name: 'Birmingham Shelter', address: 'Another Address, Another Place' }, //2
+	{ name: 'Brighton Shelter', address: 'Another place etc' }, //3
+	{ name: 'Another Shelter', address: 'Another place etc' }, //4
+	{ name: 'Bournemouth Shelter', address: 'Yet another place' }, //5
+	{ name: 'Cambridge Shelter', address: 'Yet another place' } //6
 ];
 
 /**

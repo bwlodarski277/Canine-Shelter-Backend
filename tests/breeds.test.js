@@ -79,7 +79,7 @@ describe('GET /breeds/{id}', () => {
 });
 
 describe('GET /breeds/{id}/dogs', () => {
-	it('should get a list of dog breeds', async () => {
+	it('should get a list of breed dogs', async () => {
 		const res = await request(app).get('/api/v1/breeds/1/dogs');
 		expect(res.status).toBe(200);
 		expect(res.body).toBeInstanceOf(Array);

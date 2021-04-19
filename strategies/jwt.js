@@ -24,21 +24,10 @@ const opts = {
  * @async
  */
 const checkUser = async (jwtPayload, done) => {
-	let user;
+	const user = await userModel.getById(jwtPayload.sub);
 
-	try {
-		user = await userModel.getById(jwtPayload.sub);
-	} catch (error) {
-		console.error(`Error during authentication for user ${jwtPayload.name}`);
-		return done(error);
-	}
-
-	if (user) {
-		console.log(`Successfully authenticated user ${jwtPayload.name}.`);
-		return done(null, user);
-	}
-	return done(null, false);
-	// return done(null, { role: 'guest' });
+	console.log(`Successfully authenticated user ${jwtPayload.name}.`);
+	return done(null, user);
 };
 
 module.exports = new JwtStrategy(opts, checkUser);

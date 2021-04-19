@@ -44,7 +44,6 @@ describe('GET /users', () => {
 			.set({ Authorization: `Basic ${btoa('TestStaff:staffPass')}` });
 		expect(res.status).toBe(200);
 		expect(res.body).toBeInstanceOf(Array);
-		expect(res.body[0]).toMatchObject({ id: 5 });
 	});
 
 	it('should filter data correctly', async () => {
@@ -383,6 +382,14 @@ describe('PUT /users/{id}', () => {
 			.set({ Authorization: `Basic ${btoa('TestUser:userPass')}` })
 			.send({ invalid: 'value' });
 		expect(res.status).toBe(400);
+	});
+
+	it('should hash the password', async () => {
+		const res = await request(app)
+			.put('/api/v1/users/1')
+			.set({ Authorization: `Basic ${btoa('TestUser:userPass')}` })
+			.send({ password: 'userPass' });
+		expect(res.status).toBe(200);
 	});
 
 	it('should check that the user exists', async () => {

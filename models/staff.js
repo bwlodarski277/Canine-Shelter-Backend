@@ -49,6 +49,17 @@ exports.getByStaffId = async id => {
 };
 
 /**
+ * Gets a location's staff member by location ID.
+ * @param {number} locationId ID of location to fetch staff for.
+ * @returns {Promise<Staff>} record containing staff member's location.
+ * @async
+ */
+exports.getByLocationId = async locationId => {
+	const [data] = await run(async () => await db('staff').where({ locationId }));
+	return data;
+};
+
+/**
  * Creates a new staff member entry in the DB.
  * @param {number} userId ID of the user to assign to a location.
  * @param {number} locationId ID of the location to assign staff to.

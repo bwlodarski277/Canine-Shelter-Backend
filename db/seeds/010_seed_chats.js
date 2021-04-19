@@ -4,8 +4,13 @@
 const Knex = require('knex');
 
 const chats = [
-	{ locationId: 1, userId: 1 },
-	{ locationId: 2, userId: 5 }
+	{ locationId: 1, userId: 1 }, //1
+	{ locationId: 2, userId: 5 }, //2
+	{ locationId: 1, userId: 2 }, //3
+	{ locationId: 1, userId: 3 }, //4
+	{ locationId: 1, userId: 4 }, //5
+	{ locationId: 4, userId: 6 }, //6
+	{ locationId: 4, userId: 5 } //7
 ];
 
 /**

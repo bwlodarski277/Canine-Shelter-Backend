@@ -47,15 +47,16 @@ exports.run = async dbQuery => {
  * Used to hide sensitive information when an error happens in the DB.
  * @memberof helpers/database
  */
-exports.DatabaseException = class DatabaseException {
+class DatabaseException extends Error {
 	/**
 	 * @param {string} message error message to provide
 	 * @param {number|string} code exception's error code
 	 */
 	constructor(message, code, errno) {
+		super(message);
 		this.message = message;
 		this.code = code;
 		this.errno = errno;
 		this.name = 'DatabaseException';
 	}
-};
+}

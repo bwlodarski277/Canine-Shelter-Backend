@@ -38,7 +38,6 @@ exports.getAll = async (query, page, limit, order, direction) => {
 	const data = await run(
 		async () =>
 			await db('dogs')
-				// .select(...select)
 				// Safe as it is escaped by driver
 				.where('name', 'like', `%${query}%`)
 				.orWhere('description', 'like', `%${query}%`)

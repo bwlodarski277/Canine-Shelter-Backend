@@ -37,16 +37,16 @@ exports.getSingleFav = async id => {
 	return data;
 };
 
-/**
- * Gets a list of users that favourited a dog.
- * @param {number} dogId ID of the dog to find the favourites of.
- * @returns {Promise<Array<Favourite>>} list of users who favourited a dog.
- * @async
- */
-exports.getByDogId = async dogId => {
-	const data = await run(async () => await db('favourites').where({ dogId }));
-	return data;
-};
+// /**
+//  * Gets a list of users that favourited a dog.
+//  * @param {number} dogId ID of the dog to find the favourites of.
+//  * @returns {Promise<Array<Favourite>>} list of users who favourited a dog.
+//  * @async
+//  */
+// exports.getByDogId = async dogId => {
+// 	const data = await run(async () => await db('favourites').where({ dogId }));
+// 	return data;
+// };
 
 /**
  * Gets a count of users that favourited a dog.

@@ -11,8 +11,11 @@ const ac = new AccessControl();
 
 const { config } = require('../config');
 
-// Users may attempt to register themselves as staff
-ac.grant('user')
+// Not used, but added to make sure user is role exists
+ac.grant('user').execute('none').on('none');
+
+// Staff may assign themselves to a location
+ac.grant('staff')
 	.condition({ Fn: 'EQUALS', args: { key: config.staffKey } })
 	.execute('create')
 	.on('staff');
@@ -24,6 +27,12 @@ ac.grant('staff').execute('read').on('staff');
 ac.grant('staff')
 	.condition({ Fn: 'EQUALS', args: { user: '$.owner' } })
 	.execute('modify')
+	.on('staff');
+
+// Staff may delete their own record
+ac.grant('staff')
+	.condition({ Fn: 'EQUALS', args: { user: '$.owner' } })
+	.execute('delete')
 	.on('staff');
 
 // Admins may perform the same actions but also delete staff.
@@ -55,11 +64,14 @@ exports.read = async role => await ac.can(role).execute('read').on('staff');
  * @returns permission object
  */
 exports.modify = async (role, user, owner) =>
-	await ac.can(role).condition({ user, owner }).execute('modify').on('staff');
+	await ac.can(role).context({ user, owner }).execute('modify').on('staff');
 
 /**
  * Checks if a user may delete a staff member.
  * @param {string} role user's role
+ * @param {number} user user ID
+ * @param {number} owner ID of staff member being modified
  * @returns permission object
  */
-exports.delete = async role => await ac.can(role).execute('delete').on('staff');
+exports.delete = async (role, user, owner) =>
+	await ac.can(role).context({ user, owner }).execute('delete').on('staff');

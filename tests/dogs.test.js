@@ -14,7 +14,7 @@ afterAll(() => {
 });
 
 describe('GET /dogs', () => {
-	it('should not allow unauthorised dogs to view dogs list', async () => {
+	it('should allow users to view dogs list', async () => {
 		const res = await request(app).get('/api/v1/dogs');
 		expect(res.status).toBe(200);
 		expect(res.body).toBeInstanceOf(Array);

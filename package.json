@@ -23,10 +23,11 @@
 	"jest": {
 		"testEnvironment": "node",
 		"coveragePathIgnorePatterns": [
-			"/node_modules/",
-			"/docs",
-			"/.vscode",
-			"/openapi"
+			".vscode",
+			"db",
+			"docs",
+			"node_modules",
+			"openapi"
 		]
 	},
 	"author": "Bartlomiej Wlodarski",

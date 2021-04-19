@@ -106,7 +106,11 @@ const addDog = async ctx => {
 	const body = ctx.request.body;
 	const id = await dogModel.add(body);
 	ctx.status = 201;
-	ctx.body = { id, created: true, link: `${ctx.request.path}/${id}` };
+	ctx.body = {
+		id,
+		created: true,
+		link: `${ctx.protocol}://${ctx.host}${ctx.request.path}/${id}`
+	};
 };
 
 /**
@@ -129,7 +133,11 @@ const updateDog = async ctx => {
 		const { body } = ctx.request;
 		await dogModel.update(dogId, body);
 		ctx.status = 200;
-		ctx.body = { id: dogId, updated: true, link: ctx.request.path };
+		ctx.body = {
+			id: dogId,
+			updated: true,
+			link: `${ctx.protocol}://${ctx.host}${ctx.request.path}`
+		};
 	}
 };
 
@@ -163,7 +171,7 @@ const getDogBreed = async ctx => {
 	const id = ctx.params.id;
 	const dogBreed = await dogBreedModel.getByDogId(id);
 	if (dogBreed) {
-		const breed = `${ctx.protocol}://${ctx.host}/breeds/${dogBreed.breedId}`;
+		const breed = `${ctx.protocol}://${ctx.host}/api/v1/breeds/${dogBreed.breedId}`;
 		dogBreed.links = { breed };
 		ctx.body = dogBreed;
 	}
@@ -192,7 +200,11 @@ const addDogBreed = async ctx => {
 		}
 		await dogBreedModel.add(dogId, breedId);
 		ctx.status = 201;
-		ctx.body = { id: dogId, created: true, link: ctx.request.path };
+		ctx.body = {
+			id: dogId,
+			created: true,
+			link: `${ctx.protocol}://${ctx.host}${ctx.request.path}`
+		};
 	}
 };
 
@@ -215,7 +227,11 @@ const updateDogBreed = async ctx => {
 			return;
 		}
 		await dogBreedModel.update(dogId, breedId);
-		ctx.body = { id: dogId, updated: true, link: ctx.request.path };
+		ctx.body = {
+			id: dogId,
+			updated: true,
+			link: `${ctx.protocol}://${ctx.host}${ctx.request.path}`
+		};
 	}
 };
 
@@ -256,7 +272,7 @@ const getDogLocation = async ctx => {
 	const dogId = ctx.params.id;
 	const dogLocation = await dogLocationModel.getByDogId(dogId);
 	if (dogLocation) {
-		const location = `${ctx.protocol}://${ctx.host}/breeds/${dogLocation.locationId}`;
+		const location = `${ctx.protocol}://${ctx.host}/api/v1/breeds/${dogLocation.locationId}`;
 		dogLocation.links = { location };
 		ctx.body = dogLocation;
 	}
@@ -288,7 +304,11 @@ const addDogLocation = async ctx => {
 
 		await dogLocationModel.add(dogId, locationId);
 		ctx.status = 201;
-		ctx.body = { id: dogId, created: true, link: ctx.request.path };
+		ctx.body = {
+			id: dogId,
+			created: true,
+			link: `${ctx.protocol}://${ctx.host}${ctx.request.path}`
+		};
 	}
 };
 
@@ -311,7 +331,11 @@ const updateDogLocation = async ctx => {
 			return;
 		}
 		await dogLocationModel.update(dogId, locationId);
-		ctx.body = { id: dogId, updated: true, link: ctx.request.path };
+		ctx.body = {
+			id: dogId,
+			updated: true,
+			link: `${ctx.protocol}://${ctx.host}${ctx.request.path}`
+		};
 	}
 };
 

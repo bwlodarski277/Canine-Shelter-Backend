@@ -10,6 +10,26 @@
 				"locationId": {
 					"description": "Staff location ID",
 					"type": "integer"
+				},
+				"staffKey": {
+					"description": "Staff key to validate staff members",
+					"type": "string",
+					"minLength": 32,
+					"maxLength": 32
+				}
+			},
+			"required": ["locationId", "staffKey"],
+			"additionalProperties": false
+		},
+		"staffUpdate": {
+			"$id": "#staffUpdate",
+			"title": "Staff",
+			"description": "Data to update a staff member",
+			"type": "object",
+			"properties": {
+				"locationId": {
+					"description": "Staff location ID",
+					"type": "integer"
 				}
 			},
 			"required": ["locationId"],

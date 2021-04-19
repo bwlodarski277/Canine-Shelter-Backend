@@ -18,11 +18,27 @@ const { db, run } = require('../helpers/database');
 
 /**
  * Gets all location entries from the DB.
+ * Allows for searching, filtering and sorting.
+ * @param {string} query search for dogs by name and description.
+ * @param {number} page which page to get data from.
+ * @param {number} limit number of items on a page.
+ * @param {string} order what parameter to order by.
+ * @param {'asc'|'desc'} direction direction to sort (asc. or desc.).
  * @returns {Promise<Array<Location>>} array of all location records.
  * @async
  */
-exports.getAll = async () => {
-	const data = await run(async () => await db('locations'));
+exports.getAll = async (query, page, limit, order, direction) => {
+	const offset = (page - 1) * limit;
+	const data = await run(
+		async () =>
+			await db('locations')
+				// Escaped by the driver
+				.where('name', 'like', `%${query}%`)
+				.orWhere('address', 'like', `%${query}%`)
+				.orderBy(order, direction)
+				.limit(limit)
+				.offset(offset)
+	);
 	return data;
 };
 

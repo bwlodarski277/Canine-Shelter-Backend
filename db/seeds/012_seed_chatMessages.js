@@ -7,7 +7,11 @@ const chatMessages = [
 	{ chatId: 1, messageId: 1 },
 	{ chatId: 1, messageId: 2 },
 	{ chatId: 2, messageId: 3 },
-	{ chatId: 2, messageId: 4 }
+	{ chatId: 2, messageId: 4 },
+	{ chatId: 7, messageId: 5 },
+	{ chatId: 7, messageId: 6 },
+	{ chatId: 7, messageId: 7 },
+	{ chatId: 7, messageId: 8 }
 ];
 
 /**

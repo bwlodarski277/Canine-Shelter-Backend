@@ -104,12 +104,10 @@ exports.getByEmail = async email => {
  * @async
  */
 exports.add = async user => {
-	if (user.password) {
-		// Hashing the password and storing it back in the object
-		const { password } = user;
-		const hash = bcrypt.hashSync(password, 10);
-		user.password = hash;
-	}
+	// Hashing the password and storing it back in the object
+	const { password } = user;
+	const hash = bcrypt.hashSync(password, 10);
+	user.password = hash;
 	// Passing data to Knex
 	const [data] = await run(async () => await db('users').insert(user));
 	return data;

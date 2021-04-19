@@ -9,12 +9,18 @@
 const Ajv = require('ajv').default;
 const addFormats = require('ajv-formats').default;
 
+const { refresh } = require('../schemas/auth.json').definitions;
 const { breed } = require('../schemas/breeds.json').definitions;
 const { dog, dogUpdate, dogBreed, dogLocation } = require('../schemas/dogs.json').definitions;
 
-const { location, chat, message } = require('../schemas/locations.json').definitions;
+const {
+	location,
+	locationUpdate,
+	chat,
+	message
+} = require('../schemas/locations.json').definitions;
 
-const { staff } = require('../schemas/staff.json').definitions;
+const { staff, staffUpdate } = require('../schemas/staff.json').definitions;
 const { user, favourite, userUpdate } = require('../schemas/users.json').definitions;
 
 /**
@@ -53,15 +59,18 @@ const makeValidator = schema => {
 	return handler;
 };
 
+exports.validateRefresh = makeValidator(refresh);
 exports.validateBreed = makeValidator(breed);
 exports.validateDog = makeValidator(dog);
 exports.validateDogUpdate = makeValidator(dogUpdate);
 exports.validateDogBreed = makeValidator(dogBreed);
 exports.validateDogLocation = makeValidator(dogLocation);
 exports.validateLocation = makeValidator(location);
+exports.validateLocationUpdate = makeValidator(locationUpdate);
 exports.validateChat = makeValidator(chat);
 exports.validateMessage = makeValidator(message);
 exports.validateStaff = makeValidator(staff);
+exports.validateStaffUpdate = makeValidator(staffUpdate);
 exports.validateUser = makeValidator(user);
 exports.validateUserUpdate = makeValidator(userUpdate);
 exports.validateFavourite = makeValidator(favourite);

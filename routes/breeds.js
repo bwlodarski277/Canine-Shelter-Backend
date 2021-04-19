@@ -56,12 +56,13 @@ const getAll = async ctx => {
 
 const getDogs = async ctx => {
 	const breedId = ctx.params.id;
-	let dogs = await dogBreedModel.getByBreedId(breedId);
 	const breed = await breedModel.getById(breedId);
 	if (breed) {
-		dogs = dogs.map(
-			dog => (dog.links = { dog: `${ctx.protocol}://${ctx.host}/dogs/${dog.id}` })
-		);
+		let dogs = await dogBreedModel.getByBreedId(breedId);
+		dogs = dogs.map(dog => {
+			dog.links = { dog: `${ctx.protocol}://${ctx.host}/api/v1/dogs/${dog.id}` };
+			return dog;
+		});
 		ctx.body = dogs;
 	}
 };
@@ -106,7 +107,11 @@ const addBreed = async ctx => {
 	const body = ctx.request.body;
 	const breedId = await breedModel.add(body);
 	ctx.status = 201;
-	ctx.body = { ID: breedId, created: true, link: `${ctx.request.path}/${breedId}` };
+	ctx.body = {
+		ID: breedId,
+		created: true,
+		link: `${ctx.protocol}://${ctx.host}${ctx.request.path}/${breedId}`
+	};
 };
 
 /**
@@ -125,7 +130,11 @@ const updateBreed = async ctx => {
 	if (breed) {
 		const data = ctx.request.body;
 		await breedModel.update(breedId, data);
-		ctx.body = { id: breedId, updated: true, link: ctx.request.path };
+		ctx.body = {
+			id: breedId,
+			updated: true,
+			link: `${ctx.protocol}://${ctx.host}${ctx.request.path}`
+		};
 	}
 };
 
