@@ -27,7 +27,7 @@
 		"no-unused-vars": ["error", { "ignoreRestSiblings": true }],
 		"max-len": ["error", { "code": 120 }],
 		"curly": ["error", "multi"],
-		"consistent-return": "error",
+		"consistent-return": "off",
 		"eqeqeq": "error",
 		"dot-notation": "error",
 		"no-redeclare": "error",
