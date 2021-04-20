@@ -37,9 +37,12 @@ const getAll = async (ctx, next) => {
 		order = 'id',
 		direction
 	} = ctx.request.query;
-	limit = clamp(limit, 1, 20); // Clamping the limit to be between 1 and 20.
+	// Clamping the limit to be between 1 and 20.
+	limit = clamp(limit, 1, 20);
+	// fixing direction to two values
 	direction = direction === 'desc' ? 'desc' : 'asc';
 	if (!Array.isArray(select)) select = Array(select);
+	// Getting data
 	let breeds = await breedModel.getAll(query, page, limit, order, direction);
 	breeds = breeds.map(breed => {
 		// Selecting fields the user wants
@@ -56,6 +59,10 @@ const getAll = async (ctx, next) => {
 	return next();
 };
 
+/**
+ * Gets all the dogs from assigned to a breed.
+ * @param {object} ctx context passed from Koa.
+ */
 const getDogs = async (ctx, next) => {
 	const breedId = ctx.params.id;
 	const breed = await breedModel.getById(breedId);
@@ -68,6 +75,8 @@ const getDogs = async (ctx, next) => {
 		ctx.body = dogs;
 		return next();
 	}
+	ctx.status = 404;
+	ctx.body = { message: 'Breed does not exist.' };
 };
 
 /**
@@ -95,6 +104,8 @@ const getBreed = async (ctx, next) => {
 		ctx.body = partial;
 		return next();
 	}
+	ctx.status = 404;
+	ctx.body = { message: 'Breed does not exist.' };
 };
 
 /**
@@ -131,6 +142,7 @@ const updateBreed = async ctx => {
 	}
 	const breedId = ctx.params.id;
 	const breed = await breedModel.getById(breedId);
+	// Checking if breed exists
 	if (breed) {
 		const data = ctx.request.body;
 		await breedModel.update(breedId, data);
@@ -139,7 +151,10 @@ const updateBreed = async ctx => {
 			updated: true,
 			link: `${ctx.protocol}://${ctx.host}${ctx.request.path}`
 		};
+		return;
 	}
+	ctx.status = 404;
+	ctx.body = { message: 'Breed does not exist.' };
 };
 
 /**
@@ -155,10 +170,14 @@ const deleteBreed = async ctx => {
 	}
 	const breedId = ctx.params.id;
 	const breed = await breedModel.getById(breedId);
+	// Checking if breed exists
 	if (breed) {
 		await breedModel.delete(breedId);
 		ctx.body = { id: breedId, deleted: true };
+		return;
 	}
+	ctx.status = 404;
+	ctx.body = { message: 'Breed does not exist.' };
 };
 
 router.get('/', getAll, ifNoneMatch);

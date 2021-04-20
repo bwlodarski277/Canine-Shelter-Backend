@@ -89,6 +89,8 @@ const getLocation = async (ctx, next) => {
 		ctx.body = partial;
 		return next();
 	}
+	ctx.status = 404;
+	ctx.body = { message: 'Location does not exist.' };
 };
 
 /**
@@ -135,7 +137,10 @@ const updateLocation = async ctx => {
 			updated: true,
 			link: `${ctx.protocol}://${ctx.host}${ctx.request.path}`
 		};
+		return;
 	}
+	ctx.status = 404;
+	ctx.body = { message: 'Location does not exist.' };
 };
 
 /**
@@ -154,7 +159,10 @@ const deleteLocation = async ctx => {
 		}
 		await locationsModel.delete(locationId);
 		ctx.body = { id: locationId, deleted: true };
+		return;
 	}
+	ctx.status = 404;
+	ctx.body = { message: 'Location does not exist.' };
 };
 
 /**
@@ -174,6 +182,8 @@ const getLocationDogs = async (ctx, next) => {
 		ctx.body = locationDogs;
 		return next();
 	}
+	ctx.status = 404;
+	ctx.body = { message: 'Location does not exist.' };
 };
 
 /**
@@ -204,6 +214,8 @@ const getAllChats = async (ctx, next) => {
 		ctx.body = chats;
 		return next();
 	}
+	ctx.status = 404;
+	ctx.body = { message: 'Location does not exist.' };
 };
 
 const createChat = async ctx => {
@@ -229,7 +241,10 @@ const createChat = async ctx => {
 			created: true,
 			link: `${ctx.protocol}://${ctx.host}${ctx.request.path}/${id}`
 		};
+		return;
 	}
+	ctx.status = 404;
+	ctx.body = { message: 'Location does not exist.' };
 };
 
 const deleteChat = async ctx => {
@@ -251,8 +266,14 @@ const deleteChat = async ctx => {
 			for (const message of messages) await messagesModel.delete(message.id);
 			await chatModel.delete(chatId);
 			ctx.body = { id: chatId, deleted: true };
+			return;
 		}
+		ctx.status = 404;
+		ctx.body = { message: 'Chat does not exist.' };
+		return;
 	}
+	ctx.status = 404;
+	ctx.body = { message: 'Location does not exist.' };
 };
 
 const getChat = async (ctx, next) => {
@@ -260,6 +281,7 @@ const getChat = async (ctx, next) => {
 	locationId = parseInt(locationId);
 	chatId = parseInt(chatId);
 	const { id: userId, role } = ctx.state.user;
+	// Making sure staffLoc doesn't throw an error if nothing returned
 	const { locationId: staffLoc } = (await staffModel.getByUserId(userId)) || {};
 	const location = await locationsModel.getById(locationId);
 	if (location) {
@@ -280,7 +302,12 @@ const getChat = async (ctx, next) => {
 			ctx.body = chat;
 			return next();
 		}
+		ctx.status = 404;
+		ctx.body = { message: 'Chat does not exist.' };
+		return;
 	}
+	ctx.status = 404;
+	ctx.body = { message: 'Location does not exist.' };
 };
 
 const getMessages = async (ctx, next) => {
@@ -288,6 +315,7 @@ const getMessages = async (ctx, next) => {
 	locationId = parseInt(locationId);
 	chatId = parseInt(chatId);
 	const { id: userId, role } = ctx.state.user;
+	// Making sure staffLoc doesn't throw an error if nothing returned
 	const { locationId: staffLoc } = (await staffModel.getByUserId(userId)) || {};
 	const location = await locationsModel.getById(locationId);
 	if (location) {
@@ -310,7 +338,12 @@ const getMessages = async (ctx, next) => {
 			ctx.body = chatMessages;
 			return next();
 		}
+		ctx.status = 404;
+		ctx.body = { message: 'Chat does not exist.' };
+		return;
 	}
+	ctx.status = 404;
+	ctx.body = { message: 'Location does not exist.' };
 };
 
 const sendMessage = async ctx => {
@@ -318,6 +351,7 @@ const sendMessage = async ctx => {
 	locationId = parseInt(locationId);
 	chatId = parseInt(chatId);
 	const { id: userId, role } = ctx.state.user;
+	// Making sure staffLoc doesn't throw an error if nothing returned
 	const { locationId: staffLoc } = (await staffModel.getByUserId(userId)) || {};
 	const location = await locationsModel.getById(locationId);
 	if (location) {
@@ -336,6 +370,8 @@ const sendMessage = async ctx => {
 				return;
 			}
 			const { body } = ctx.request;
+			// Since chats are limited to two users, we can use a boolean
+			// to decide who sent what message. 0 for staff, 1 for users.
 			const sender = ctx.state.user.role === 'staff' ? 0 : 1;
 			body.sender = sender;
 
@@ -348,8 +384,14 @@ const sendMessage = async ctx => {
 				created: true,
 				link: `${ctx.protocol}://${ctx.host}${ctx.request.path}/${messageId}`
 			};
+			return;
 		}
+		ctx.status = 404;
+		ctx.body = { message: 'Chat does not exist.' };
+		return;
 	}
+	ctx.status = 404;
+	ctx.body = { message: 'Location does not exist.' };
 };
 
 const getMessage = async (ctx, next) => {
@@ -357,6 +399,7 @@ const getMessage = async (ctx, next) => {
 	locationId = parseInt(locationId);
 	chatId = parseInt(chatId);
 	const { id: userId, role } = ctx.state.user;
+	// Making sure staffLoc doesn't throw an error if nothing returned
 	const { locationId: staffLoc } = (await staffModel.getByUserId(userId)) || {};
 	const location = await locationsModel.getById(locationId);
 	if (location) {
@@ -379,8 +422,16 @@ const getMessage = async (ctx, next) => {
 				ctx.body = message;
 				return next();
 			}
+			ctx.status = 404;
+			ctx.body = { message: 'Message does not exist.' };
+			return;
 		}
+		ctx.status = 404;
+		ctx.body = { message: 'Chat does not exist.' };
+		return;
 	}
+	ctx.status = 404;
+	ctx.body = { message: 'Location does not exist.' };
 };
 
 const deleteMessage = async ctx => {
@@ -388,13 +439,17 @@ const deleteMessage = async ctx => {
 	const chatId = parseInt(ctx.params.chatId);
 	const messageId = parseInt(ctx.params.messageId);
 	const { id: userId, role } = ctx.state.user;
+	// Making sure staffLoc doesn't throw an error if nothing returned
 	const { locationId: staffLoc } = (await staffModel.getByUserId(userId)) || {};
 	const location = await locationsModel.getById(locationId);
+	// Checking if location exists
 	if (location) {
 		const chat = await chatModel.getById(chatId);
+		// Checking if chat exists
 		if (chat) {
 			const { userId: chatUser } = chat;
 			const message = await messagesModel.getById(messageId);
+			// Checking if message exists
 			if (message) {
 				const { sender } = message;
 				const permission = await can.message.delete(
@@ -412,9 +467,18 @@ const deleteMessage = async ctx => {
 				await chatMessagesModel.delete(messageId);
 				await messagesModel.delete(messageId);
 				ctx.body = { id: messageId, deleted: true };
+				return;
 			}
+			ctx.status = 404;
+			ctx.body = { message: 'Message does not exist.' };
+			return;
 		}
+		ctx.status = 404;
+		ctx.body = { message: 'Chat does not exist.' };
+		return;
 	}
+	ctx.status = 404;
+	ctx.body = { message: 'Location does not exist.' };
 };
 
 router.get('/', getAll, ifNoneMatch);
