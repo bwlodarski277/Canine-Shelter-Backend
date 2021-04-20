@@ -46,6 +46,8 @@ ac.grant('user')
 	.execute('delete')
 	.on('favourites');
 
+// ac.grant('user').execute('create').on('image');
+
 // Staff have the same permissions as users but can veiw all users
 ac.grant('staff').extend('user');
 ac.grant('staff').execute('read').on('user', attributes);
@@ -59,6 +61,7 @@ ac.grant('admin').execute('modify').on('user');
 ac.grant('admin').execute('delete').on('user');
 ac.grant('admin').execute('read').on('favourites');
 ac.grant('admin').execute('delete').on('favourites');
+// ac.grant('admin').execute('create').on('image');
 
 exports.user = {
 	/**
@@ -109,9 +112,29 @@ exports.favourite = {
 	get: async (role, user, owner) =>
 		await ac.can(role).context({ user, owner }).execute('read').on('favourites'),
 
+	/**
+	 * Checks if a user may create a user's favourites.
+	 * @param {string} role user's role
+	 * @param {number} user user's ID
+	 * @param {number} owner ID of user being accessed
+	 */
 	create: async (role, user, owner) =>
 		await ac.can(role).context({ user, owner }).execute('add').on('favourites'),
 
+	/**
+	 * Checks if a user may delete a user's favourites.
+	 * @param {string} role user's role
+	 * @param {number} user user's ID
+	 * @param {number} owner ID of user being accessed
+	 */
 	delete: async (role, user, owner) =>
 		await ac.can(role).context({ user, owner }).execute('delete').on('favourites')
 };
+
+// exports.image = {
+// 	/**
+// 	 * Checks if a user may upload an image.
+// 	 * @param {string} role user's role
+// 	 */
+// 	create: async role => await ac.can(role).execute('create').on('image')
+// };
