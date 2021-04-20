@@ -12,6 +12,7 @@ const breeds = require('./routes/breeds');
 const locations = require('./routes/locations');
 const auth = require('./routes/auth');
 const staff = require('./routes/staff');
+const uploads = require('./routes/uploads');
 
 app.use(cors());
 
@@ -22,5 +23,6 @@ app.use(breeds.routes());
 app.use(locations.routes());
 app.use(auth.routes());
 app.use(staff.routes());
+app.use(uploads.routes());
 
 module.exports = app;
