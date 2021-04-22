@@ -113,6 +113,7 @@ const getUser = async (ctx, next) => {
 		}
 		const self = `${ctx.protocol}://${ctx.host}${prefix}/${partial.id}`;
 		partial.links = {
+			self: self,
 			favourites: `${self}/favourites`,
 			chats: `${self}/chats`
 		};

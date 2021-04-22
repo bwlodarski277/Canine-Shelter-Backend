@@ -47,7 +47,6 @@
 				"imageUrl": {
 					"description": "Link to the user's profile picture",
 					"type": "string",
-					"pattern": "uri",
 					"examples": ["https://picsum.photos/200"]
 				}
 			},
@@ -94,7 +93,6 @@
 				"imageUrl": {
 					"description": "Link to the user's profile picture",
 					"type": "string",
-					"pattern": "uri",
 					"examples": ["https://picsum.photos/200"]
 				}
 			},

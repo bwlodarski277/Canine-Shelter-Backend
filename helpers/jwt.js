@@ -13,7 +13,7 @@ const jwt = require('jsonwebtoken');
  * @typedef Payload
  * @type {object}
  * @property {string} token a JWT or refresh token.
- * @property {string} expiresIn how long the token expires in.
+ * @property {string} exp how long the token expires in.
  */
 
 /**
@@ -44,5 +44,7 @@ exports.generate = (payload, secret, expiresIn) => {
 	delete payload.exp;
 	delete payload.iat;
 	const token = jwt.sign(payload, secret, { expiresIn });
-	return { token, expiresIn };
+	const epoch = jwt.decode(token, { complete: true }).payload.exp;
+	const exp = new Date(epoch * 1000);
+	return { token, exp };
 };

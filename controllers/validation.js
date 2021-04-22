@@ -7,7 +7,7 @@
  */
 
 const Ajv = require('ajv').default;
-const addFormats = require('ajv-formats').default;
+const addFormats = require('ajv-formats');
 
 const { refresh } = require('../schemas/auth.json').definitions;
 const { breed } = require('../schemas/breeds.json').definitions;
@@ -53,6 +53,7 @@ const makeValidator = schema => {
 				return { item: dataPath, message };
 			});
 			ctx.body = { errors };
+			return;
 		}
 	};
 

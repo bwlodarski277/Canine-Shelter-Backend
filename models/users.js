@@ -106,8 +106,12 @@ exports.getByEmail = async email => {
 exports.add = async user => {
 	// Hashing the password and storing it back in the object
 	const { password } = user;
-	const hash = bcrypt.hashSync(password, 10);
-	user.password = hash;
+	// We can't test the else as this only happens during the google callback
+	/* istanbul ignore else */
+	if (password) {
+		const hash = bcrypt.hashSync(password, 10);
+		user.password = hash;
+	}
 	// Passing data to Knex
 	const [data] = await run(async () => await db('users').insert(user));
 	return data;

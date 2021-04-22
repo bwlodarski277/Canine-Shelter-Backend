@@ -45,8 +45,8 @@ const getAll = async (ctx, next) => {
 		order = 'id',
 		direction
 	} = ctx.request.query;
-	// Clamping the limit to be between 1 and 20.
-	limit = clamp(limit, 1, 20);
+	// Clamping the limit to be between 1 and 100.
+	limit = clamp(limit, 1, 100);
 	// Fixing direction to two values
 	direction = direction === 'desc' ? 'desc' : 'asc';
 	if (!Array.isArray(select)) select = Array(select);
@@ -64,7 +64,9 @@ const getAll = async (ctx, next) => {
 		};
 		return partial;
 	});
-	ctx.body = dogs;
+	// Getting number of pages for pagination
+	const count = await dogModel.getCount(query);
+	ctx.body = { dogs, count };
 	return next();
 };
 
