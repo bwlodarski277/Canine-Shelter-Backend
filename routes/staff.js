@@ -155,11 +155,26 @@ const deleteStaff = async ctx => {
 	ctx.body = { message: 'Staff does not exist.' };
 };
 
+const unstaffedLocations = async (ctx, next) => {
+	const { role } = ctx.state.user;
+	const permission = await can.read(role);
+	if (!permission.granted) {
+		ctx.status = 403;
+		ctx.body = { message: 'Not a staff member.' };
+		return;
+	}
+	const freeLocs = await locationModel.getFree();
+	ctx.body = freeLocs;
+	return next();
+};
+
 router.get('/', auth, getAll, ifNoneMatch);
 router.post('/', auth, validateStaff, createStaff);
 
 router.get('/:id([0-9]+)', auth, getStaff, ifModifiedSince);
 router.put('/:id([0-9]+)', auth, validateStaffUpdate, updateStaff);
 router.del('/:id([0-9]+)', auth, deleteStaff);
+
+router.get('/unstaffed', auth, unstaffedLocations, ifNoneMatch);
 
 module.exports = router;

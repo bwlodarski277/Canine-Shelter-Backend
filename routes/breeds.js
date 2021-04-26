@@ -55,7 +55,8 @@ const getAll = async (ctx, next) => {
 		};
 		return partial;
 	});
-	ctx.body = breeds;
+	const count = await breedModel.getCount(query);
+	ctx.body = { breeds, count };
 	return next();
 };
 
@@ -67,12 +68,31 @@ const getDogs = async (ctx, next) => {
 	const breedId = ctx.params.id;
 	const breed = await breedModel.getById(breedId);
 	if (breed) {
-		let dogs = await dogBreedModel.getByBreedId(breedId);
+		let {
+			query = '',
+			select = [],
+			page = 1,
+			limit = 10,
+			order = 'id',
+			direction
+		} = ctx.request.query;
+		limit = clamp(limit, 1, 20);
+		if (!Array.isArray(select)) select = Array(select);
+		let dogs = await dogBreedModel.getByBreedId(breedId, query, page, limit, order, direction);
 		dogs = dogs.map(dog => {
-			dog.links = { dog: `${ctx.protocol}://${ctx.host}/api/v1/dogs/${dog.id}` };
-			return dog;
+			const partial = { id: dog.dogId };
+			select.map(field => (partial[field] = dog[field]));
+			const self = `${ctx.protocol}://${ctx.host}/api/v1/dogs/${dog.dogId}`;
+			partial.links = {
+				self: self,
+				breed: `${self}/breed`,
+				location: `${self}/location`,
+				favourites: `${self}/favourites`
+			};
+			return partial;
 		});
-		ctx.body = dogs;
+		const count = await dogBreedModel.getCount(breedId, query);
+		ctx.body = { dogs, count };
 		return next();
 	}
 	ctx.status = 404;

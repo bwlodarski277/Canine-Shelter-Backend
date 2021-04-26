@@ -46,7 +46,7 @@
 				},
 				"imageUrl": {
 					"description": "Link to the user's profile picture",
-					"type": "string",
+					"type": ["string", "null"],
 					"examples": ["https://picsum.photos/200"]
 				}
 			},
@@ -92,7 +92,7 @@
 				},
 				"imageUrl": {
 					"description": "Link to the user's profile picture",
-					"type": "string",
+					"type": ["string", "null"],
 					"examples": ["https://picsum.photos/200"]
 				}
 			},

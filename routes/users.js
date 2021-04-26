@@ -132,7 +132,14 @@ const createUser = async ctx => {
 	const { staffKey, ...body } = ctx.request.body;
 	const { username, email } = body;
 	// Giving the user the role 'staff' if they provide right key.
-	body.role = staffKey === config.staffKey ? 'staff' : 'user';
+	if (staffKey)
+		if (staffKey === config.staffKey) body.role = 'staff';
+		else {
+			ctx.status = 400;
+			ctx.body = { message: 'Invalid staff key.' };
+			return;
+		}
+	else body.role = 'user';
 	// Making sure username isn't taken
 	let user = await userModel.getByUsername(username);
 	if (user) {
@@ -173,6 +180,20 @@ const updateUser = async ctx => {
 			return;
 		}
 		const { body } = ctx.request;
+		// Making sure username isn't taken
+		let user = await userModel.getByUsername(body.username || null);
+		if (user) {
+			ctx.status = 400;
+			ctx.body = { message: 'Username is taken.' };
+			return;
+		}
+		// Making sure email isn't taken
+		user = await userModel.getByEmail(body.email || null);
+		if (user) {
+			ctx.status = 400;
+			ctx.body = { message: 'Email is taken.' };
+			return;
+		}
 		await userModel.update(id, body);
 		ctx.body = {
 			id: id,

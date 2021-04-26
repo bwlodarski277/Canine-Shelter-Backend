@@ -26,14 +26,65 @@ exports.getByDogId = async dogId => {
 	return data;
 };
 
+// /**
+//  * Gets all the dogs with a breed ID.
+//  * @param {number} breedId ID of the breed to fetch.
+//  * @returns {Promise<Array<DogBreed>>} list of all dogs of the given breed.
+//  * @async
+//  */
+// exports.getByBreedId = async breedId => {
+// 	const data = await run(async () => await db('dogBreeds').where({ breedId }));
+// 	return data;
+// };
+
 /**
- * Gets all the dogs with a breed ID.
+ * Gets all dog breed entries for a breed from the DB.
+ * Allows for searching, filtering and sorting.
  * @param {number} breedId ID of the breed to fetch.
- * @returns {Promise<Array<DogBreed>>} list of all dogs of the given breed.
+ * @param {number} page which page to get data from.
+ * @param {number} limit number of items on a page.
+ * @param {string} order what parameter to order by.
+ * @param {'asc'|'desc'} direction direction to sort (asc. or desc.).
+ * @returns {Promise<Array<Breed>>} array of all breed records.
  * @async
  */
-exports.getByBreedId = async breedId => {
-	const data = await run(async () => await db('dogBreeds').where({ breedId }));
+exports.getByBreedId = async (breedId, query, page, limit, order, direction) => {
+	const offset = (page - 1) * limit;
+	const data = await run(
+		async () =>
+			await db('dogs')
+				.join('dogBreeds', 'dogs.id', '=', 'dogBreeds.dogId')
+				.where({ breedId })
+				.andWhere(qry =>
+					qry
+						.where('name', 'like', `%${query}%`)
+						.orWhere('description', 'like', `%${query}%`)
+				)
+				.orderBy(`dogs.${order}`, direction)
+				.limit(limit)
+				.offset(offset)
+	);
+	return data;
+};
+
+/**
+ * Gets the number of dogs associated with the breed.
+ * @param {number} breedId ID of the breed to fetch.
+ * @returns {Promise<number>} number of items
+ */
+exports.getCount = async (breedId, query) => {
+	const [{ data }] = await run(
+		async () =>
+			await db('dogs')
+				.join('dogBreeds', 'dogs.id', '=', 'dogBreeds.dogId')
+				.where({ breedId })
+				.andWhere(qry =>
+					qry
+						.where('name', 'like', `%${query}%`)
+						.orWhere('description', 'like', `%${query}%`)
+				)
+				.count({ data: '*' })
+	);
 	return data;
 };
 

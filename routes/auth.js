@@ -48,16 +48,17 @@ const staff = async ctx => {
 	// Checking if user is a staff member
 	const staff = await staffModel.getByUserId(id);
 	if (staff) {
-		const { id: staffId } = staff;
 		ctx.body = {
-			staffId,
+			staffId: staff.id,
 			links: {
-				staff: `${ctx.protocol}://${ctx.host}/api/v1/staff/${staffId}`
+				self: `${ctx.protocol}://${ctx.host}/api/v1/staff/${staff.id}`,
+				user: `${ctx.protocol}://${ctx.host}/api/v1/users/${staff.userId}`,
+				location: `${ctx.protocol}://${ctx.host}/api/v1/locations/${staff.locationId}`
 			}
 		};
 		return;
 	}
-	ctx.status = 404;
+	ctx.status = 200;
 	ctx.body = { message: 'Staff not assigned to a location.' };
 };
 
@@ -109,6 +110,7 @@ const googleCallback = async ctx => {
 };
 
 router.get('/login', auth, login);
+
 router.get('/staff', auth, staff);
 
 router.get('/jwt', basic, getJWT);

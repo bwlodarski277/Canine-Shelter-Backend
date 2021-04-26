@@ -17,8 +17,9 @@ const twit = new Twit({
  * @param {string} text
  * @param {string} link
  * @returns {boolean} value indicating whether the tweet was posted or not.
+ * @async
  */
-exports.tweet = async (text, link = '') => {
+exports.tweet = async (text = '', link = '') => {
 	// The Twitter API converts URLs to t.co shortened links, which
 	// are made up of 23 characters.
 	let status = '';
@@ -33,5 +34,3 @@ exports.tweet = async (text, link = '') => {
 		return false;
 	}
 };
-
-(async () => console.log(await exports.tweet('test')))();

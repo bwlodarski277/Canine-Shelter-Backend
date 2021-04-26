@@ -19,13 +19,23 @@ const ac = new AccessControl();
 // Not used, but created so that the 'user' role is registered.
 // ac.grant('user').execute('none').on('none');
 
+// Only staff create or delete locations
+ac.grant('staff').execute('create').on('location');
+
 // Letting staff modify details about a location.
 ac.grant('staff')
 	.condition({ Fn: 'EQUALS', args: { location: '$.owner' } })
 	.execute('modify')
 	.on('location');
 
-// Only admins may create or delete locations
+ac.grant('staff')
+	.condition({ Fn: 'EQUALS', args: { location: '$.owner' } })
+	.execute('delete')
+	.on('location');
+
+ac.grant('staff').execute('modify').on('location');
+ac.grant('staff').execute('delete').on('location');
+
 ac.grant('admin').execute('create').on('location');
 ac.grant('admin').execute('modify').on('location');
 ac.grant('admin').execute('delete').on('location');

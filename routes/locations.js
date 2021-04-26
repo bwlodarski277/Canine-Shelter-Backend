@@ -58,7 +58,8 @@ const getAll = async (ctx, next) => {
 		};
 		return partial;
 	});
-	ctx.body = locations;
+	const count = await locationsModel.count(query);
+	ctx.body = { locations, count };
 	return next();
 };
 
@@ -173,13 +174,38 @@ const getLocationDogs = async (ctx, next) => {
 	const locationId = ctx.params.id;
 	const location = await locationsModel.getById(locationId);
 	if (location) {
-		let locationDogs = await dogLocationsModel.getByLocationId(locationId);
-		locationDogs = locationDogs.map(dog => {
-			dog.links = {
-				dog: `${ctx.protocol}://${ctx.host}/dogs/${dog.id}`
+		let {
+			query = '',
+			select = [],
+			page = 1,
+			limit = 10,
+			order = 'id',
+			direction
+		} = ctx.request.query;
+		limit = clamp(limit, 1, 20);
+		if (!Array.isArray(select)) select = Array(select);
+		let dogs = await dogLocationsModel.getByLocationId(
+			locationId,
+			query,
+			page,
+			limit,
+			order,
+			direction
+		);
+		dogs = dogs.map(dog => {
+			const partial = { id: dog.dogId };
+			select.map(field => (partial[field] = dog[field]));
+			const self = `${ctx.protocol}://${ctx.host}/api/v1/dogs/${dog.dogId}`;
+			partial.links = {
+				self: self,
+				breed: `${self}/breed`,
+				location: `${self}/location`,
+				favourites: `${self}/favourites`
 			};
+			return partial;
 		});
-		ctx.body = locationDogs;
+		const count = await dogLocationsModel.getCount(locationId, query);
+		ctx.body = { dogs, count };
 		return next();
 	}
 	ctx.status = 404;

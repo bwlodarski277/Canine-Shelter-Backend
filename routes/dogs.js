@@ -26,6 +26,7 @@ const can = require('../permissions/dogs');
 const { auth } = require('../controllers/auth');
 const { clamp } = require('../helpers/utils');
 const { ifModifiedSince, ifNoneMatch } = require('../helpers/caching');
+const { tweet } = require('../helpers/twitter');
 
 const prefix = '/api/v1/dogs';
 const router = new Router({ prefix });
@@ -121,6 +122,7 @@ const addDog = async ctx => {
 		created: true,
 		link: `${ctx.protocol}://${ctx.host}${ctx.request.path}/${id}`
 	};
+	await tweet(body.description, ctx.body.link);
 };
 
 /**
