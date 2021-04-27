@@ -382,11 +382,13 @@ const getUserChats = async (ctx, next) => {
 		}
 		let chats = await chatModel.getByUserId(userId);
 		chats = chats.map(chat => {
-			const { locationId } = chat;
-			const self = `${ctx.protocol}://${ctx.host}/api/v1/locations/${locationId}/chats/${id}`;
+			const { id: chatId, locationId, userId } = chat;
+			const self = `${ctx.protocol}://${ctx.host}/api/v1/locations/${locationId}`;
 			chat.links = {
-				self: self,
-				messages: `${self}/messages`
+				self: `${self}/chats/${chatId}`,
+				messages: `${self}/chats/${chatId}/messages`,
+				location: self,
+				user: `${ctx.protocol}://${ctx.host}/api/v1/users/${userId}`
 			};
 			return chat;
 		});
