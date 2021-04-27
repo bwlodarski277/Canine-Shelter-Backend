@@ -33,9 +33,6 @@ ac.grant('staff')
 	.execute('delete')
 	.on('location');
 
-ac.grant('staff').execute('modify').on('location');
-ac.grant('staff').execute('delete').on('location');
-
 ac.grant('admin').execute('create').on('location');
 ac.grant('admin').execute('modify').on('location');
 ac.grant('admin').execute('delete').on('location');
@@ -104,7 +101,7 @@ ac.grant('staff')
 
 // { Fn: 'EQUALS', args: { staffLocation: '$.chatLocation' } }
 ac.grant('staff')
-	.condition(ctx => ctx.staffLocation === ctx.chatLocation && ctx.sender === 0)
+	.condition({ Fn: 'EQUALS', args: { staffLocation: '$.chatLocation' } })
 	.execute('delete')
 	.on('message');
 
