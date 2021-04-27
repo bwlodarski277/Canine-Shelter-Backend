@@ -1,5 +1,7 @@
 'use strict';
 
+/* istanbul ignore file */
+
 /* eslint-disable camelcase */
 const Twit = require('twit');
 const { twitter: config } = require('../config').config;
