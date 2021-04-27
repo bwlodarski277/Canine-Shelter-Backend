@@ -26,7 +26,7 @@ const opts = {
 const checkUser = async (jwtPayload, done) => {
 	const user = await userModel.getById(jwtPayload.sub);
 
-	console.log(`Successfully authenticated user ${jwtPayload.name}.`);
+	// console.log(`Successfully authenticated user ${jwtPayload.name}.`);
 	return done(null, user);
 };
 

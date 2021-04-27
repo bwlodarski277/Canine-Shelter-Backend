@@ -293,6 +293,20 @@ describe('POST /users', () => {
 		expect(res2.status).toBe(200);
 		expect(res2.body).toMatchObject({ role: 'staff' });
 	});
+
+	it('should handle invalid staff keys', async () => {
+		const res = await request(app)
+			.post('/api/v1/users')
+			.send({
+				username: 'UnitTestStaff',
+				email: 'staff22@test.com',
+				password: 'UnitTestPassword',
+				firstName: 'Test',
+				lastName: 'User',
+				staffKey: 'a'.repeat(32)
+			});
+		expect(res.status).toBe(400);
+	});
 });
 
 describe('POST /users/{id}/favourites', () => {
@@ -366,6 +380,22 @@ describe('PUT /users/{id}', () => {
 			.get('/api/v1/users/1')
 			.set({ Authorization: `Basic ${btoa('TestUser:userPass')}` });
 		expect(res2.body).toMatchObject({ firstName: 'Test2' });
+	});
+
+	it('should reject taken usernames', async () => {
+		const res = await request(app)
+			.put('/api/v1/users/1')
+			.set({ Authorization: `Basic ${btoa('TestUser:userPass')}` })
+			.send({ username: 'TestUser' });
+		expect(res.status).toBe(400);
+	});
+
+	it('should reject taken emails', async () => {
+		const res = await request(app)
+			.put('/api/v1/users/1')
+			.set({ Authorization: `Basic ${btoa('TestUser:userPass')}` })
+			.send({ email: 'user1@example.com' });
+		expect(res.status).toBe(400);
 	});
 
 	it('should allow users to only update themselves', async () => {

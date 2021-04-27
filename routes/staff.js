@@ -73,7 +73,10 @@ const createStaff = async ctx => {
 			created: true,
 			link: `${ctx.protocol}://${ctx.host}${ctx.request.path}/${id}`
 		};
+		return;
 	}
+	ctx.status = 404;
+	ctx.body = { message: 'Location does not exist.' };
 };
 
 /**
@@ -99,6 +102,8 @@ const getStaff = async (ctx, next) => {
 		ctx.body = staff;
 		return next();
 	}
+	ctx.status = 404;
+	ctx.body = { message: 'Staff does not exist.' };
 };
 
 const updateStaff = async ctx => {
@@ -125,7 +130,10 @@ const updateStaff = async ctx => {
 			updated: true,
 			link: `${ctx.protocol}://${ctx.host}${ctx.request.path}`
 		};
+		return;
 	}
+	ctx.status = 404;
+	ctx.body = { message: 'Staff does not exist.' };
 };
 
 const deleteStaff = async ctx => {
@@ -141,7 +149,23 @@ const deleteStaff = async ctx => {
 		}
 		await staffModel.delete(id);
 		ctx.body = { id, deleted: true };
+		return;
 	}
+	ctx.status = 404;
+	ctx.body = { message: 'Staff does not exist.' };
+};
+
+const unstaffedLocations = async (ctx, next) => {
+	const { role } = ctx.state.user;
+	const permission = await can.read(role);
+	if (!permission.granted) {
+		ctx.status = 403;
+		ctx.body = { message: 'Not a staff member.' };
+		return;
+	}
+	const freeLocs = await locationModel.getFree();
+	ctx.body = freeLocs;
+	return next();
 };
 
 router.get('/', auth, getAll, ifNoneMatch);
@@ -150,5 +174,7 @@ router.post('/', auth, validateStaff, createStaff);
 router.get('/:id([0-9]+)', auth, getStaff, ifModifiedSince);
 router.put('/:id([0-9]+)', auth, validateStaffUpdate, updateStaff);
 router.del('/:id([0-9]+)', auth, deleteStaff);
+
+router.get('/unstaffed', auth, unstaffedLocations, ifNoneMatch);
 
 module.exports = router;

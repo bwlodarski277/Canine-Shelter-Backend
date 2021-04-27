@@ -17,31 +17,37 @@ describe('GET /breeds', () => {
 	it('should give status 200 an be an array', async () => {
 		const res = await request(app).get('/api/v1/breeds');
 		expect(res.status).toEqual(200);
-		expect(res.body).toBeInstanceOf(Array);
+		expect(res.body).toBeInstanceOf(Object);
+		expect(Object.keys(res.body)).toContain('breeds');
 	});
 
 	it('should filter properly', async () => {
 		const res = await request(app).get('/api/v1/breeds').query({ select: 'name' });
 		expect(res.status).toBe(200);
-		expect(res.body).toBeInstanceOf(Array);
-		expect(Object.keys(res.body[0])).toContain('name');
+		expect(res.body).toBeInstanceOf(Object);
+		expect(Object.keys(res.body.breeds[0])).toContain('name');
 	});
 
 	it('should paginate properly', async () => {
 		const res = await request(app).get('/api/v1/breeds').query({ limit: 1 });
 		expect(res.status).toBe(200);
-		expect(res.body).toHaveLength(1);
+		expect(res.body.breeds).toHaveLength(1);
 	});
 
 	it('should handle sort direction', async () => {
 		const res = await request(app).get('/api/v1/breeds').query({ direction: 'desc' });
-		expect(res.body[0]).toMatchObject({ id: 3 });
+		expect(res.body.breeds[0]).toMatchObject({ id: 3 });
 	});
 
 	it('should handle invalid requests', async () => {
 		const res = await request(app).get('/api/v1/breeds').query({ select: 'invalid' });
 		expect(res.status).toBe(200);
 		expect(Object.keys(res.body)).not.toContain('invalid');
+	});
+
+	it('should allow returning all records if limit is 0', async () => {
+		const res = await request(app).get('/api/v1/breeds').query({ limit: 0 });
+		expect(res.status).toBe(200);
 	});
 });
 
@@ -82,7 +88,13 @@ describe('GET /breeds/{id}/dogs', () => {
 	it('should get a list of breed dogs', async () => {
 		const res = await request(app).get('/api/v1/breeds/1/dogs');
 		expect(res.status).toBe(200);
-		expect(res.body).toBeInstanceOf(Array);
+		expect(res.body).toBeInstanceOf(Object);
+	});
+
+	it('should handle selection arguments', async () => {
+		const res = await request(app).get('/api/v1/breeds/1/dogs').query({ select: 'name' });
+		expect(res.status).toBe(200);
+		expect(Object.keys(res.body.dogs[0])).toContain('name');
 	});
 
 	it('should handle nonexistent breeds', async () => {

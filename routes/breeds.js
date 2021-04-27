@@ -17,7 +17,7 @@ const { clamp } = require('../helpers/utils');
 const can = require('../permissions/breeds');
 const { ifModifiedSince, ifNoneMatch } = require('../helpers/caching');
 
-const { validateBreed } = require('../controllers/validation');
+const { validateBreed, validateBreedUpdate } = require('../controllers/validation');
 
 const prefix = '/api/v1/breeds';
 const router = new Router({ prefix });
@@ -37,9 +37,12 @@ const getAll = async (ctx, next) => {
 		order = 'id',
 		direction
 	} = ctx.request.query;
-	limit = clamp(limit, 1, 20); // Clamping the limit to be between 1 and 20.
+	// Clamping the limit to be between 1 and 20.
+	limit = clamp(limit, 0, 20);
+	// fixing direction to two values
 	direction = direction === 'desc' ? 'desc' : 'asc';
 	if (!Array.isArray(select)) select = Array(select);
+	// Getting data
 	let breeds = await breedModel.getAll(query, page, limit, order, direction);
 	breeds = breeds.map(breed => {
 		// Selecting fields the user wants
@@ -52,22 +55,48 @@ const getAll = async (ctx, next) => {
 		};
 		return partial;
 	});
-	ctx.body = breeds;
+	const count = await breedModel.getCount(query);
+	ctx.body = { breeds, count };
 	return next();
 };
 
+/**
+ * Gets all the dogs from assigned to a breed.
+ * @param {object} ctx context passed from Koa.
+ */
 const getDogs = async (ctx, next) => {
 	const breedId = ctx.params.id;
 	const breed = await breedModel.getById(breedId);
 	if (breed) {
-		let dogs = await dogBreedModel.getByBreedId(breedId);
+		let {
+			query = '',
+			select = [],
+			page = 1,
+			limit = 10,
+			order = 'id',
+			direction
+		} = ctx.request.query;
+		limit = clamp(limit, 1, 20);
+		if (!Array.isArray(select)) select = Array(select);
+		let dogs = await dogBreedModel.getByBreedId(breedId, query, page, limit, order, direction);
 		dogs = dogs.map(dog => {
-			dog.links = { dog: `${ctx.protocol}://${ctx.host}/api/v1/dogs/${dog.id}` };
-			return dog;
+			const partial = { id: dog.dogId };
+			select.map(field => (partial[field] = dog[field]));
+			const self = `${ctx.protocol}://${ctx.host}/api/v1/dogs/${dog.dogId}`;
+			partial.links = {
+				self: self,
+				breed: `${self}/breed`,
+				location: `${self}/location`,
+				favourites: `${self}/favourites`
+			};
+			return partial;
 		});
-		ctx.body = dogs;
+		const count = await dogBreedModel.getCount(breedId, query);
+		ctx.body = { dogs, count };
 		return next();
 	}
+	ctx.status = 404;
+	ctx.body = { message: 'Breed does not exist.' };
 };
 
 /**
@@ -90,11 +119,14 @@ const getBreed = async (ctx, next) => {
 		}
 		const self = `${ctx.protocol}://${ctx.host}${prefix}/${partial.id}`;
 		partial.links = {
+			self: self,
 			dogs: `${self}/dogs`
 		};
 		ctx.body = partial;
 		return next();
 	}
+	ctx.status = 404;
+	ctx.body = { message: 'Breed does not exist.' };
 };
 
 /**
@@ -131,6 +163,7 @@ const updateBreed = async ctx => {
 	}
 	const breedId = ctx.params.id;
 	const breed = await breedModel.getById(breedId);
+	// Checking if breed exists
 	if (breed) {
 		const data = ctx.request.body;
 		await breedModel.update(breedId, data);
@@ -139,7 +172,10 @@ const updateBreed = async ctx => {
 			updated: true,
 			link: `${ctx.protocol}://${ctx.host}${ctx.request.path}`
 		};
+		return;
 	}
+	ctx.status = 404;
+	ctx.body = { message: 'Breed does not exist.' };
 };
 
 /**
@@ -155,17 +191,21 @@ const deleteBreed = async ctx => {
 	}
 	const breedId = ctx.params.id;
 	const breed = await breedModel.getById(breedId);
+	// Checking if breed exists
 	if (breed) {
 		await breedModel.delete(breedId);
 		ctx.body = { id: breedId, deleted: true };
+		return;
 	}
+	ctx.status = 404;
+	ctx.body = { message: 'Breed does not exist.' };
 };
 
 router.get('/', getAll, ifNoneMatch);
 router.post('/', auth, validateBreed, addBreed);
 
 router.get('/:id([0-9]+)', getBreed, ifModifiedSince);
-router.put('/:id([0-9]+)', auth, validateBreed, updateBreed);
+router.put('/:id([0-9]+)', auth, validateBreedUpdate, updateBreed);
 router.del('/:id([0-9]+)', auth, deleteBreed);
 
 router.get('/:id([0-9]+)/dogs', getDogs, ifNoneMatch);

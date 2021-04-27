@@ -83,7 +83,8 @@ describe('/staff', () => {
 		const res = await request(app)
 			.get('/api/v1/auth/staff')
 			.set({ Authorization: `Basic ${btoa('TestStaff5:staffPass')}` });
-		expect(res.status).toEqual(404);
+		expect(res.status).toEqual(200);
+		expect(res.body).toMatchObject({ message: 'Staff not assigned to a location.' });
 	});
 });
 

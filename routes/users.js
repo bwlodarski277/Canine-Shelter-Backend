@@ -9,6 +9,17 @@
 const Router = require('koa-router');
 const bodyParser = require('koa-bodyparser');
 
+// const fs = require('fs');
+// const uploadDir = '/tmp/api/uploads';
+// const fileStore = '/var/tmp/api/public/images';
+
+// const koaBody = require('koa-body')({
+// 	multipart: true,
+// 	formidable: { uploadDir }
+// });
+
+// const mime = require('mime-types');
+
 const userModel = require('../models/users');
 const favsModel = require('../models/favourites');
 const chatModel = require('../models/chats');
@@ -50,14 +61,16 @@ const getAll = async (ctx, next) => {
 		order = 'id',
 		direction
 	} = ctx.request.query;
-	limit = clamp(limit, 1, 20); // Clamping the limit to be between 1 and 20.
+	// Clamping the limit to be between 1 and 20.
+	limit = clamp(limit, 1, 20);
+	// Limiting direction to two possible values
 	direction = direction === 'desc' ? 'desc' : 'asc';
 	if (!Array.isArray(select)) select = Array(select);
 	let users = await userModel.getAll(query, page, limit, order, direction);
 	users = users.map(user => {
 		// filtering out fields the user can't see
 		user = permission.filter(user);
-		// Selecting fields the user wants]
+		// Selecting fields the user wants
 		const partial = { id: user.id };
 		select.map(field => (partial[field] = user[field]));
 		const self = `${ctx.protocol}://${ctx.host}${prefix}/${partial.id}`;
@@ -100,12 +113,15 @@ const getUser = async (ctx, next) => {
 		}
 		const self = `${ctx.protocol}://${ctx.host}${prefix}/${partial.id}`;
 		partial.links = {
+			self: self,
 			favourites: `${self}/favourites`,
 			chats: `${self}/chats`
 		};
 		ctx.body = partial;
 		return next();
 	}
+	ctx.status = 404;
+	ctx.body = { message: 'User does not exist.' };
 };
 
 /**
@@ -116,7 +132,14 @@ const createUser = async ctx => {
 	const { staffKey, ...body } = ctx.request.body;
 	const { username, email } = body;
 	// Giving the user the role 'staff' if they provide right key.
-	body.role = staffKey === config.staffKey ? 'staff' : 'user';
+	if (staffKey)
+		if (staffKey === config.staffKey) body.role = 'staff';
+		else {
+			ctx.status = 400;
+			ctx.body = { message: 'Invalid staff key.' };
+			return;
+		}
+	else body.role = 'user';
 	// Making sure username isn't taken
 	let user = await userModel.getByUsername(username);
 	if (user) {
@@ -132,6 +155,7 @@ const createUser = async ctx => {
 		return;
 	}
 	const id = await userModel.add(body);
+
 	ctx.status = 201;
 	ctx.body = {
 		id,
@@ -148,6 +172,7 @@ const updateUser = async ctx => {
 	const { id: userId, role } = ctx.state.user;
 	const id = parseInt(ctx.params.id);
 	const user = await userModel.getById(id);
+	// Making sure user exists
 	if (user) {
 		const permission = await can.user.modify(role, userId, id);
 		if (!permission.granted) {
@@ -155,13 +180,30 @@ const updateUser = async ctx => {
 			return;
 		}
 		const { body } = ctx.request;
+		// Making sure username isn't taken
+		let user = await userModel.getByUsername(body.username || null);
+		if (user) {
+			ctx.status = 400;
+			ctx.body = { message: 'Username is taken.' };
+			return;
+		}
+		// Making sure email isn't taken
+		user = await userModel.getByEmail(body.email || null);
+		if (user) {
+			ctx.status = 400;
+			ctx.body = { message: 'Email is taken.' };
+			return;
+		}
 		await userModel.update(id, body);
 		ctx.body = {
 			id: id,
 			updated: true,
 			link: `${ctx.protocol}://${ctx.host}${ctx.request.path}`
 		};
+		return;
 	}
+	ctx.status = 404;
+	ctx.body = { message: 'User does not exist.' };
 };
 
 /**
@@ -172,6 +214,7 @@ const deleteUser = async ctx => {
 	const id = parseInt(ctx.params.id);
 	const { id: userId, role } = ctx.state.user;
 	const user = await userModel.getById(id);
+	// Making sure user exists
 	if (user) {
 		const permission = await can.user.delete(role, userId, id);
 		if (!permission.granted) {
@@ -180,7 +223,10 @@ const deleteUser = async ctx => {
 		}
 		await userModel.delete(id);
 		ctx.body = { id, deleted: true };
+		return;
 	}
+	ctx.status = 404;
+	ctx.body = { message: 'User does not exist.' };
 };
 
 /**
@@ -191,6 +237,7 @@ const getUserFavs = async (ctx, next) => {
 	const id = parseInt(ctx.params.id);
 	const { id: userId, role } = ctx.state.user;
 	const user = await userModel.getById(id);
+	// Making sure user exists
 	if (user) {
 		const permission = await can.favourite.get(role, userId, id);
 		if (!permission.granted) {
@@ -199,6 +246,7 @@ const getUserFavs = async (ctx, next) => {
 		}
 		let favourites = await favsModel.getByUserId(id);
 		favourites = favourites.map(favourite => {
+			// Adding links
 			favourite.links = {
 				self: `${ctx.protocol}://${ctx.host}${prefix}/${id}/favourites/${favourite.id}`,
 				dog: `${ctx.protocol}://${ctx.host}/api/v1/dogs/${favourite.dogId}`
@@ -208,6 +256,8 @@ const getUserFavs = async (ctx, next) => {
 		ctx.body = favourites;
 		return next();
 	}
+	ctx.status = 404;
+	ctx.body = { message: 'User does not exist.' };
 };
 
 /**
@@ -241,11 +291,14 @@ const addUserFav = async ctx => {
 				created: true,
 				link: `${ctx.protocol}://${ctx.host}${ctx.request.path}/${favId}`
 			};
-		} else {
-			ctx.status = 400;
-			ctx.body = { message: 'Dog does not exist.' };
+			return;
 		}
+		ctx.status = 400;
+		ctx.body = { message: 'Dog does not exist.' };
+		return;
 	}
+	ctx.status = 404;
+	ctx.body = { message: 'User does not exist.' };
 };
 
 /**
@@ -258,8 +311,10 @@ const getUserFav = async (ctx, next) => {
 	favId = parseInt(favId);
 	const { id: userId, role } = ctx.state.user;
 	const user = await userModel.getById(id);
+	// Checks if user exists
 	if (user) {
 		const favourite = await favsModel.getSingleFav(favId);
+		// checks if favourite exists
 		if (favourite) {
 			const permission = await can.favourite.get(role, userId, id);
 			if (!permission.granted) {
@@ -273,7 +328,12 @@ const getUserFav = async (ctx, next) => {
 			ctx.body = favourite;
 			return next();
 		}
+		ctx.status = 404;
+		ctx.body = { message: 'Favourite does not exist.' };
+		return;
 	}
+	ctx.status = 404;
+	ctx.body = { message: 'User does not exist.' };
 };
 
 /**
@@ -296,8 +356,14 @@ const deleteUserFav = async ctx => {
 			}
 			await favsModel.delete(favId);
 			ctx.body = { id: favId, deleted: true };
+			return;
 		}
+		ctx.status = 404;
+		ctx.body = { message: 'Favourite does not exist.' };
+		return;
 	}
+	ctx.status = 404;
+	ctx.body = { message: 'User does not exist.' };
 };
 
 /**
@@ -314,10 +380,23 @@ const getUserChats = async (ctx, next) => {
 			ctx.status = 403;
 			return;
 		}
-		const chats = await chatModel.getByUserId(userId);
+		let chats = await chatModel.getByUserId(userId);
+		chats = chats.map(chat => {
+			const { id: chatId, locationId, userId } = chat;
+			const self = `${ctx.protocol}://${ctx.host}/api/v1/locations/${locationId}`;
+			chat.links = {
+				self: `${self}/chats/${chatId}`,
+				messages: `${self}/chats/${chatId}/messages`,
+				location: self,
+				user: `${ctx.protocol}://${ctx.host}/api/v1/users/${userId}`
+			};
+			return chat;
+		});
 		ctx.body = chats;
 		return next();
 	}
+	ctx.status = 404;
+	ctx.body = { message: 'User does not exist.' };
 };
 
 router.get('/', auth, getAll, ifNoneMatch);

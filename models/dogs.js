@@ -48,6 +48,22 @@ exports.getAll = async (query, page, limit, order, direction) => {
 	return data;
 };
 
+/**
+ * Gets the number of items given an optional query.
+ * @param {string} [query] optional query to count pages for
+ * @returns {Promise<number>} number of items
+ */
+exports.getCount = async query => {
+	const [{ data }] = await run(
+		async () =>
+			await db('dogs')
+				.where('name', 'like', `%${query}%`)
+				.orWhere('description', 'like', `%${query}%`)
+				.count({ data: '*' })
+	);
+	return data;
+};
+
 //  * @param {Array<string>} select list of columns to select.
 /**
  * Gets a single dog entry from the DB by their ID.

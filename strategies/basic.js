@@ -33,15 +33,15 @@ const checkUser = async (username, password, done) => {
 	if (user) {
 		const verified = await verifyPassword(user, password);
 		if (verified) {
-			console.log(`Successfully authenticated user ${username}.`);
+			// console.log(`Successfully authenticated user ${username}.`);
 			// Overwriting the user variable to make sure password is not returned.
 			user = await users.getById(user.id, []);
 			return done(null, user);
 		}
-		console.log(`Incorrect password for user ${username}.`);
+		// console.log(`Incorrect password for user ${username}.`);
 		return done(null, false);
 	}
-	console.log(`No user found with username ${username}.`);
+	// console.log(`No user found with username ${username}.`);
 
 	return done(null, false);
 };

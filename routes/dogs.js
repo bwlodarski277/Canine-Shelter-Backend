@@ -26,6 +26,7 @@ const can = require('../permissions/dogs');
 const { auth } = require('../controllers/auth');
 const { clamp } = require('../helpers/utils');
 const { ifModifiedSince, ifNoneMatch } = require('../helpers/caching');
+const { tweet } = require('../helpers/twitter');
 
 const prefix = '/api/v1/dogs';
 const router = new Router({ prefix });
@@ -45,7 +46,9 @@ const getAll = async (ctx, next) => {
 		order = 'id',
 		direction
 	} = ctx.request.query;
-	limit = clamp(limit, 1, 20); // Clamping the limit to be between 1 and 20.
+	// Clamping the limit to be between 1 and 100.
+	limit = clamp(limit, 1, 100);
+	// Fixing direction to two values
 	direction = direction === 'desc' ? 'desc' : 'asc';
 	if (!Array.isArray(select)) select = Array(select);
 	let dogs = await dogModel.getAll(query, page, limit, order, direction);
@@ -62,7 +65,9 @@ const getAll = async (ctx, next) => {
 		};
 		return partial;
 	});
-	ctx.body = dogs;
+	// Getting number of pages for pagination
+	const count = await dogModel.getCount(query);
+	ctx.body = { dogs, count };
 	return next();
 };
 
@@ -94,6 +99,8 @@ const getDog = async (ctx, next) => {
 		ctx.body = partial;
 		return next();
 	}
+	ctx.status = 404;
+	ctx.body = { message: 'Dog does not exist.' };
 };
 
 /**
@@ -115,6 +122,7 @@ const addDog = async ctx => {
 		created: true,
 		link: `${ctx.protocol}://${ctx.host}${ctx.request.path}/${id}`
 	};
+	await tweet(body.description, ctx.body.link);
 };
 
 /**
@@ -124,8 +132,10 @@ const addDog = async ctx => {
 const updateDog = async ctx => {
 	const dogId = parseInt(ctx.params.id);
 	const dog = await dogModel.getById(dogId);
+	// Checking if dog exists
 	if (dog) {
 		const { id: userId, role } = ctx.state.user;
+		// Making sure userLoc and dogLoc don't throw an error if nothing returned
 		const { locationId: userLoc } = (await staffModel.getByUserId(userId)) || {};
 		const { locationId: dogLoc } = (await dogLocationModel.getByDogId(dogId)) || {};
 		// If a user is a staff member
@@ -142,7 +152,10 @@ const updateDog = async ctx => {
 			updated: true,
 			link: `${ctx.protocol}://${ctx.host}${ctx.request.path}`
 		};
+		return;
 	}
+	ctx.status = 404;
+	ctx.body = { message: 'Dog does not exist.' };
 };
 
 /**
@@ -154,6 +167,7 @@ const deleteDog = async ctx => {
 	const dog = await dogModel.getById(dogId);
 	if (dog) {
 		const { id: userId, role } = ctx.state.user;
+		// Making sure userLoc and dogLoc don't throw an error if nothing returned
 		const { locationId: userLoc } = (await staffModel.getByUserId(userId)) || {};
 		const { locationId: dogLoc } = (await dogLocationModel.getByDogId(dogId)) || {};
 
@@ -164,7 +178,10 @@ const deleteDog = async ctx => {
 		}
 		await dogModel.delete(dogId);
 		ctx.body = { id: dogId, deleted: true };
+		return;
 	}
+	ctx.status = 404;
+	ctx.body = { message: 'Dog does not exist.' };
 };
 
 /**
@@ -181,6 +198,8 @@ const getDogBreed = async (ctx, next) => {
 		ctx.body = dogBreed;
 		return next();
 	}
+	ctx.status = 404;
+	ctx.body = { message: 'Dog does have breed assigned.' };
 };
 
 /**
@@ -211,7 +230,10 @@ const addDogBreed = async ctx => {
 			created: true,
 			link: `${ctx.protocol}://${ctx.host}${ctx.request.path}`
 		};
+		return;
 	}
+	ctx.status = 404;
+	ctx.body = { message: 'Dog does not exist.' };
 };
 
 /**
@@ -224,6 +246,7 @@ const updateDogBreed = async ctx => {
 	const dog = await dogModel.getById(dogId);
 	if (dog) {
 		const { id: userId, role } = ctx.state.user;
+		// Making sure userLoc and dogLoc don't throw an error if nothing returned
 		const { locationId: userLoc } = (await staffModel.getByUserId(userId)) || {};
 		const { locationId: dogLoc } = (await dogLocationModel.getByDogId(dogId)) || {};
 
@@ -238,18 +261,22 @@ const updateDogBreed = async ctx => {
 			updated: true,
 			link: `${ctx.protocol}://${ctx.host}${ctx.request.path}`
 		};
+		return;
 	}
+	ctx.status = 404;
+	ctx.body = { message: 'Dog does not exist.' };
 };
 
 /**
  * Deletes a dog's breed from the database.
  * @param {object} ctx context passed from Koa.
  */
-const deleteDogBreed = async (ctx, next) => {
+const deleteDogBreed = async ctx => {
 	const dogId = parseInt(ctx.params.id);
 	const dog = await dogModel.getById(dogId);
 	if (dog) {
 		const { id: userId, role } = ctx.state.user;
+		// Making sure userLoc and dogLoc don't throw an error if nothing returned
 		const { locationId: userLoc } = (await staffModel.getByUserId(userId)) || {};
 		const { locationId: dogLoc } = (await dogLocationModel.getByDogId(dogId)) || {};
 
@@ -267,8 +294,10 @@ const deleteDogBreed = async (ctx, next) => {
 		}
 		await dogBreedModel.delete(dogId);
 		ctx.body = { id: dogId, deleted: true };
-		return next();
+		return;
 	}
+	ctx.status = 404;
+	ctx.body = { message: 'Dog does not exist.' };
 };
 
 /**
@@ -285,6 +314,8 @@ const getDogLocation = async (ctx, next) => {
 		ctx.body = dogLocation;
 		return next();
 	}
+	ctx.status = 404;
+	ctx.body = { message: 'Dog does not have a location.' };
 };
 
 /**
@@ -318,7 +349,10 @@ const addDogLocation = async ctx => {
 			created: true,
 			link: `${ctx.protocol}://${ctx.host}${ctx.request.path}`
 		};
+		return;
 	}
+	ctx.status = 404;
+	ctx.body = { message: 'Dog does not exist.' };
 };
 
 /**
@@ -331,6 +365,7 @@ const updateDogLocation = async ctx => {
 	const dog = await dogModel.getById(dogId);
 	if (dog) {
 		const { id: userId, role } = ctx.state.user;
+		// Making sure userLoc and dogLoc don't throw an error if nothing returned
 		const { locationId: userLoc } = (await staffModel.getByUserId(userId)) || {};
 		const { locationId: dogLoc } = (await dogLocationModel.getByDogId(dogId)) || {};
 
@@ -345,7 +380,10 @@ const updateDogLocation = async ctx => {
 			updated: true,
 			link: `${ctx.protocol}://${ctx.host}${ctx.request.path}`
 		};
+		return;
 	}
+	ctx.status = 404;
+	ctx.body = { message: 'Dog does not exist.' };
 };
 
 /**
@@ -357,6 +395,7 @@ const deleteDogLocation = async ctx => {
 	const dog = await dogModel.getById(dogId);
 	if (dog) {
 		const { id: userId, role } = ctx.state.user;
+		// Making sure userLoc and dogLoc don't throw an error if nothing returned
 		const { locationId: userLoc } = (await staffModel.getByUserId(userId)) || {};
 		const { locationId: dogLoc } = (await dogLocationModel.getByDogId(dogId)) || {};
 
@@ -374,7 +413,10 @@ const deleteDogLocation = async ctx => {
 
 		await dogLocationModel.delete(dogId);
 		ctx.body = { id: dogId, deleted: true };
+		return;
 	}
+	ctx.status = 404;
+	ctx.body = { message: 'Dog does not exist.' };
 };
 
 /**
@@ -389,6 +431,8 @@ const getFavourites = async (ctx, next) => {
 		ctx.body = { count };
 		return next();
 	}
+	ctx.status = 404;
+	ctx.body = { message: 'Dog does not exist.' };
 };
 
 router.get('/', getAll, ifNoneMatch);

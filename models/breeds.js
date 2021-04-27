@@ -36,8 +36,24 @@ exports.getAll = async (query, page, limit, order, direction) => {
 				.where('name', 'like', `%${query}%`)
 				.orWhere('description', 'like', `%${query}%`)
 				.orderBy(order, direction)
-				.limit(limit)
+				.limit(limit ? limit : null)
 				.offset(offset)
+	);
+	return data;
+};
+
+/**
+ * Gets the number of items given an optional query.
+ * @param {string} [query] optional query to count pages for
+ * @returns {Promise<number>} number of items
+ */
+exports.getCount = async query => {
+	const [{ data }] = await run(
+		async () =>
+			await db('breeds')
+				.where('name', 'like', `%${query}%`)
+				.orWhere('description', 'like', `%${query}%`)
+				.count({ data: '*' })
 	);
 	return data;
 };

@@ -16,6 +16,8 @@ const { validateRefresh } = require('../controllers/validation');
 const { auth, basic, google } = require('../controllers/auth');
 const { config } = require('../config');
 
+const can = require('../permissions/staff');
+
 const router = new Router({ prefix: '/api/v1/auth' });
 router.use(bodyParser());
 
@@ -37,21 +39,27 @@ const login = async ctx => {
  */
 const staff = async ctx => {
 	const { id, role } = ctx.state.user;
-	if (role !== 'staff') {
+	const permission = await can.read(role);
+	if (!permission.granted) {
 		ctx.status = 403;
 		ctx.body = { message: 'Not a staff member.' };
 		return;
 	}
+	// Checking if user is a staff member
 	const staff = await staffModel.getByUserId(id);
 	if (staff) {
-		const { id: staffId } = staff;
 		ctx.body = {
-			staffId,
+			staffId: staff.id,
 			links: {
-				staff: `${ctx.protocol}://${ctx.host}/api/v1/staff/${staffId}`
+				self: `${ctx.protocol}://${ctx.host}/api/v1/staff/${staff.id}`,
+				user: `${ctx.protocol}://${ctx.host}/api/v1/users/${staff.userId}`,
+				location: `${ctx.protocol}://${ctx.host}/api/v1/locations/${staff.locationId}`
 			}
 		};
+		return;
 	}
+	ctx.status = 200;
+	ctx.body = { message: 'Staff not assigned to a location.' };
 };
 
 /**
@@ -81,7 +89,10 @@ const refresh = async ctx => {
 		const refresh = jwtHelper.generate(user, config.jwtRefresh, '7d');
 
 		ctx.body = { access, refresh };
-	} else ctx.status = 400;
+	} else {
+		ctx.status = 400;
+		ctx.body = { message: 'Invalid JWT' };
+	}
 };
 
 /**
@@ -99,6 +110,7 @@ const googleCallback = async ctx => {
 };
 
 router.get('/login', auth, login);
+
 router.get('/staff', auth, staff);
 
 router.get('/jwt', basic, getJWT);

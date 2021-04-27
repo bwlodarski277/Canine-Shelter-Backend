@@ -43,6 +43,37 @@ exports.getAll = async (query, page, limit, order, direction) => {
 };
 
 /**
+ * Gets the number locations given a query.
+ * @param {number} breedId ID of the breed to fetch.
+ * @returns {Promise<number>} number of items
+ */
+exports.count = async query => {
+	const [{ data }] = await run(
+		async () =>
+			await db('locations')
+				.where('name', 'like', `%${query}%`)
+				.orWhere('address', 'like', `%${query}%`)
+				.count({ data: '*' })
+	);
+	return data;
+};
+
+/**
+ * Gets a list of locations without a staff member assigned.
+ * @returns {Promise<List<Location>>} list of free locations
+ */
+exports.getFree = async () => {
+	const data = await run(
+		async () =>
+			await db('locations')
+				.leftJoin('staff', 'locations.id', '=', 'staff.locationId')
+				.select('locations.*')
+				.where({ 'staff.locationId': null })
+	);
+	return data;
+};
+
+/**
  * Gets a single location entry from the DB by its ID.
  * @param {number} id ID of the location to fetch.
  * @returns {Promise<Location>} object containing the locations's record.

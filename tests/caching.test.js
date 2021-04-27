@@ -1,6 +1,9 @@
 'use strict';
 
 const app = require('../app');
+
+// Supertest runs requests on different ports every time
+// so this is necessary for If-None-Match to work.
 const server = app.listen(1234, () => {});
 
 const request = require('supertest').agent(server);

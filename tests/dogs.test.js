@@ -17,29 +17,29 @@ describe('GET /dogs', () => {
 	it('should allow users to view dogs list', async () => {
 		const res = await request(app).get('/api/v1/dogs');
 		expect(res.status).toBe(200);
-		expect(res.body).toBeInstanceOf(Array);
+		expect(res.body).toBeInstanceOf(Object);
 	});
 
 	it('should choose sorting direction accordingly', async () => {
 		const res = await request(app).get('/api/v1/dogs').query({ direction: 'desc' });
 		expect(res.status).toBe(200);
-		expect(res.body).toBeInstanceOf(Array);
-		expect(res.body[0].id).toBeGreaterThan(res.body[1].id);
+		expect(res.body).toBeInstanceOf(Object);
+		expect(res.body.dogs[0].id).toBeGreaterThan(res.body.dogs[1].id);
 	});
 
 	it('should filter data properly', async () => {
 		const res = await request(app).get('/api/v1/dogs').query({ select: 'name' });
 		expect(res.status).toBe(200);
-		expect(res.body).toBeInstanceOf(Array);
-		res.body.map(dog => expect(Object.keys(dog)).toContain('name'));
-		res.body.map(dog => expect(Object.keys(dog)).not.toContain('age'));
+		expect(res.body).toBeInstanceOf(Object);
+		res.body.dogs.map(dog => expect(Object.keys(dog)).toContain('name'));
+		res.body.dogs.map(dog => expect(Object.keys(dog)).not.toContain('age'));
 	});
 
 	it('should handle invalid filters', async () => {
 		const res = await request(app).get('/api/v1/dogs').query({ select: 'invalid' });
 		expect(res.status).toBe(200);
-		expect(res.body).toBeInstanceOf(Array);
-		res.body.map(dog => expect(Object.keys(dog)).not.toContain('invalid'));
+		expect(res.body).toBeInstanceOf(Object);
+		res.body.dogs.map(dog => expect(Object.keys(dog)).not.toContain('invalid'));
 	});
 });
 

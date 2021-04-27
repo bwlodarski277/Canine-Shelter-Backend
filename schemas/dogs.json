@@ -33,7 +33,6 @@
 				"imageUrl": {
 					"description": "Path to a picture of the dog",
 					"type": "string",
-					"pattern": "uri",
 					"examples": ["https://picsum.photos/200"]
 				}
 			},
@@ -72,7 +71,6 @@
 				"imageUrl": {
 					"description": "Path to a picture of the dog",
 					"type": "string",
-					"pattern": "uri",
 					"examples": ["https://picsum.photos/200"]
 				}
 			},

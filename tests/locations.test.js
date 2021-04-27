@@ -17,29 +17,30 @@ describe('GET /locations', () => {
 	it('should give a list of locations', async () => {
 		const res = await request(app).get('/api/v1/locations');
 		expect(res.status).toBe(200);
-		expect(res.body).toBeInstanceOf(Array);
+		expect(res.body).toBeInstanceOf(Object);
+		expect(Object.keys(res.body)).toContain('locations');
 	});
 
 	it('should choose sorting direction accordingly', async () => {
 		const res = await request(app).get('/api/v1/locations').query({ direction: 'desc' });
 		expect(res.status).toBe(200);
-		expect(res.body).toBeInstanceOf(Array);
-		expect(res.body[0].id).toBeGreaterThan(res.body[1].id);
+		expect(res.body).toBeInstanceOf(Object);
+		expect(res.body.locations[0].id).toBeGreaterThan(res.body.locations[1].id);
 	});
 
 	it('should filter data properly', async () => {
 		const res = await request(app).get('/api/v1/locations').query({ select: 'name' });
 		expect(res.status).toBe(200);
-		expect(res.body).toBeInstanceOf(Array);
-		res.body.map(dog => expect(Object.keys(dog)).toContain('name'));
-		res.body.map(dog => expect(Object.keys(dog)).not.toContain('address'));
+		expect(res.body).toBeInstanceOf(Object);
+		res.body.locations.map(dog => expect(Object.keys(dog)).toContain('name'));
+		res.body.locations.map(dog => expect(Object.keys(dog)).not.toContain('address'));
 	});
 
 	it('should handle invalid filters', async () => {
 		const res = await request(app).get('/api/v1/locations').query({ select: 'invalid' });
 		expect(res.status).toBe(200);
-		expect(res.body).toBeInstanceOf(Array);
-		res.body.map(dog => expect(Object.keys(dog)).not.toContain('invalid'));
+		expect(res.body).toBeInstanceOf(Object);
+		res.body.locations.map(dog => expect(Object.keys(dog)).not.toContain('invalid'));
 	});
 });
 
@@ -81,7 +82,15 @@ describe('GET /locations/{id}/dogs', () => {
 	it('should return a list of dogs', async () => {
 		const res = await request(app).get('/api/v1/locations/1/dogs');
 		expect(res.status).toBe(200);
-		expect(res.body).toBeInstanceOf(Array);
+		expect(res.body).toBeInstanceOf(Object);
+		expect(Object.keys(res.body)).toContain('dogs');
+	});
+
+	it('should handle filtering properly', async () => {
+		const res = await request(app).get('/api/v1/locations/1/dogs').query({ select: 'name' });
+		expect(res.status).toBe(200);
+		expect(res.body).toBeInstanceOf(Object);
+		expect(Object.keys(res.body.dogs[0])).toContain('name');
 	});
 
 	it('should check if the location exists', async () => {
@@ -292,12 +301,20 @@ describe('POST /locations', () => {
 		expect(res.status).toBe(401);
 	});
 
-	it('should not allow staff to make locations', async () => {
+	it('should not allow users to make locations', async () => {
+		const res = await request(app)
+			.post('/api/v1/locations')
+			.set({ Authorization: `Basic ${btoa('TestUser:userPass')}` })
+			.send({ name: 'London shelter' });
+		expect(res.status).toBe(403);
+	});
+
+	it('should allow staff to make locations', async () => {
 		const res = await request(app)
 			.post('/api/v1/locations')
 			.set({ Authorization: `Basic ${btoa('TestStaff:staffPass')}` })
 			.send({ name: 'London shelter' });
-		expect(res.status).toBe(403);
+		expect(res.status).toBe(201);
 	});
 
 	it('should allow admins to create locations', async () => {
@@ -582,7 +599,6 @@ describe('DEL /locations/{id}/chats/{chatId}', () => {
 	});
 });
 
-// TODO: uncomment this and carry on with it
 describe('DEL /locations/{id}/chats/{chatId}/messages/{messageId}', () => {
 	it('should prevent unauthorised access', async () => {
 		const res = await request(app).del('/api/v1/locations/2/chats/6/messages/5');
@@ -610,11 +626,11 @@ describe('DEL /locations/{id}/chats/{chatId}/messages/{messageId}', () => {
 		expect(res.status).toBe(200);
 	});
 
-	it('should prevent staff from deleting user messages', async () => {
+	it('should allow staff to delete user messages', async () => {
 		const res = await request(app)
 			.del('/api/v1/locations/2/chats/7/messages/6')
 			.set({ Authorization: `Basic ${btoa('TestStaff2:staffPass2')}` });
-		expect(res.status).toBe(403);
+		expect(res.status).toBe(200);
 	});
 
 	it('should check if the location exists', async () => {
