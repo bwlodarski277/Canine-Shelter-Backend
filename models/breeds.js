@@ -36,7 +36,7 @@ exports.getAll = async (query, page, limit, order, direction) => {
 				.where('name', 'like', `%${query}%`)
 				.orWhere('description', 'like', `%${query}%`)
 				.orderBy(order, direction)
-				.limit(limit)
+				.limit(limit ? limit : null)
 				.offset(offset)
 	);
 	return data;

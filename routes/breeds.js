@@ -17,7 +17,7 @@ const { clamp } = require('../helpers/utils');
 const can = require('../permissions/breeds');
 const { ifModifiedSince, ifNoneMatch } = require('../helpers/caching');
 
-const { validateBreed } = require('../controllers/validation');
+const { validateBreed, validateBreedUpdate } = require('../controllers/validation');
 
 const prefix = '/api/v1/breeds';
 const router = new Router({ prefix });
@@ -38,7 +38,7 @@ const getAll = async (ctx, next) => {
 		direction
 	} = ctx.request.query;
 	// Clamping the limit to be between 1 and 20.
-	limit = clamp(limit, 1, 20);
+	limit = clamp(limit, 0, 20);
 	// fixing direction to two values
 	direction = direction === 'desc' ? 'desc' : 'asc';
 	if (!Array.isArray(select)) select = Array(select);
@@ -119,6 +119,7 @@ const getBreed = async (ctx, next) => {
 		}
 		const self = `${ctx.protocol}://${ctx.host}${prefix}/${partial.id}`;
 		partial.links = {
+			self: self,
 			dogs: `${self}/dogs`
 		};
 		ctx.body = partial;
@@ -204,7 +205,7 @@ router.get('/', getAll, ifNoneMatch);
 router.post('/', auth, validateBreed, addBreed);
 
 router.get('/:id([0-9]+)', getBreed, ifModifiedSince);
-router.put('/:id([0-9]+)', auth, validateBreed, updateBreed);
+router.put('/:id([0-9]+)', auth, validateBreedUpdate, updateBreed);
 router.del('/:id([0-9]+)', auth, deleteBreed);
 
 router.get('/:id([0-9]+)/dogs', getDogs, ifNoneMatch);

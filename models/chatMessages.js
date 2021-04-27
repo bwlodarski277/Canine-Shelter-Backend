@@ -18,11 +18,18 @@ const { db, run } = require('../helpers/database');
 /**
  * Gets a list of chat messages by chat ID.
  * @param {int} chatId ID of the chat to lookup.
- * @returns {Promise<Array<ChatMessage>>} List of chat message records.
+ * @returns {Promise<Array<Message>>} List of chat message records.
  * @async
  */
 exports.getByChatId = async chatId => {
-	const data = await run(async () => await db('chatMessages').where({ chatId }));
+	// const data = await run(async () => await db('chatMessages').where({ chatId }));
+	// return data;
+	const data = await run(
+		async () =>
+			await db('messages')
+				.join('chatMessages', 'messages.id', '=', 'chatMessages.messageId')
+				.where({ chatId })
+	);
 	return data;
 };
 

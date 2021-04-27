@@ -22,6 +22,26 @@
 			"required": ["name"],
 			"additionalProperties": false
 		},
+		"breedUpdate": {
+			"$id": "#breedUpdate",
+			"title": "Breed",
+			"description": "Data to update a breed",
+			"type": "object",
+			"properties": {
+				"name": {
+					"description": "Breed name",
+					"type": "string",
+					"examples": ["Corgi"],
+					"maxLength": 64
+				},
+				"description": {
+					"description": "Description talking about the breed",
+					"type": "string",
+					"examples": ["Herding dog originating from Wales"]
+				}
+			},
+			"additionalProperties": false
+		},
 		"breedData": {
 			"$id": "#breedData",
 			"title": "Breed information record",

@@ -380,7 +380,16 @@ const getUserChats = async (ctx, next) => {
 			ctx.status = 403;
 			return;
 		}
-		const chats = await chatModel.getByUserId(userId);
+		let chats = await chatModel.getByUserId(userId);
+		chats = chats.map(chat => {
+			const { locationId } = chat;
+			const self = `${ctx.protocol}://${ctx.host}/api/v1/locations/${locationId}/chats/${id}`;
+			chat.links = {
+				self: self,
+				messages: `${self}/messages`
+			};
+			return chat;
+		});
 		ctx.body = chats;
 		return next();
 	}

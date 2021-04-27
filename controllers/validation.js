@@ -10,7 +10,7 @@ const Ajv = require('ajv').default;
 const addFormats = require('ajv-formats');
 
 const { refresh } = require('../schemas/auth.json').definitions;
-const { breed } = require('../schemas/breeds.json').definitions;
+const { breed, breedUpdate } = require('../schemas/breeds.json').definitions;
 const { dog, dogUpdate, dogBreed, dogLocation } = require('../schemas/dogs.json').definitions;
 
 const {
@@ -62,6 +62,7 @@ const makeValidator = schema => {
 
 exports.validateRefresh = makeValidator(refresh);
 exports.validateBreed = makeValidator(breed);
+exports.validateBreedUpdate = makeValidator(breedUpdate);
 exports.validateDog = makeValidator(dog);
 exports.validateDogUpdate = makeValidator(dogUpdate);
 exports.validateDogBreed = makeValidator(dogBreed);
