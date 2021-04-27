@@ -2,3 +2,17 @@
 
 Welcome to the Canine Shelter API documentation homepage.
 
+## Setup
+
+### Database
+To start off, two databases (schemas) need to be created in MySQL, called `canine_shelter` and `canine_test_db`.
+The databases should have no tables.
+
+### Config files
+Create a copy of `config.js.template` and rename it to `config.js`, and fill in the values in the files to appropriate fields.
+
+Then, rename `.env.template` to `.env`.
+
+### Directories
+
+For file uploads, two directories need to be created: `/tmp/api/uploads` and `/var/tmp/api/public/images`.
