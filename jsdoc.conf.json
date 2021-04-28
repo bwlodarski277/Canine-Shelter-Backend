@@ -2,7 +2,7 @@
 	"source": {
 		"includePattern": ".+\\.js(doc|x)?$",
 		"include": ["."],
-		"exclude": ["node_modules", "docs", "openapi"]
+		"exclude": ["node_modules", "docs", "openapi", "db"]
 	},
 	"recurseDepth": 10,
 	"opts": {
