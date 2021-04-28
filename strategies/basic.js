@@ -8,7 +8,7 @@
 
 const BasicStrategy = require('passport-http').BasicStrategy;
 const users = require('../models/users');
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 
 /**
  * Checks if a password is valid.

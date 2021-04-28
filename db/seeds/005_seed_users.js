@@ -2,7 +2,7 @@
 
 // eslint-disable-next-line no-unused-vars
 const Knex = require('knex');
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 
 const users = [
 	{
