@@ -7,7 +7,7 @@
  */
 
 const { db, run } = require('../helpers/database');
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 
 /**
  * User object returned from the DB.
