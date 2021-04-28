@@ -58,16 +58,42 @@
 				"description": {
 					"description": "Breed description",
 					"type": "string"
+				},
+				"links": {
+					"description": "HATEOAS links",
+					"type": "object",
+					"properties": {
+						"self": {
+							"description": "Link to breed record",
+							"type": "string",
+							"examples": ["http://localhost:3000/api/v1/breeds/1"]
+						},
+						"dogs": {
+							"description": "Link to breed dogs",
+							"type": "string",
+							"examples": ["http://localhost:3000/api/v1/breeds/1/dogs"]
+						}
+					}
 				}
 			}
 		},
 		"breeds": {
 			"$id": "#breeds",
 			"title": "Breeds list",
-			"description": "List of breeds",
-			"type": "array",
-			"items": {
-				"$ref": "#/definitions/breedData"
+			"type": "object",
+			"properties": {
+				"breeds": {
+					"description": "List of breeds",
+					"type": "array",
+					"items": {
+						"$ref": "#/definitions/breedData"
+					}
+				},
+				"count": {
+					"description": "Total number of breeds for given query",
+					"type": "integer",
+					"examples": [3]
+				}
 			}
 		},
 		"breedCreated": {
@@ -140,7 +166,7 @@
 			"description": "List of dogs of a certain breed",
 			"type": "array",
 			"items": {
-				"$ref": "./dogs.json#/definitions/dogBreedData"
+				"$ref": "./dogs.json#/definitions/dogData"
 			}
 		}
 	}

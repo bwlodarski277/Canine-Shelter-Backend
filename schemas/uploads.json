@@ -1,0 +1,28 @@
+{
+	"$schema": "http://json-schema.org/draft-07/schema",
+	"definitions": {
+		"imageAdded": {
+			"$id": "#imageAdded",
+			"title": "Image added",
+			"description": "Image added to the database",
+			"type": "object",
+			"properties": {
+				"created": {
+					"description": "Upload confirmation",
+					"type": "boolean",
+					"examples": [true]
+				},
+				"link": {
+					"description": "Link to new image",
+					"type": "string"
+				}
+			}
+		},
+		"image": {
+			"$id": "#image",
+			"title": "Single image fro the database",
+			"type": "string",
+			"format": "binary"
+		}
+	}
+}
