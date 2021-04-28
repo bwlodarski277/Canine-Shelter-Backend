@@ -2,7 +2,7 @@
 
 const Router = require('koa-router');
 const { v4: uuidV4 } = require('uuid');
-const { existsSync, copyFileSync, createReadStream } = require('fs');
+const { existsSync, copyFileSync, createReadStream, mkdirSync } = require('fs');
 const { auth } = require('../controllers/auth');
 
 const uploadDir = '/tmp/api/uploads';
@@ -45,5 +45,12 @@ const getImage = async (ctx, next) => {
 
 router.post('/', auth, koaBody, postImage);
 router.get('getImage', '/:uuid([0-9a-f\\-]{36}\\..+)', getImage, ifNoneMatch);
+
+/* istanbul ignore if */
+if (!existsSync('/tmp/api')) {
+	mkdirSync('/tmp/api');
+	mkdirSync('/tmp/api/uploads');
+}
+
 
 module.exports = router;

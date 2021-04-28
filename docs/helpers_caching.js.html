@@ -3,7 +3,7 @@
 <head>
     
     <meta charset="utf-8">
-    <title>helpers/twitter.js - Documentation</title>
+    <title>helpers/caching.js - Documentation</title>
     
     
     <script src="scripts/prettify/prettify.js"></script>
@@ -32,7 +32,7 @@
 
 <div id="main">
     
-    <h1 class="page-title">helpers/twitter.js</h1>
+    <h1 class="page-title">helpers/caching.js</h1>
     
 
     
@@ -44,41 +44,40 @@
         <article>
             <pre class="prettyprint source linenums"><code>'use strict';
 
-/* istanbul ignore file */
-
-/* eslint-disable camelcase */
-const Twit = require('twit');
-const { twitter: config } = require('../config').config;
-
-const twit = new Twit({
-	consumer_key: config.apiKey,
-	consumer_secret: config.apiSecretKey,
-	access_token: config.accessToken,
-	access_token_secret: config.accessTokenSecret
-});
+const etag = require('etag');
 
 /**
- * Tweets a block of text and a URL on the Canine Shelter Twitter page.
- * {@link https://twitter.com/CanineShelter}
- * @param {string} text
- * @param {string} link
- * @returns {boolean} value indicating whether the tweet was posted or not.
+ * Uses the If-Modified-Since header to see if the API needs to return data.
+ * @param {object} ctx Koa object passed by previous middleware
+ * @param {function} next next function to call in the middleware chain
  * @async
  */
-exports.tweet = async (text = '', link = '') => {
-	// The Twitter API converts URLs to t.co shortened links, which
-	// are made up of 23 characters.
-	let status = '';
-	// Take away extra 4 for '...\n'
-	if (text.length + 23 > 280) status = `${text.substr(0, text.length - 23 - 4)}...\n${link}`;
-	else status = `${text}\n${link}`;
-	try {
-		await twit.post('statuses/update', { status });
-		return true;
-	} catch (error) {
-		console.error(error);
-		return false;
+exports.ifModifiedSince = async (ctx, next) => {
+	ctx.set('Last-Modified', new Date(ctx.body.modified).toUTCString());
+	ctx.set('ETag', etag(JSON.stringify(ctx.body)));
+	const { ['if-modified-since']: ifModifiedSince } = ctx.headers;
+	if (ifModifiedSince) {
+		const since = Date.parse(ifModifiedSince);
+		const modified = new Date(ctx.body.modified);
+		if (modified &lt; since) ctx.status = 304;
 	}
+	return next();
+};
+
+/**
+ * Uses the If-None-Match header to see if the API needs to return data.
+ * @param {object} ctx Koa object passed by previous middleware
+ * @param {function} next next function to call in the middleware chain
+ * @async
+ */
+exports.ifNoneMatch = async (ctx, next) => {
+	ctx.set('ETag', etag(JSON.stringify(ctx.body)));
+	const { ['if-none-match']: ifNoneMatch } = ctx.headers;
+	if (ifNoneMatch) {
+		const current = etag(JSON.stringify(ctx.body));
+		if (ifNoneMatch === current) ctx.status = 304;
+	}
+	return next();
 };
 </code></pre>
         </article>

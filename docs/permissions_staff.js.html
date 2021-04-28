@@ -3,7 +3,7 @@
 <head>
     
     <meta charset="utf-8">
-    <title>helpers/twitter.js - Documentation</title>
+    <title>permissions/staff.js - Documentation</title>
     
     
     <script src="scripts/prettify/prettify.js"></script>
@@ -32,7 +32,7 @@
 
 <div id="main">
     
-    <h1 class="page-title">helpers/twitter.js</h1>
+    <h1 class="page-title">permissions/staff.js</h1>
     
 
     
@@ -44,42 +44,81 @@
         <article>
             <pre class="prettyprint source linenums"><code>'use strict';
 
-/* istanbul ignore file */
+/**
+ * @file RBAC permissions for /staff routes.
+ * @module permissions/staff
+ * @author Bartlomiej Wlodarski
+ */
 
-/* eslint-disable camelcase */
-const Twit = require('twit');
-const { twitter: config } = require('../config').config;
+const { AccessControl } = require('role-acl');
+const ac = new AccessControl();
 
-const twit = new Twit({
-	consumer_key: config.apiKey,
-	consumer_secret: config.apiSecretKey,
-	access_token: config.accessToken,
-	access_token_secret: config.accessTokenSecret
-});
+const { config } = require('../config');
+
+// Not used, but added to make sure user is role exists
+ac.grant('user').execute('none').on('none');
+
+// Staff may assign themselves to a location
+ac.grant('staff')
+	.condition({ Fn: 'EQUALS', args: { key: config.staffKey } })
+	.execute('create')
+	.on('staff');
+
+// Staff may view all staff
+ac.grant('staff').execute('read').on('staff');
+
+//Staff may modify their own record
+ac.grant('staff')
+	.condition({ Fn: 'EQUALS', args: { user: '$.owner' } })
+	.execute('modify')
+	.on('staff');
+
+// Staff may delete their own record
+ac.grant('staff')
+	.condition({ Fn: 'EQUALS', args: { user: '$.owner' } })
+	.execute('delete')
+	.on('staff');
+
+// Admins may perform the same actions but also delete staff.
+ac.grant('admin').extend('staff');
+ac.grant('admin').execute('modify').on('staff');
+ac.grant('admin').execute('delete').on('staff');
 
 /**
- * Tweets a block of text and a URL on the Canine Shelter Twitter page.
- * {@link https://twitter.com/CanineShelter}
- * @param {string} text
- * @param {string} link
- * @returns {boolean} value indicating whether the tweet was posted or not.
- * @async
+ * Checks if a user may register themselves as a staff member.
+ * @param {string} role user's role
+ * @param {string} key provided staff key
+ * @returns permission object
  */
-exports.tweet = async (text = '', link = '') => {
-	// The Twitter API converts URLs to t.co shortened links, which
-	// are made up of 23 characters.
-	let status = '';
-	// Take away extra 4 for '...\n'
-	if (text.length + 23 > 280) status = `${text.substr(0, text.length - 23 - 4)}...\n${link}`;
-	else status = `${text}\n${link}`;
-	try {
-		await twit.post('statuses/update', { status });
-		return true;
-	} catch (error) {
-		console.error(error);
-		return false;
-	}
-};
+exports.create = async (role, key) =>
+	await ac.can(role).context({ key }).execute('create').on('staff');
+
+/**
+ * Checks if a user may view staff list.
+ * @param {string} role user's role
+ * @returns permission object
+ */
+exports.read = async role => await ac.can(role).execute('read').on('staff');
+
+/**
+ * Checks if a user may modify a staff member.
+ * @param {string} role user's role
+ * @param {number} user user ID
+ * @param {number} owner ID of staff member being modified
+ * @returns permission object
+ */
+exports.modify = async (role, user, owner) =>
+	await ac.can(role).context({ user, owner }).execute('modify').on('staff');
+
+/**
+ * Checks if a user may delete a staff member.
+ * @param {string} role user's role
+ * @param {number} user user ID
+ * @param {number} owner ID of staff member being modified
+ * @returns permission object
+ */
+exports.delete = async (role, user, owner) =>
+	await ac.can(role).context({ user, owner }).execute('delete').on('staff');
 </code></pre>
         </article>
     </section>

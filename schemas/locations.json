@@ -62,16 +62,47 @@
 					"description": "Location address",
 					"type": "string",
 					"examples": ["Coventry Shelter\n,1 Sample Road,\nCoventry,\nCV1 5FB"]
+				},
+				"links": {
+					"description": "HATEOAS links",
+					"type": "object",
+					"properties": {
+						"self": {
+							"description": "Link to location record",
+							"type": "string",
+							"examples": ["http://localhost:3000/api/v1/locations/1"]
+						},
+						"dogs": {
+							"description": "Link to location dogs",
+							"type": "string",
+							"examples": ["http://localhost:3000/api/v1/locations/1/dogs"]
+						},
+						"chats": {
+							"description": "Link to location chats",
+							"type": "string",
+							"examples": ["http://localhost:3000/api/v1/locations/1/chats"]
+						}
+					}
 				}
 			}
 		},
 		"locations": {
 			"$id": "locations",
 			"title": "Locations",
-			"description": "List of locations",
-			"type": "array",
-			"items": {
-				"$ref": "#/definitions/locationData"
+			"type": "object",
+			"properties": {
+				"locations": {
+					"description": "List of locations",
+					"type": "array",
+					"items": {
+						"$ref": "#/definitions/locationData"
+					}
+				},
+				"count": {
+					"description": "Total number of locations for given query",
+					"type": "integer",
+					"examples": [7]
+				}
 			}
 		},
 		"locationCreated": {
@@ -143,7 +174,7 @@
 			"description": "List of dogs at a given location",
 			"type": "array",
 			"items": {
-				"$ref": "./dogs.json#/definitions/dogLocationData"
+				"$ref": "./dogs.json#/definitions/dogData"
 			}
 		},
 		"chat": {
@@ -185,6 +216,29 @@
 					"description": "ID of user linked to the chat",
 					"type": "integer",
 					"examples": [4]
+				},
+				"links": {
+					"description": "HATEOAS links",
+					"type": "object",
+					"properties": {
+						"self": {
+							"description": "Link to chat record",
+							"type": "string",
+							"examples": ["http://localhost:3000/api/v1/locations/1/chats/1"]
+						},
+						"messages": {
+							"description": "Link to chat messages",
+							"type": "string",
+							"examples": [
+								"http://localhost:3000/api/v1/locations/1/chats/1/messages"
+							]
+						},
+						"user": {
+							"description": "Link to chat user",
+							"type": "string",
+							"examples": ["http://localhost:3000/api/v1/users/1"]
+						}
+					}
 				}
 			}
 		},
@@ -282,6 +336,19 @@
 					"description": "Message body",
 					"type": "string",
 					"examples": ["Example message"]
+				},
+				"links": {
+					"description": "HATEOAS links",
+					"type": "object",
+					"properties": {
+						"self": {
+							"description": "Link to chat record",
+							"type": "string",
+							"examples": [
+								"http://localhost:3000/api/v1/locations/1/chats/1/messages/1"
+							]
+						}
+					}
 				}
 			}
 		},

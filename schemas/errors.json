@@ -30,6 +30,19 @@
 			"items": {
 				"$ref": "#/definitions/validationError"
 			}
+		},
+		"unauthorisedError": {
+			"$id": "#unauthorisedError",
+			"Title": "Unauthorised error",
+			"description": "Occurs when the user does not have permission to perform an action",
+			"type": "object",
+			"properties": {
+				"message": {
+					"description": "A message describing why the request failed",
+					"type": "string",
+					"examples": ["Username is taken"]
+				}
+			}
 		}
 	}
 }

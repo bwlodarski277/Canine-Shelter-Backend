@@ -121,6 +121,32 @@
 					"description": "Path to a picture of the dog",
 					"type": "string",
 					"pattern": "uri"
+				},
+				"links": {
+					"description": "HATEOAS links",
+					"type": "object",
+					"properties": {
+						"self": {
+							"description": "Link to dog record",
+							"type": "string",
+							"examples": ["http://localhost:3000/api/v1/dogs/1"]
+						},
+						"breed": {
+							"description": "Link to dog breed",
+							"type": "string",
+							"examples": ["http://localhost:3000/api/v1/dogs/1/breed"]
+						},
+						"location": {
+							"description": "Link to dog location",
+							"type": "string",
+							"examples": ["http://localhost:3000/api/v1/dogs/1/location"]
+						},
+						"favourites": {
+							"description": "Link to dog favourites",
+							"type": "string",
+							"examples": ["http://localhost:3000/api/v1/dogs/1/favourites"]
+						}
+					}
 				}
 			}
 		},
@@ -128,9 +154,20 @@
 			"$id": "#dogs",
 			"title": "Dogs list",
 			"description": "List of dogs",
-			"type": "array",
-			"items": {
-				"$ref": "#/definitions/dogData"
+			"type": "object",
+			"properties": {
+				"dogs": {
+					"description": "List of dogs",
+					"type": "array",
+					"items": {
+						"$ref": "#/definitions/dogData"
+					}
+				},
+				"count": {
+					"description": "Total count of dogs for given query",
+					"type": "integer",
+					"examples": [5]
+				}
 			}
 		},
 		"dogCreated": {
@@ -217,18 +254,7 @@
 			"title": "Dog's breed data",
 			"description": "Dog and breed link table",
 			"type": "object",
-			"properties": {
-				"dogId": {
-					"description": "ID of dog linked to a breed",
-					"type": "integer",
-					"examples": [2]
-				},
-				"breedId": {
-					"description": "Id of breed linked to a dog",
-					"type": "integer",
-					"examples": [1]
-				}
-			}
+			"$ref": "./breeds.json#/definitions/breedData"
 		},
 		"dogBreedCreated": {
 			"$id": "#dogBreedCreated",
@@ -314,18 +340,7 @@
 			"title": "Dog location data",
 			"description": "Dog and location link table",
 			"type": "object",
-			"properties": {
-				"dogId": {
-					"description": "ID of dog assigned to a location",
-					"type": "integer",
-					"examples": [2]
-				},
-				"breedId": {
-					"description": "ID of location assigned to a dog",
-					"type": "integer",
-					"examples": [5]
-				}
-			}
+			"$ref": "./locations.json#/definitions/locationData"
 		},
 		"dogLocationCreated": {
 			"$id": "#dogLocationCreated",

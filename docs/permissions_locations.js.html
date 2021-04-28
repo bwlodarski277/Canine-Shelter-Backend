@@ -3,7 +3,7 @@
 <head>
     
     <meta charset="utf-8">
-    <title>helpers/twitter.js - Documentation</title>
+    <title>permissions/locations.js - Documentation</title>
     
     
     <script src="scripts/prettify/prettify.js"></script>
@@ -32,7 +32,7 @@
 
 <div id="main">
     
-    <h1 class="page-title">helpers/twitter.js</h1>
+    <h1 class="page-title">permissions/locations.js</h1>
     
 
     
@@ -44,41 +44,231 @@
         <article>
             <pre class="prettyprint source linenums"><code>'use strict';
 
-/* istanbul ignore file */
-
-/* eslint-disable camelcase */
-const Twit = require('twit');
-const { twitter: config } = require('../config').config;
-
-const twit = new Twit({
-	consumer_key: config.apiKey,
-	consumer_secret: config.apiSecretKey,
-	access_token: config.accessToken,
-	access_token_secret: config.accessTokenSecret
-});
-
 /**
- * Tweets a block of text and a URL on the Canine Shelter Twitter page.
- * {@link https://twitter.com/CanineShelter}
- * @param {string} text
- * @param {string} link
- * @returns {boolean} value indicating whether the tweet was posted or not.
- * @async
+ * @file RBAC permissions for /locations routes.
+ * @module permissions/locations
+ * @author Bartlomiej Wlodarski
  */
-exports.tweet = async (text = '', link = '') => {
-	// The Twitter API converts URLs to t.co shortened links, which
-	// are made up of 23 characters.
-	let status = '';
-	// Take away extra 4 for '...\n'
-	if (text.length + 23 > 280) status = `${text.substr(0, text.length - 23 - 4)}...\n${link}`;
-	else status = `${text}\n${link}`;
-	try {
-		await twit.post('statuses/update', { status });
-		return true;
-	} catch (error) {
-		console.error(error);
-		return false;
-	}
+
+const { AccessControl } = require('role-acl');
+const ac = new AccessControl();
+
+// const checkMessage = ctx => {
+// 	// If is staff check location, else check user ID.
+// 	// TODO: check the role in this function? (not sure if this is needed, since we check the sender stuff.)
+// 	if (ctx.sender === 0) return ctx.staffLocation === ctx.chatLocation;
+// 	return ctx.userId === ctx.chatUser;
+// };
+
+// Not used, but created so that the 'user' role is registered.
+// ac.grant('user').execute('none').on('none');
+
+// Only staff create or delete locations
+ac.grant('staff').execute('create').on('location');
+
+// Letting staff modify details about a location.
+ac.grant('staff')
+	.condition({ Fn: 'EQUALS', args: { location: '$.owner' } })
+	.execute('modify')
+	.on('location');
+
+ac.grant('staff')
+	.condition({ Fn: 'EQUALS', args: { location: '$.owner' } })
+	.execute('delete')
+	.on('location');
+
+ac.grant('admin').execute('create').on('location');
+ac.grant('admin').execute('modify').on('location');
+ac.grant('admin').execute('delete').on('location');
+
+// Users may create chats with a location
+ac.grant('user').execute('create').on('chat');
+
+ac.grant('user')
+	.condition({ Fn: 'EQUALS', args: { userId: '$.chatUser' } })
+	.execute('read')
+	.on('chat');
+
+// Users may delete their own chats
+ac.grant('user')
+	.condition({ Fn: 'EQUALS', args: { userId: '$.chatUser' } })
+	.execute('delete')
+	.on('chat');
+
+// Staff may delete chats at their location
+ac.grant('staff')
+	.condition({ Fn: 'EQUALS', args: { staffLocation: '$.chatLocation' } })
+	.execute('delete')
+	.on('chat');
+
+// Staff may view a single chat at their location
+ac.grant('staff')
+	.condition({ Fn: 'EQUALS', args: { staffLocation: '$.chatLocation' } })
+	.execute('read')
+	.on('chat');
+
+// Staff may view all chats at their location.
+ac.grant('staff')
+	.condition({ Fn: 'EQUALS', args: { staffLocation: '$.chatLocation' } })
+	.execute('read')
+	.on('chats');
+
+// Users may create messages in chats they're part of.
+ac.grant('user')
+	.condition({ Fn: 'EQUALS', args: { userId: '$.chatUser' } })
+	.execute('create')
+	.on('message');
+
+// Users may create messages in their own chats.
+ac.grant('user')
+	.condition({ Fn: 'EQUALS', args: { userId: '$.chatUser' } })
+	.execute('read')
+	.on('message');
+
+// { Fn: 'EQUALS', args: { userId: '$.chatUser' } }
+ac.grant('user')
+	.condition(ctx => ctx.userId === ctx.chatUser &amp;&amp; ctx.sender === 1)
+	.execute('delete')
+	.on('message');
+
+// Staff may create messages in chats with their location.
+ac.grant('staff')
+	.condition({ Fn: 'EQUALS', args: { staffLocation: '$.chatLocation' } })
+	.execute('create')
+	.on('message');
+
+// Staff may read messages in chats at their location.
+ac.grant('staff')
+	.condition({ Fn: 'EQUALS', args: { staffLocation: '$.chatLocation' } })
+	.execute('read')
+	.on('message');
+
+// { Fn: 'EQUALS', args: { staffLocation: '$.chatLocation' } }
+ac.grant('staff')
+	.condition({ Fn: 'EQUALS', args: { staffLocation: '$.chatLocation' } })
+	.execute('delete')
+	.on('message');
+
+exports.location = {
+	/**
+	 * Checks if a user may create a location
+	 * @param {string} role user's role
+	 * @returns permission object
+	 */
+	create: async role => await ac.can(role).execute('create').on('location'),
+	/**
+	 * Checks if a user may modify a location
+	 * @param {string} role user's role
+	 * @param {number} location location ID
+	 * @param {number} owner staff's location ID
+	 * @returns permission object
+	 */
+	modify: async (role, location, owner) =>
+		await ac.can(role).context({ location, owner }).execute('modify').on('location'),
+	/**
+	 * Checks if a user may delete a location
+	 * @param {string} role user's role
+	 * @returns permission object
+	 */
+	delete: async role => await ac.can(role).execute('delete').on('location')
+};
+
+exports.chat = {
+	/**
+	 * Checks if a user may create a chat.
+	 * @param {string} role user's role
+	 * @returns permission object
+	 */
+	create: async role => await ac.can(role).execute('create').on('chat'),
+	/**
+	 * Checks if a user may read all messages in a chat
+	 * @param {string} role user's role
+	 * @param {number} staffLocation user's staff location (if staff)
+	 * @param {number} chatLocation chat location ID (if staff)
+	 * @returns permission object
+	 */
+	readAll: async (role, staffLocation, chatLocation) =>
+		await ac.can(role).context({ staffLocation, chatLocation }).execute('read').on('chats'),
+	/**
+	 * Checks if a user may read a chat.
+	 * @param {string} role user's role
+	 * @param {number} userId user's ID
+	 * @param {number} chatUser ID of user associated with chat
+	 * @param {number} staffLocation staff ID (if staff)
+	 * @param {number} chatLocation chat location ID (if staff)
+	 * @returns permission object
+	 */
+	read: async (role, userId, chatUser, staffLocation, chatLocation) =>
+		await ac
+			.can(role)
+			.context({ userId, chatUser, staffLocation, chatLocation })
+			.execute('read')
+			.on('chat'),
+
+	/**
+	 * Checks if a user may delete a chat.
+	 * @param {string} role user's role
+	 * @param {number} userId user's ID
+	 * @param {number} chatUser ID of user associated with chat
+	 * @param {number} staffLocation staff ID (if staff)
+	 * @param {number} chatLocation chat location ID (if staff)
+	 * @returns permission object
+	 */
+	delete: async (role, userId, chatUser, staffLocation, chatLocation) =>
+		await ac
+			.can(role)
+			.context({ userId, chatUser, staffLocation, chatLocation })
+			.execute('delete')
+			.on('chat')
+};
+
+exports.message = {
+	/**
+	 * Checks if a user may create a chat message.
+	 * @param {string} role user's role
+	 * @param {number} userId user's ID
+	 * @param {number} chatUser ID of user associated with chat
+	 * @param {number} staffLocation staff ID (if staff)
+	 * @param {number} chatLocation chat location ID (if staff)
+	 * @returns permission object
+	 */
+	create: async (role, userId, chatUser, staffLocation, chatLocation) =>
+		await ac
+			.can(role)
+			.context({ userId, chatUser, staffLocation, chatLocation })
+			.execute('create')
+			.on('message'),
+	/**
+	 * Checks if a user may read a chat message.
+	 * @param {string} role user's role
+	 * @param {number} userId user's ID
+	 * @param {number} chatUser ID of user associated with chat
+	 * @param {number} staffLocation staff ID (if staff)
+	 * @param {number} chatLocation chat location ID (if staff)
+	 * @returns permission object
+	 */
+	read: async (role, userId, chatUser, staffLocation, chatLocation) =>
+		await ac
+			.can(role)
+			.context({ userId, chatUser, staffLocation, chatLocation })
+			.execute('read')
+			.on('message'),
+	/**
+	 * Checks if a user may delete a chat message.
+	 * @param {string} role user's role
+	 * @param {boolean|number} sender1 message sender (0 for staff, 1 for user)
+	 * @param {number} userId user's ID
+	 * @param {number} chatUser ID of user associated with chat
+	 * @param {number} staffLocation staff ID (if staff)
+	 * @param {number} chatLocation chat location ID (if staff)
+	 * @returns permission object
+	 */
+	delete: async (role, sender, userId, chatUser, staffLocation, chatLocation) =>
+		await ac
+			.can(role)
+			.context({ sender, userId, chatUser, staffLocation, chatLocation })
+			.execute('delete')
+			.on('message')
 };
 </code></pre>
         </article>

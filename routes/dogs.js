@@ -122,7 +122,8 @@ const addDog = async ctx => {
 		created: true,
 		link: `${ctx.protocol}://${ctx.host}${ctx.request.path}/${id}`
 	};
-	await tweet(body.description, ctx.body.link);
+	const webUrl = 'https://latin-kimono-3000.codio-box.uk/dogs/' + id;
+	await tweet(body.description, webUrl);
 };
 
 /**

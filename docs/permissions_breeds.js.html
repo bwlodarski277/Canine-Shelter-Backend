@@ -3,7 +3,7 @@
 <head>
     
     <meta charset="utf-8">
-    <title>helpers/twitter.js - Documentation</title>
+    <title>permissions/breeds.js - Documentation</title>
     
     
     <script src="scripts/prettify/prettify.js"></script>
@@ -32,7 +32,7 @@
 
 <div id="main">
     
-    <h1 class="page-title">helpers/twitter.js</h1>
+    <h1 class="page-title">permissions/breeds.js</h1>
     
 
     
@@ -44,42 +44,34 @@
         <article>
             <pre class="prettyprint source linenums"><code>'use strict';
 
-/* istanbul ignore file */
-
-/* eslint-disable camelcase */
-const Twit = require('twit');
-const { twitter: config } = require('../config').config;
-
-const twit = new Twit({
-	consumer_key: config.apiKey,
-	consumer_secret: config.apiSecretKey,
-	access_token: config.accessToken,
-	access_token_secret: config.accessTokenSecret
-});
-
 /**
- * Tweets a block of text and a URL on the Canine Shelter Twitter page.
- * {@link https://twitter.com/CanineShelter}
- * @param {string} text
- * @param {string} link
- * @returns {boolean} value indicating whether the tweet was posted or not.
- * @async
+ * @file RBAC permissions for /breeds routes.
+ * @module permissions/breeds
+ * @author Bartlomiej Wlodarski
  */
-exports.tweet = async (text = '', link = '') => {
-	// The Twitter API converts URLs to t.co shortened links, which
-	// are made up of 23 characters.
-	let status = '';
-	// Take away extra 4 for '...\n'
-	if (text.length + 23 > 280) status = `${text.substr(0, text.length - 23 - 4)}...\n${link}`;
-	else status = `${text}\n${link}`;
-	try {
-		await twit.post('statuses/update', { status });
-		return true;
-	} catch (error) {
-		console.error(error);
-		return false;
-	}
-};
+
+const { AccessControl } = require('role-acl');
+const ac = new AccessControl();
+
+// Not used, but created so the 'user' role is registered.
+ac.grant('user').execute('none').on('none');
+
+// Staff may add, modify or delete breeds
+ac.grant('staff').execute('create').on('breed');
+ac.grant('staff').execute('modify').on('breed');
+ac.grant('staff').execute('delete').on('breed');
+
+// Admins may do the same.
+ac.grant('admin').extend('staff');
+
+/** Checks if a user may create a breed. */
+exports.create = async role => ac.can(role).execute('create').on('breed');
+
+/** Checks if a user may modify a breed. */
+exports.modify = async role => ac.can(role).execute('modify').on('breed');
+
+/** Checks if a user may delete a breed. */
+exports.delete = async role => ac.can(role).execute('delete').on('breed');
 </code></pre>
         </article>
     </section>

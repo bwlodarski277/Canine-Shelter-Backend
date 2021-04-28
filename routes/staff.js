@@ -82,7 +82,6 @@ const createStaff = async ctx => {
 /**
  * Gets a staff member
  * @param {object} ctx Koa context
- * @returns
  */
 const getStaff = async (ctx, next) => {
 	const id = ctx.params.id;

@@ -51,6 +51,14 @@
 			"description": "Endpoints for managing conversations with shelters"
 		},
 		{
+			"name": "Uploads",
+			"description": "Entdpoints for uploading images"
+		},
+		{
+			"name": "Auth",
+			"description": "Endpoints for authenticating users"
+		},
+		{
 			"name": "Miscellaneous",
 			"description": "Miscellaneous endpoints"
 		}
@@ -61,7 +69,21 @@
 				"description": "User needs to be authenticated to access this route"
 			},
 			"notFoundError": {
-				"description": "Resource does not exist"
+				"description": "Resource does not exist",
+				"content": {
+					"application/json": {
+						"schema": {
+							"type": "object",
+							"properties": {
+								"message": {
+									"description": "Error message",
+									"type": "string",
+									"example": "User does not exist"
+								}
+							}
+						}
+					}
+				}
 			},
 			"validationError": {
 				"description": "Occurs when the server rejects the form data",
@@ -130,6 +152,13 @@
 				"description": "Staff ID",
 				"required": true,
 				"schema": { "type": "integer" }
+			},
+			"uuid": {
+				"name": "uuid",
+				"in": "path",
+				"description": "Image UUID",
+				"required": true,
+				"schema": { "type": "string", "format": "uuid" }
 			}
 		},
 		"securitySchemes": {
@@ -150,6 +179,7 @@
 			"get": {
 				"tags": ["Breeds"],
 				"summary": "Gets all the breeds on the website",
+				"security": [],
 				"responses": {
 					"200": {
 						"description": "A list of breeds",
@@ -278,12 +308,61 @@
 			"get": {
 				"tags": ["Breeds"],
 				"summary": "Get a list of dogs associated with breed",
+				"security": [],
+				"parameters": [
+					{
+						"name": "query",
+						"description": "A search query",
+						"in": "query",
+						"required": false,
+						"schema": { "type": "string" },
+						"example": "Rex"
+					},
+					{
+						"name": "page",
+						"description": "Page number to browse",
+						"in": "query",
+						"required": false,
+						"schema": { "type": "integer" },
+						"example": 1
+					},
+					{
+						"name": "limit",
+						"description": "Limit of entries per page",
+						"in": "query",
+						"required": false,
+						"schema": { "type": "integer" },
+						"example": 5
+					},
+					{
+						"name": "order",
+						"description": "Item to order the results by",
+						"in": "query",
+						"required": false,
+						"schema": {
+							"type": "string",
+							"enum": ["id", "name", "description", "age", "gender"]
+						},
+						"example": "age"
+					},
+					{
+						"name": "direction",
+						"description": "Direction to sort in (ascending or descending)",
+						"in": "query",
+						"required": false,
+						"schema": {
+							"type": "string",
+							"enum": ["asc", "desc"]
+						},
+						"example": "asc"
+					}
+				],
 				"responses": {
 					"200": {
 						"description": "A list of dogs",
 						"content": {
 							"application/json": {
-								"schema": { "$ref": "./breeds.json#/definitions/breedDogs" }
+								"schema": { "$ref": "./dogs.json#/definitions/dogs" }
 							}
 						}
 					},
@@ -311,6 +390,54 @@
 			"get": {
 				"tags": ["Users"],
 				"summary": "Gets a list of users on the website",
+				"parameters": [
+					{
+						"name": "query",
+						"description": "A search query",
+						"in": "query",
+						"required": false,
+						"schema": { "type": "string" },
+						"example": "Rex"
+					},
+					{
+						"name": "page",
+						"description": "Page number to browse",
+						"in": "query",
+						"required": false,
+						"schema": { "type": "integer" },
+						"example": 1
+					},
+					{
+						"name": "limit",
+						"description": "Limit of entries per page",
+						"in": "query",
+						"required": false,
+						"schema": { "type": "integer" },
+						"example": 5
+					},
+					{
+						"name": "order",
+						"description": "Item to order the results by",
+						"in": "query",
+						"required": false,
+						"schema": {
+							"type": "string",
+							"enum": ["id", "username", "email", "firstName", "lastName"]
+						},
+						"example": "firstName"
+					},
+					{
+						"name": "direction",
+						"description": "Direction to sort in (ascending or descending)",
+						"in": "query",
+						"required": false,
+						"schema": {
+							"type": "string",
+							"enum": ["asc", "desc"]
+						},
+						"example": "asc"
+					}
+				],
 				"responses": {
 					"200": {
 						"description": "A list of users",
@@ -450,6 +577,36 @@
 					},
 					"403": {
 						"description": "Non-admins can only modify their own account"
+					},
+					"404": {
+						"$ref": "#/components/responses/notFoundError"
+					}
+				}
+			}
+		},
+		"/users/{id}/chats": {
+			"summary": "A list of the user's chats",
+			"parameters": [{ "$ref": "#/components/parameters/userId" }],
+			"get": {
+				"tags": ["Users"],
+				"summary": "Get a list of the user's chats",
+				"description": "Gets a single user by their ID",
+				"responses": {
+					"200": {
+						"description": "A single user's data",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "./locations.json#/definitions/chats"
+								}
+							}
+						}
+					},
+					"401": {
+						"$ref": "#/components/responses/authenticationError"
+					},
+					"403": {
+						"description": "Users may only view their own records"
 					},
 					"404": {
 						"$ref": "#/components/responses/notFoundError"
@@ -1016,6 +1173,7 @@
 			"get": {
 				"tags": ["Dogs"],
 				"description": "Get a list of favourites associated with the dog",
+				"security": [],
 				"responses": {
 					"200": {
 						"description": "Successfully retrieved favourites list",
@@ -1173,6 +1331,54 @@
 			"get": {
 				"summary": "Get a list of dogs",
 				"description": "Gets a list of dogs at a given location by location ID",
+				"parameters": [
+					{
+						"name": "query",
+						"description": "A search query",
+						"in": "query",
+						"required": false,
+						"schema": { "type": "string" },
+						"example": "Rex"
+					},
+					{
+						"name": "page",
+						"description": "Page number to browse",
+						"in": "query",
+						"required": false,
+						"schema": { "type": "integer" },
+						"example": 1
+					},
+					{
+						"name": "limit",
+						"description": "Limit of entries per page",
+						"in": "query",
+						"required": false,
+						"schema": { "type": "integer" },
+						"example": 5
+					},
+					{
+						"name": "order",
+						"description": "Item to order the results by",
+						"in": "query",
+						"required": false,
+						"schema": {
+							"type": "string",
+							"enum": ["id", "name", "description", "age", "gender"]
+						},
+						"example": "age"
+					},
+					{
+						"name": "direction",
+						"description": "Direction to sort in (ascending or descending)",
+						"in": "query",
+						"required": false,
+						"schema": {
+							"type": "string",
+							"enum": ["asc", "desc"]
+						},
+						"example": "asc"
+					}
+				],
 				"security": [],
 				"tags": ["Locations"],
 				"responses": {
@@ -1181,7 +1387,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "./locations.json#/definitions/locationDogs"
+									"$ref": "./dogs.json#/definitions/dogs"
 								}
 							}
 						}
@@ -1254,7 +1460,6 @@
 				"summary": "Get an individual chat",
 				"description": "Gets a chat's information by chat ID",
 				"tags": ["Chats"],
-				"security": [],
 				"responses": {
 					"200": {
 						"description": "Successfully retrieved chat information",
@@ -1433,6 +1638,9 @@
 								}
 							}
 						}
+					},
+					"404": {
+						"$ref": "#/components/responses/notFoundError"
 					}
 				}
 			}
@@ -1593,6 +1801,174 @@
 					},
 					"404": {
 						"$ref": "#/components/responses/notFoundError"
+					}
+				}
+			}
+		},
+		"/auth/login": {
+			"summary": "Log in",
+			"description": "Route for logging the user in",
+			"get": {
+				"summary": "Gets the user's ID",
+				"tags": ["Auth"],
+				"responses": {
+					"200": {
+						"description": "User ID",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "./auth.json#/definitions/loginData"
+								}
+							}
+						}
+					},
+					"401": {
+						"$ref": "#/components/responses/authenticationError"
+					}
+				}
+			}
+		},
+		"/auth/jwt": {
+			"summary": "JSON Web Token",
+			"description": "Route for getting JWT",
+			"get": {
+				"summary": "Gets a user's JWT",
+				"tags": ["Auth"],
+				"responses": {
+					"200": {
+						"description": "JWT and refresh token",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "./auth.json#/definitions/jwt"
+								}
+							}
+						}
+					},
+					"401": {
+						"$ref": "#/components/responses/authenticationError"
+					}
+				}
+			}
+		},
+		"/auth/jwt/refresh": {
+			"summary": "JSON Web Token refresh",
+			"description": "Router for refreshing user's JWT",
+			"post": {
+				"summary": "Generates a new JWT given a refresh token",
+				"tags": ["Auth"],
+				"security": [],
+				"requestBody": {
+					"description": "User's refresh token",
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "./auth.json#/definitions/refresh"
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "Successfully generated JWT",
+						"content": {
+							"application/json": {
+								"schema": { "$ref": "./auth.json#/definitions/jwt" }
+							}
+						}
+					},
+					"400": {
+						"$ref": "#/components/responses/validationError"
+					}
+				}
+			}
+		},
+		"/auth/staff": {
+			"summary": "User staff data",
+			"description": "Route for getting user's staff data",
+			"get": {
+				"summary": "Gets the current user's staff record",
+				"tags": ["Auth"],
+				"responses": {
+					"200": {
+						"description": "Successfully retrieved staff record",
+						"content": {
+							"application/json": {
+								"schema": { "$ref": "./staff.json#/definitions/staffData" }
+							}
+						}
+					},
+					"401": {
+						"$ref": "#/components/responses/authenticationError"
+					},
+					"403": {
+						"description": "User is not a staff member"
+					}
+				}
+			}
+		},
+		"/uploads": {
+			"summary": "Image uploads",
+			"description": "Route for uploading images",
+			"post": {
+				"summary": "Uploads an image to the DB",
+				"tags": ["Uploads"],
+				"requestBody": {
+					"description": "Image to upload",
+					"required": true,
+					"content": {
+						"image/png": {
+							"schema": {
+								"type": "string",
+								"format": "binary"
+							}
+						},
+						"image/jpeg": {
+							"schema": {
+								"type": "string",
+								"format": "binary"
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "Successfully uploaded image",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "./uploads.json#/definitions/imageAdded"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/uploads/{uuid}": {
+			"summary": "A single image",
+			"description": "Route for getting an image from the DB",
+			"parameters": [{ "$ref": "#/components/parameters/uuid" }],
+			"get": {
+				"summary": "Gets a single image from the DB",
+				"tags": ["Uploads"],
+				"security": [],
+				"responses": {
+					"200": {
+						"description": "Successfully retrieved image",
+						"content": {
+							"image/png": {
+								"schema": {
+									"$ref": "./uploads.json#/definitions/image"
+								}
+							},
+							"image/jpeg": {
+								"schema": {
+									"$ref": "./uploads.json#/definitions/image"
+								}
+							}
+						}
 					}
 				}
 			}

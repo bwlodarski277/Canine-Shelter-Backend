@@ -150,10 +150,20 @@
 		"users": {
 			"$id": "users",
 			"title": "Users",
-			"description": "List of users",
-			"type": "array",
-			"items": {
-				"$ref": "#/definitions/userData"
+			"type": "object",
+			"properties": {
+				"users": {
+					"description": "List of users",
+					"type": "array",
+					"items": {
+						"$ref": "#/definitions/userData"
+					}
+				},
+				"count": {
+					"description": "Total number of users for given query",
+					"type": "integer",
+					"examples": [10]
+				}
 			}
 		},
 		"userCreated": {

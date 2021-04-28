@@ -69,7 +69,6 @@ exports.user = {
 	 * @param {string} role user's role
 	 * @param {number} user user's ID
 	 * @param {number} owner ID of user being accessed
-	 * @returns
 	 */
 	get: async (role, user, owner) =>
 		await ac.can(role).context({ user, owner }).execute('read').on('user'),
