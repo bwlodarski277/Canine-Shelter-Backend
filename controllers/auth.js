@@ -40,7 +40,7 @@ exports.jwt = passport.authenticate(['jwt'], { session: false });
  * Google OAuth2.0 authenticator middleware.
  * To be used in the Google sign-in route.
  */
-exports.google = passport.authenticate(['google'], {
-	session: false,
-	scope: ['profile', 'email']
-});
+// exports.google = passport.authenticate(['google'], {
+// 	session: false,
+// 	scope: ['profile', 'email']
+// });
