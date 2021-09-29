@@ -14,7 +14,7 @@ module.exports = {
 			database: config.database
 		},
 		migrations: { directory: __dirname + '/db/migrations' },
-		seeds: { directory: __dirname + '/db/seeds' }
+		seeds: { directory: __dirname + '/db/samples' }
 	},
 	development: {
 		client: 'mysql2',
