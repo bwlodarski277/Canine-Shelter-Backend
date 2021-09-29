@@ -30,6 +30,10 @@
 			"openapi"
 		]
 	},
+	"engines": {
+		"node": "14.x",
+		"npm": "7.x"
+	},
 	"author": "Bartlomiej Wlodarski",
 	"license": "ISC",
 	"dependencies": {
