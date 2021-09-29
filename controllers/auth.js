@@ -10,11 +10,11 @@ const passport = require('koa-passport');
 
 const basicAuth = require('../strategies/basic');
 const jwt = require('../strategies/jwt');
-const googleOauth = require('../strategies/google-oauth2');
+// const googleOauth = require('../strategies/google-oauth2');
 
 passport.use(basicAuth);
 passport.use(jwt);
-passport.use(googleOauth);
+// passport.use(googleOauth);
 
 /**
  * General authenticator middleware.
