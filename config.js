@@ -13,8 +13,8 @@ exports.config = {
 	jwtSecret: process.env.JWT_SECRET || '',
 	jwtRefresh: process.env.JWT_REFRESH || '',
 	googleOauth: {
-		clientID: '',
-		clientSecret: ''
+		clientID: process.env.G_ID || '',
+		clientSecret: process.env.G_SECRET || ''
 	},
 	twitter: {
 		apiKey: process.env.T_API || '',
