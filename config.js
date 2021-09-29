@@ -22,5 +22,7 @@ exports.config = {
 		bearerToken: process.env.T_BEARER || '',
 		accessToken: process.env.T_ACCESS || '',
 		accessTokenSecret: process.env.T_ACCESS_SECRET || ''
-	}
+	},
+	uploadDir: process.env.UPLOAD_DIR || '/tmp/api/uploads',
+	fileStore: process.env.FILE_STORE || '/var/tmp/api/public/images'
 };
