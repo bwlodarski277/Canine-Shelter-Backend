@@ -21,12 +21,7 @@ const { ifNoneMatch } = require('../helpers/caching');
 const prefix = '/api/v1/uploads';
 const router = new Router({ prefix });
 
-if (cloudConfig.api_key)
-	cloudinary.config({
-		cloud_name: 'hw7dz1pqh',
-		api_key: '232278249785724',
-		api_secret: 'aH1Q5xFcMdOtVXZOFv6tsHbqZ4A'
-	});
+if (cloudConfig.api_key) cloudinary.config(cloudConfig);
 
 const postImage = async ctx => {
 	const { path, type } = ctx.request.files.upload;
