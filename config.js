@@ -1,4 +1,3 @@
-/* eslint-disable camelcase */
 /* eslint-disable max-len */
 'use strict';
 
@@ -23,11 +22,6 @@ exports.config = {
 		bearerToken: process.env.T_BEARER || '',
 		accessToken: process.env.T_ACCESS || '',
 		accessTokenSecret: process.env.T_ACCESS_SECRET || ''
-	},
-	cloudinary: {
-		cloud_name: process.env.CLOUD_NAME || '',
-		api_key: process.env.CLOUD_KEY || '',
-		api_secret: process.env.CLOUD_SECRET || ''
 	},
 	uploadDir: process.env.UPLOAD_DIR || '/tmp/api/uploads',
 	fileStore: process.env.FILE_STORE || '/var/tmp/api/public/images'
