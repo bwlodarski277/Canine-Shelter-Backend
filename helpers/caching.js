@@ -15,7 +15,7 @@ exports.ifModifiedSince = async (ctx, next) => {
 	if (ifModifiedSince) {
 		const since = Date.parse(ifModifiedSince);
 		const modified = new Date(ctx.body.modified);
-		if (modified < since) ctx.status = 304;
+		if (modified <= since) ctx.status = 304;
 	}
 	return next();
 };
