@@ -72,7 +72,7 @@
 		"eslint-plugin-jest": "^24.3.5",
 		"eslint-plugin-prettier": "^4.0.0",
 		"jest": "^28.1.1",
-		"jsdoc": "^3.6.6",
+		"jsdoc": "^3.6.10",
 		"mock-fs": "^5.1.2",
 		"nodemon": "^2.0.16",
 		"prettier": "2.2.1",
