@@ -41,7 +41,7 @@
 		"ajv": "^8.11.0",
 		"ajv-formats": "^1.5.1",
 		"bcryptjs": "^2.4.3",
-		"dotenv": "^8.2.0",
+		"dotenv": "^16.0.1",
 		"etag": "^1.8.1",
 		"fs": "*",
 		"jsonwebtoken": "^8.5.1",
