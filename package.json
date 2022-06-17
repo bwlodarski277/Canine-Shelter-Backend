@@ -75,7 +75,7 @@
 		"jsdoc": "^3.6.10",
 		"mock-fs": "^5.1.2",
 		"nodemon": "^2.0.16",
-		"prettier": "2.2.1",
+		"prettier": "2.7.1",
 		"supertest": "^6.1.3"
 	}
 }
