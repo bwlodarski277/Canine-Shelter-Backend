@@ -74,7 +74,7 @@
 		"jest": "^28.1.1",
 		"jsdoc": "^3.6.10",
 		"mock-fs": "^5.1.2",
-		"nodemon": "^2.0.16",
+		"nodemon": "^2.0.19",
 		"prettier": "2.7.1",
 		"supertest": "^6.1.3"
 	}
