@@ -64,7 +64,7 @@
 	"devDependencies": {
 		"@types/iconv-lite": "^0.0.1",
 		"@types/jest": "^28.1.1",
-		"clean-jsdoc-theme": "^4.0.8",
+		"clean-jsdoc-theme": "^4.1.4",
 		"docdash": "^1.2.0",
 		"eslint": "^7.23.0",
 		"eslint-config-prettier": "^8.5.0",
