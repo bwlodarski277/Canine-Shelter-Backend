@@ -66,7 +66,7 @@
 		"@types/jest": "^28.1.1",
 		"clean-jsdoc-theme": "^4.0.8",
 		"docdash": "^1.2.0",
-		"eslint": "^7.23.0",
+		"eslint": "^8.23.0",
 		"eslint-config-prettier": "^8.5.0",
 		"eslint-plugin-import": "^2.26.0",
 		"eslint-plugin-jest": "^26.5.3",
